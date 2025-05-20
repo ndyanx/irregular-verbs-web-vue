@@ -207,6 +207,7 @@ export default {
   methods: {
     toggleParticiple() {
       this.showParticiple = !this.showParticiple;
+      this.$emit('toggle-participle');
     },
     prevPage() {
       if (this.currentPage > 1) this.currentPage--;

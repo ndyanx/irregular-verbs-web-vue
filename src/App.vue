@@ -11,13 +11,15 @@
     <VerbTable 
       :verbs="verbs" 
       :soundEnabled="soundEnabled"
+      :showParticiple="showParticiple"
+      @toggle-participle="toggleParticiple"
       @speak-word="speakWord"
     />
     
     <QuizModal 
       :show="showQuiz" 
       :verbs="verbs"
-      :showParticiple="true"
+      :showParticiple="showParticiple"
       @close="showQuiz = false"
     />
     
@@ -175,10 +177,14 @@ export default {
 ],
       soundEnabled: false,
       darkMode: false,
-      showQuiz: false
+      showQuiz: false,
+      showParticiple: true,
     }
   },
   methods: {
+    toggleParticiple() {
+      this.showParticiple = !this.showParticiple;
+    },
     toggleSound() {
       this.soundEnabled = !this.soundEnabled;
       localStorage.setItem('soundEnabled', this.soundEnabled);
