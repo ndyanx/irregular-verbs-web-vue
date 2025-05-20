@@ -220,10 +220,10 @@ export default {
     }
   },
   created() {
-    // Cargar preferencias del usuario
     this.soundEnabled = localStorage.getItem('soundEnabled') === 'true';
     this.darkMode = localStorage.getItem('darkMode') === 'true';
-    document.body.classList.toggle('dark-mode', this.darkMode);
+    //document.body.classList.toggle('dark-mode', this.darkMode);
+    document.body.classList.add('theme-loaded');
   }
 }
 </script>

@@ -9,6 +9,25 @@
 </head>
   <body>
     <div id="app"></div>
+    <style>
+      body:not(.theme-loaded) {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      body.theme-loaded {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.3s ease;
+      }
+    </style>
+
+    <script>
+      const dark = localStorage.getItem('darkMode') === 'true';
+      if (dark) {
+        document.body.classList.add('dark-mode');
+      }
+    </script>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
