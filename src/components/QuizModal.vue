@@ -230,6 +230,7 @@ export default {
 }
 
 .quiz-header h3 {
+  font-size: 1.2rem;
   margin: 0;
   color: var(--primary);
 }
@@ -299,7 +300,7 @@ export default {
 }
 
 /* Animaciones */
-@keyframes correctAnswer {
+/* @keyframes correctAnswer {
   0% { background-color: rgba(76, 201, 240, 0.1); }
   50% { background-color: rgba(76, 201, 240, 0.3); }
   100% { background-color: rgba(76, 201, 240, 0.1); }
@@ -309,7 +310,7 @@ export default {
   0% { background-color: rgba(247, 37, 133, 0.1); }
   50% { background-color: rgba(247, 37, 133, 0.3); }
   100% { background-color: rgba(247, 37, 133, 0.1); }
-}
+} */
 
 .correct {
   animation: correctAnswer 1s ease;

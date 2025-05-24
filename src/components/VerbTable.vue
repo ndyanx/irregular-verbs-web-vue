@@ -33,11 +33,11 @@
     
     <div class="table-container">
       <table>
-        <thead>
+        <thead class="rainbow-header">
           <tr>
             <th>Presente</th>
             <th>Pasado</th>
-            <th class="participle-column" :style="{ display: showParticiple ? '' : 'none' }">Participio</th>
+            <th :style="{ display: showParticiple ? '' : 'none' }">Participio</th>
             <th>Significado</th>
           </tr>
         </thead>
@@ -256,6 +256,35 @@ h1 {
   font-weight: 600;
   color: var(--primary);
   font-size: 2.2rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  background: linear-gradient(
+    270deg,
+    #f72585,
+    #7209b7,
+    #3a0ca3,
+    #4361ee,
+    #4cc9f0,
+    #4895ef,
+    #f72585
+  );
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientText 6s ease infinite;
+  text-align: center;
+}
+
+@keyframes gradientText {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* ============ BARRA DE BÚSQUEDA ============ */
@@ -344,12 +373,12 @@ th, td {
   white-space: nowrap;
 }
 
-th {
+/* th {
   background: var(--primary);
   color: white;
   font-weight: 500;
   text-align: center;
-}
+} */
 
 td {
   background: var(--card);
@@ -426,6 +455,41 @@ tbody tr:hover td {
   background: var(--card);
   color: var(--text);
 }
+
+.rainbow-header {
+  position: relative;
+  z-index: 0;
+}
+
+.rainbow-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(270deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #4895ef, #f72585);
+  background-size: 400% 400%;
+  animation: rainbowBG 6s linear infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.rainbow-header th {
+  position: relative;
+  background: transparent;
+  color: white;
+  font-weight: bold;
+  z-index: 1;
+  text-align: center;
+}
+
+@keyframes rainbowBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 400% 50%;
+  }
+}
+
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 768px) {

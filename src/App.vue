@@ -5,7 +5,7 @@
       :darkMode="darkMode"
       @toggle-sound="toggleSound"
       @toggle-dark-mode="toggleDarkMode"
-      @open-quiz="showQuiz = true"
+      @open-quiz="handleOpenQuiz"
     />
     
     <VerbTable 
@@ -17,10 +17,16 @@
     />
     
     <QuizModal 
-      :show="showQuiz" 
+      :show="showQuiz === 'classic'" 
       :verbs="verbs"
       :showParticiple="showParticiple"
-      @close="showQuiz = false"
+      @close="showQuiz = null"
+    />
+    
+    <QuizModal2 
+      :show="showQuiz === 'match'" 
+      :verbs="verbs"
+      @close="showQuiz = null"
     />
     
     <Footer />
@@ -31,6 +37,7 @@
 import NavBar from './components/NavBar.vue';
 import VerbTable from './components/VerbTable.vue';
 import QuizModal from './components/QuizModal.vue';
+import QuizModal2 from './components/QuizModal2.vue';
 import Footer from './components/Footer.vue';
 
 export default {
@@ -39,6 +46,7 @@ export default {
     NavBar,
     VerbTable,
     QuizModal,
+    QuizModal2,
     Footer
   },
   data() {
@@ -177,11 +185,14 @@ export default {
 ],
       soundEnabled: false,
       darkMode: false,
-      showQuiz: false,
+      showQuiz: null, // Cambiado a null y ahora puede ser 'classic' o 'match'
       showParticiple: true,
     }
   },
   methods: {
+    handleOpenQuiz(type) {
+      this.showQuiz = type; // 'classic' o 'match'
+    },
     toggleParticiple() {
       this.showParticiple = !this.showParticiple;
     },
@@ -231,14 +242,14 @@ export default {
 <style>
 /* ============ VARIABLES & RESET ============ */
 :root {
-  --primary: #4361ee;
-  --primary-light: #4895ef;
+  --primary: #6c51a6;
+  --primary-light: #6c51a6;
   --text: #2b2d42;
   --text-light: #8d99ae;
   --bg: #f8f9fa;
   --card: #ffffff;
   --border: #e9ecef;
-  --success: #4cc9f0;
+  --success: #6c51a6;
   --danger: #f72585;
   --warning: #f8961e;
   --radius: 12px;
@@ -246,9 +257,10 @@ export default {
   --transition: all 0.3s ease;
 }
 
+
 .dark-mode {
-  --primary: #4895ef;
-  --primary-light: #4361ee;
+  --primary: #6c51a6;
+  --primary-light: #6c51a6;
   --text: #f8f9fa;
   --text-light: #adb5bd;
   --bg: #121212;
