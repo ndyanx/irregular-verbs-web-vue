@@ -1,93 +1,81 @@
 <template>
-  <div 
-    id="quiz-modal" 
-    class="quiz-modal"
-    v-if="show"
-    @click.self="close"
-  >
-    <div class="quiz-content">
-      <div class="quiz-header">
-        <h3>Emparejar Verbos</h3>
-        <button 
-          id="close-quiz" 
-          class="icon-btn close-btn"
-          @click="close"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div class="quiz-body" :class="{ 'has-feedback': feedback }">
-        <div class="quiz-instructions">
-          <p>Selecciona el verbo que corresponda al significado mostrado:</p>
-        </div>
-        
-        <div class="meaning-display">
-          {{ currentVerb ? currentVerb[3] : '' }}
-        </div>
-        
-        <div class="verbs-grid">
-          <div 
-            v-for="(verb, index) in shuffledVerbs" 
-            :key="index"
-            class="verb-card"
-            :class="{
-              selected: !feedback && selectedVerbs.includes(index),
-              correct: feedback && correctIndices.includes(index),
-              wrong: feedback && selectedVerbs.includes(index) && !correctIndices.includes(index)
-            }"
-            @click="selectVerb(index)"
-          >
-            <div class="verb-form" v-if="gameMode === 'base' || gameMode === 'all'">{{ verb[0] }}</div>
-            <div class="verb-form" v-if="gameMode === 'past' || gameMode === 'all'">{{ verb[1] }}</div>
-            <div class="verb-form" v-if="gameMode === 'participle' || gameMode === 'all'">{{ verb[2] }}</div>
-          </div>
-        </div>
-        
-        <div class="quiz-controls">
-          <div class="game-mode-selector">
-            <!-- Botones para pantallas grandes -->
-            <div class="mode-buttons">
-              <button
-                v-for="mode in gameModes"
-                :key="mode.value"
-                @click="gameMode = mode.value"
-                :class="{ active: gameMode === mode.value }"
-              >
-                {{ mode.label }}
-              </button>
-            </div>
+  <div v-if="show">
+    <canvas ref="confettiCanvas" class="confetti-canvas"></canvas>
 
-            <!-- Selector para móviles -->
-            <div class="mode-select">
-              <select v-model="gameMode">
-                <option v-for="mode in gameModes" :key="mode.value" :value="mode.value">
-                  {{ mode.label }}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <button 
-            class="quiz-next"
-            @click="generateNewQuestion"
-            v-if="feedback"
-          >
-            Siguiente
+    <div 
+      id="quiz-modal" 
+      class="quiz-modal"
+      @click.self="close"
+    >
+      <div class="quiz-content">
+        <!-- Tu contenido del quiz -->
+        <div class="quiz-header">
+          <h3>Emparejar Verbos</h3>
+          <button class="icon-btn close-btn" @click="close">
+            ✕
           </button>
         </div>
         
-        <div 
-          class="quiz-feedback"
-          :class="{ correct: isCorrect, wrong: !isCorrect && feedback }"
-        >
-          {{ feedback }}
-        </div>
-        
-        <div class="quiz-stats">
-          Aciertos: {{ score }} / Intentos: {{ attempts }}
+        <div class="quiz-body" :class="{ 'has-feedback': feedback }">
+          <div class="quiz-instructions">
+            <p>Selecciona el verbo que corresponda al significado mostrado:</p>
+          </div>
+
+          <div class="meaning-display">
+            {{ currentVerb ? currentVerb[3] : '' }}
+          </div>
+
+          <div class="verbs-grid">
+            <div 
+              v-for="(verb, index) in shuffledVerbs" 
+              :key="index"
+              class="verb-card"
+              :class="{
+                selected: !feedback && selectedVerbs.includes(index),
+                correct: feedback && correctIndices.includes(index),
+                wrong: feedback && selectedVerbs.includes(index) && !correctIndices.includes(index)
+              }"
+              @click="selectVerb(index)"
+            >
+              <div v-if="gameMode === 'base'">{{ verb[0] }}</div>
+              <div v-if="gameMode === 'past'">{{ verb[1] }}</div>
+              <div v-if="gameMode === 'participle'">{{ verb[2] }}</div>
+            </div>
+          </div>
+
+          <div class="quiz-controls">
+            <div class="game-mode-selector">
+              <div class="mode-buttons">
+                <button
+                  v-for="mode in gameModes"
+                  :key="mode.value"
+                  @click="gameMode = mode.value"
+                  :class="{ active: gameMode === mode.value }"
+                >
+                  {{ mode.label }}
+                </button>
+              </div>
+              <div class="mode-select">
+                <select v-model="gameMode">
+                  <option v-for="mode in gameModes" :key="mode.value" :value="mode.value">
+                    {{ mode.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <button v-if="feedback" class="quiz-next" @click="generateNewQuestion">
+              Siguiente
+            </button>
+          </div>
+
+          <div class="quiz-feedback" :class="{ correct: isCorrect, wrong: !isCorrect && feedback }">
+            {{ feedback }}
+          </div>
+
+          <div class="quiz-stats">
+            Aciertos: {{ score }} / Intentos: {{ attempts }}
+          </div>
         </div>
       </div>
     </div>
@@ -95,8 +83,10 @@
 </template>
 
 <script>
+import confetti from 'canvas-confetti';
+
 export default {
-  name: 'QuizModal2',
+  name: 'QuizModal',
   props: {
     show: Boolean,
     verbs: Array,
@@ -111,97 +101,86 @@ export default {
       score: 0,
       attempts: 0,
       correctIndices: [],
-      requiredSelections: 1,
       gameMode: 'past',
       gameModes: [
-        { value: 'base', label: 'Solo Presente' },
-        { value: 'past', label: 'Solo Pasado' },
-        { value: 'participle', label: 'Solo Participio' },
-        { value: 'all', label: 'Todas las Formas' }
+        { value: 'base', label: 'Presente' },
+        { value: 'past', label: 'Pasado' },
+        { value: 'participle', label: 'Participio' },
       ]
-    }
+    };
   },
   watch: {
-    show(newVal) {
-      if (newVal) {
-        this.generateNewQuestion();
-      } else {
-        this.resetQuiz();
-      }
+    show(val) {
+      if (val) this.generateNewQuestion();
+      else this.resetQuiz();
     },
     gameMode() {
       this.generateNewQuestion();
     }
   },
   methods: {
+    launchConfetti() {
+      const canvas = this.$refs.confettiCanvas;
+      const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+      myConfetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 }
+      });
+    },
     generateNewQuestion() {
       this.selectedVerbs = [];
       this.feedback = '';
       this.isCorrect = false;
       this.correctIndices = [];
-      
+
       const randomIndex = Math.floor(Math.random() * this.verbs.length);
       this.currentVerb = this.verbs[randomIndex];
-      this.shuffledVerbs = [this.currentVerb];
-      
-      const incorrectVerbs = [];
       const usedIndices = [randomIndex];
-      
+      const incorrectVerbs = [];
+
       while (incorrectVerbs.length < 3) {
-        const randomVerbIndex = Math.floor(Math.random() * this.verbs.length);
-        if (!usedIndices.includes(randomVerbIndex)) {
-          const verb = this.verbs[randomVerbIndex];
-          
-          let isValidIncorrect = false;
-          if (this.gameMode === 'base') {
-            isValidIncorrect = verb[0] !== this.currentVerb[0];
-          } else if (this.gameMode === 'past') {
-            isValidIncorrect = verb[1] !== this.currentVerb[1];
-          } else if (this.gameMode === 'participle') {
-            isValidIncorrect = verb[2] !== this.currentVerb[2];
-          } else {
-            isValidIncorrect = verb[0] !== this.currentVerb[0] && 
-                               verb[1] !== this.currentVerb[1] && 
-                               verb[2] !== this.currentVerb[2];
-          }
-          
-          if (isValidIncorrect) {
-            incorrectVerbs.push(verb);
-            usedIndices.push(randomVerbIndex);
+        const i = Math.floor(Math.random() * this.verbs.length);
+        if (!usedIndices.includes(i)) {
+          const v = this.verbs[i];
+          if (
+            (this.gameMode === 'base' && v[0] !== this.currentVerb[0]) ||
+            (this.gameMode === 'past' && v[1] !== this.currentVerb[1]) ||
+            (this.gameMode === 'participle' && v[2] !== this.currentVerb[2])
+          ) {
+            incorrectVerbs.push(v);
+            usedIndices.push(i);
           }
         }
       }
-      
-      this.shuffledVerbs = this.shuffleArray([...this.shuffledVerbs, ...incorrectVerbs]);
-      
+
+      this.shuffledVerbs = this.shuffleArray([this.currentVerb, ...incorrectVerbs]);
+
       this.correctIndices = this.shuffledVerbs
-        .map((verb, index) => {
-          if (this.gameMode === 'base' && verb[0] === this.currentVerb[0]) return index;
-          if (this.gameMode === 'past' && verb[1] === this.currentVerb[1]) return index;
-          if (this.gameMode === 'participle' && verb[2] === this.currentVerb[2]) return index;
-          if (this.gameMode === 'all' && verb[0] === this.currentVerb[0]) return index;
-          return -1;
-        })
-        .filter(index => index !== -1);
+        .map((verb, i) =>
+          (this.gameMode === 'base' && verb[0] === this.currentVerb[0]) ||
+          (this.gameMode === 'past' && verb[1] === this.currentVerb[1]) ||
+          (this.gameMode === 'participle' && verb[2] === this.currentVerb[2]) ? i : -1
+        ).filter(i => i !== -1);
     },
     selectVerb(index) {
       if (this.feedback) return;
       this.selectedVerbs = [index];
       this.attempts++;
-      const isCorrect = this.correctIndices.includes(index);
-      this.isCorrect = isCorrect;
-      this.feedback = isCorrect 
-        ? '¡Correcto! Has seleccionado el verbo correcto.' 
-        : 'Incorrecto. El verbo seleccionado no corresponde al significado.';
-      if (isCorrect) this.score++;
-    },
-    shuffleArray(array) {
-      const newArray = [...array];
-      for (let i = newArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      this.isCorrect = this.correctIndices.includes(index);
+      this.feedback = this.isCorrect ? '¡Correcto! 🎉' : 'Incorrecto 😢';
+      if (this.isCorrect) {
+        this.score++;
+        this.launchConfetti();
       }
-      return newArray;
+    },
+    shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
     },
     resetQuiz() {
       this.currentVerb = null;
@@ -210,14 +189,13 @@ export default {
       this.feedback = '';
       this.isCorrect = false;
       this.correctIndices = [];
-      this.gameMode = 'past';
     },
     close() {
       this.$emit('close');
       this.resetQuiz();
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -462,6 +440,16 @@ export default {
   margin-top: 15px;
   text-align: center;
   color: var(--text-light);
+}
+
+.confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2147483647; /* asegúrate que esté por encima del modal */
 }
 
 /* Responsive styles */

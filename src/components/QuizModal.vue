@@ -1,51 +1,54 @@
 <template>
-  <div 
-    id="quiz-modal" 
-    class="quiz-modal"
-    v-if="show"
-    @click.self="close"
-  >
-    <div class="quiz-content">
-      <div class="quiz-header">
-        <h3>Juego de Verbos Irregulares</h3>
-        <button 
-          id="close-quiz" 
-          class="icon-btn"
-          @click="close"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div class="quiz-body">
-        <div id="quiz-reference" class="quiz-reference">{{ currentVerb ? currentVerb[3] : '' }}</div>
-        <div id="quiz-question" class="quiz-question">{{ questionText }}</div>
-        <input 
-          type="text" 
-          id="quiz-answer" 
-          class="quiz-input" 
-          placeholder="Escribe tu respuesta..."
-          v-model="userAnswer"
-          @keyup.enter="checkAnswer"
-        >
-        <button 
-          id="quiz-submit" 
-          class="quiz-submit"
-          @click="checkAnswer"
-        >
-          Comprobar
-        </button>
-        <div 
-          id="quiz-feedback" 
-          class="quiz-feedback"
-          :class="{ correct: isCorrect, wrong: !isCorrect && feedback }"
-        >
-          {{ feedback }}
+  <div v-if="show">
+    <canvas ref="confettiCanvas" class="confetti-canvas"></canvas>
+
+    <div 
+      id="quiz-modal" 
+      class="quiz-modal"
+      @click.self="close"
+    >
+      <div class="quiz-content">
+        <div class="quiz-header">
+          <h3>Juego de Verbos Irregulares</h3>
+          <button 
+            id="close-quiz" 
+            class="icon-btn"
+            @click="close"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
-        <div id="quiz-stats" class="quiz-stats">
-          Aciertos: {{ score }} / Intentos: {{ attempts }}
+        <div class="quiz-body">
+          <div id="quiz-reference" class="quiz-reference">{{ currentVerb ? currentVerb[3] : '' }}</div>
+          <div id="quiz-question" class="quiz-question">{{ questionText }}</div>
+          <input 
+            type="text" 
+            id="quiz-answer" 
+            class="quiz-input" 
+            placeholder="Escribe tu respuesta..."
+            v-model="userAnswer"
+            @keyup.enter="checkAnswer"
+          >
+          <button 
+            id="quiz-submit" 
+            class="quiz-submit"
+            @click="checkAnswer"
+          >
+            Comprobar
+          </button>
+          <div 
+            id="quiz-feedback" 
+            class="quiz-feedback"
+            :class="{ correct: isCorrect, wrong: !isCorrect && feedback }"
+          >
+            {{ feedback }}
+          </div>
+          <div id="quiz-stats" class="quiz-stats">
+            Aciertos: {{ score }} / Intentos: {{ attempts }}
+          </div>
         </div>
       </div>
     </div>
@@ -53,6 +56,8 @@
 </template>
 
 <script>
+import confetti from 'canvas-confetti';
+
 export default {
   name: 'QuizModal',
   props: {
@@ -78,6 +83,15 @@ export default {
     }
   },
   methods: {
+    launchConfetti() {
+      const canvas = this.$refs.confettiCanvas;
+      const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+      myConfetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 }
+      });
+    },
     generateNewQuestion() {
       const availableTypes = this.questionTypes.filter(type => {
         if (type.type.includes('participle')) return this.showParticiple;
@@ -172,6 +186,7 @@ export default {
       this.attempts++;
       if (isCorrect) {
         this.score++;
+        this.launchConfetti();
         this.feedback = '¡Correcto!';
         this.isCorrect = true;
         setTimeout(this.generateNewQuestion, 1500);
@@ -339,5 +354,15 @@ export default {
 
 .icon-btn:hover {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2147483647; /* asegúrate que esté por encima del modal */
 }
 </style>
