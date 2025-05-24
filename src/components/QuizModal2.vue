@@ -19,7 +19,7 @@
           </svg>
         </button>
       </div>
-      <div class="quiz-body">
+      <div class="quiz-body" :class="{ 'has-feedback': feedback }">
         <div class="quiz-instructions">
           <p>Selecciona el verbo que corresponda al significado mostrado:</p>
         </div>
@@ -34,7 +34,7 @@
             :key="index"
             class="verb-card"
             :class="{
-              selected: selectedVerbs.includes(index),
+              selected: !feedback && selectedVerbs.includes(index),
               correct: feedback && correctIndices.includes(index),
               wrong: feedback && selectedVerbs.includes(index) && !correctIndices.includes(index)
             }"
@@ -324,6 +324,14 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
+}
+
+.quiz-body.has-feedback .verb-card {
+  pointer-events: none;
+}
+.quiz-body.has-feedback .verb-card.correct,
+.quiz-body.has-feedback .verb-card.wrong {
+  pointer-events: auto;
 }
 
 .verb-card:hover {
