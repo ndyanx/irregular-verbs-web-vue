@@ -8,11 +8,17 @@
       @click.self="close"
     >
       <div class="quiz-content">
-        <!-- Tu contenido del quiz -->
         <div class="quiz-header">
           <h3>Emparejar Verbos</h3>
-          <button class="icon-btn close-btn" @click="close">
-            ✕
+          <button 
+            id="close-quiz" 
+            class="icon-btn"
+            @click="close"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         </div>
         
@@ -22,7 +28,7 @@
           </div>
 
           <div class="meaning-display">
-            {{ currentVerb ? currentVerb[3] : '' }}
+            {{ currentVerb ? getVerbReference(currentVerb) : '' }}
           </div>
 
           <div class="verbs-grid">
@@ -37,9 +43,9 @@
               }"
               @click="selectVerb(index)"
             >
-              <div v-if="gameMode === 'base'">{{ verb[0] }}</div>
-              <div v-if="gameMode === 'past'">{{ verb[1] }}</div>
-              <div v-if="gameMode === 'participle'">{{ verb[2] }}</div>
+              <div v-if="gameMode === 'base'">{{ verb.present }}</div>
+              <div v-if="gameMode === 'past'">{{ verb.past }}</div>
+              <div v-if="gameMode === 'participle'">{{ verb.participle }}</div>
             </div>
           </div>
 
@@ -86,13 +92,14 @@
 import confetti from 'canvas-confetti';
 
 export default {
-  name: 'QuizModal',
+  name: 'MatchVerbsModal',
   props: {
     show: Boolean,
-    verbs: Array,
+    verbs: Object,
   },
   data() {
     return {
+      currentVerbKey: null,
       currentVerb: null,
       shuffledVerbs: [],
       selectedVerbs: [],
@@ -109,16 +116,10 @@ export default {
       ]
     };
   },
-  watch: {
-    show(val) {
-      if (val) this.generateNewQuestion();
-      else this.resetQuiz();
-    },
-    gameMode() {
-      this.generateNewQuestion();
-    }
-  },
   methods: {
+    getVerbReference(verb) {
+      return verb.meanings.map(m => m.present).join(" / ");
+    },
     launchConfetti() {
       const canvas = this.$refs.confettiCanvas;
       const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
@@ -134,41 +135,54 @@ export default {
       this.isCorrect = false;
       this.correctIndices = [];
 
-      const randomIndex = Math.floor(Math.random() * this.verbs.length);
-      this.currentVerb = this.verbs[randomIndex];
-      const usedIndices = [randomIndex];
+      const verbKeys = Object.keys(this.verbs);
+      const randomKey = verbKeys[Math.floor(Math.random() * verbKeys.length)];
+      this.currentVerbKey = randomKey;
+      this.currentVerb = this.verbs[randomKey];
+      
+      const usedKeys = [randomKey];
       const incorrectVerbs = [];
 
-      while (incorrectVerbs.length < 3) {
-        const i = Math.floor(Math.random() * this.verbs.length);
-        if (!usedIndices.includes(i)) {
-          const v = this.verbs[i];
+      // Seleccionar 3 verbos incorrectos
+      while (incorrectVerbs.length < 3 && usedKeys.length < verbKeys.length) {
+        const randomKey = verbKeys[Math.floor(Math.random() * verbKeys.length)];
+        if (!usedKeys.includes(randomKey)) {
+          const verb = this.verbs[randomKey];
+          
+          // Verificar que no sea la respuesta correcta
           if (
-            (this.gameMode === 'base' && v[0] !== this.currentVerb[0]) ||
-            (this.gameMode === 'past' && v[1] !== this.currentVerb[1]) ||
-            (this.gameMode === 'participle' && v[2] !== this.currentVerb[2])
+            (this.gameMode === 'base' && verb.present !== this.currentVerb.present) ||
+            (this.gameMode === 'past' && verb.past !== this.currentVerb.past) ||
+            (this.gameMode === 'participle' && verb.participle !== this.currentVerb.participle)
           ) {
-            incorrectVerbs.push(v);
-            usedIndices.push(i);
+            incorrectVerbs.push(verb);
+            usedKeys.push(randomKey);
           }
         }
       }
 
+      // Mezclar los verbos (correcto + incorrectos)
       this.shuffledVerbs = this.shuffleArray([this.currentVerb, ...incorrectVerbs]);
 
+      // Encontrar los índices de las respuestas correctas
       this.correctIndices = this.shuffledVerbs
-        .map((verb, i) =>
-          (this.gameMode === 'base' && verb[0] === this.currentVerb[0]) ||
-          (this.gameMode === 'past' && verb[1] === this.currentVerb[1]) ||
-          (this.gameMode === 'participle' && verb[2] === this.currentVerb[2]) ? i : -1
-        ).filter(i => i !== -1);
+        .map((verb, index) => {
+          if (this.gameMode === 'base' && verb.present === this.currentVerb.present) return index;
+          if (this.gameMode === 'past' && verb.past === this.currentVerb.past) return index;
+          if (this.gameMode === 'participle' && verb.participle === this.currentVerb.participle) return index;
+          return -1;
+        })
+        .filter(index => index !== -1);
     },
     selectVerb(index) {
       if (this.feedback) return;
+      
       this.selectedVerbs = [index];
       this.attempts++;
+      
       this.isCorrect = this.correctIndices.includes(index);
       this.feedback = this.isCorrect ? '¡Correcto! 🎉' : 'Incorrecto 😢';
+      
       if (this.isCorrect) {
         this.score++;
         this.launchConfetti();
@@ -183,6 +197,7 @@ export default {
       return a;
     },
     resetQuiz() {
+      this.currentVerbKey = null;
       this.currentVerb = null;
       this.shuffledVerbs = [];
       this.selectedVerbs = [];
@@ -193,6 +208,15 @@ export default {
     close() {
       this.$emit('close');
       this.resetQuiz();
+    }
+  },
+  watch: {
+    show(val) {
+      if (val) this.generateNewQuestion();
+      else this.resetQuiz();
+    },
+    gameMode() {
+      this.generateNewQuestion();
     }
   }
 };
@@ -242,28 +266,22 @@ export default {
 }
 
 .icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
+  cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background-color: var(--card);
+  color: var(--text);
 }
 
 .icon-btn:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-.close-btn {
-  color: var(--text-light);
-}
-
-.close-btn:hover {
-  color: var(--danger);
-  background-color: rgba(247, 37, 133, 0.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .quiz-instructions {

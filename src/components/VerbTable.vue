@@ -1,5 +1,5 @@
 <template>
-  <div class="content-wrapper">
+  <div :style="{ maxWidth: showParticiple ? '1300px' : '1000px' }" class="content-wrapper" >
     <h1>Verbos Irregulares en Inglés</h1>
     
     <div class="search-container">
@@ -38,44 +38,43 @@
             <th>Presente</th>
             <th>Pasado</th>
             <th :style="{ display: showParticiple ? '' : 'none' }">Participio</th>
-            <th>Significado</th>
+            <th>s. Presente</th>
+            <th>s. Pasado</th>
+            <th :style="{ display: showParticiple ? '' : 'none' }">s. Participio</th>
+            <th>Notas</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="verb in paginatedData" :key="verb[0]">
-            <td class="present-cell" @click="highlightMeaning(verb, 0)">
-              {{ verb[0] }}<br><small>{{ verb[4] }}</small>
+          <tr v-for="(verbData, verbKey) in paginatedData" :key="verbKey">
+            <td class="present-cell" @click="setActiveMeaning(verbKey, 'present')">
+              {{ verbData.present }}<br><small>{{ verbData.phonetics.present }}</small>
             </td>
-            <td class="past-cell" @click="highlightMeaning(verb, 1)">
-              {{ verb[1] }}<br><small>{{ verb[5] }}</small>
+            <td class="past-cell" @click="setActiveMeaning(verbKey, 'past')">
+              {{ verbData.past }}<br><small>{{ verbData.phonetics.past }}</small>
             </td>
             <td 
-              class="participle-cell" 
-              @click="highlightMeaning(verb, 2)"
+              class="participle-cell"
+              @click="setActiveMeaning(verbKey, 'participle')"
               :style="{ display: showParticiple ? '' : 'none' }"
             >
-              {{ verb[2] }}<br><small>{{ verb[6] }}</small>
+              {{ verbData.participle }}<br><small>{{ verbData.phonetics.participle }}</small>
             </td>
-            <td class="meaning-cell">
-              <div class="meaning-wrapper">
-                <span 
-                  class="present-meaning"
-                  :class="{ highlight: highlightedVerb === verb && highlightedField === 0 }"
-                >{{ getMeaningPart(verb[3], 0) }}</span>
-                <span class="meaning-separator"> - </span>
-                <span 
-                  class="past-meaning"
-                  :class="{ highlight: highlightedVerb === verb && highlightedField === 1 }"
-                >{{ getMeaningPart(verb[3], 1) }}</span>
-                <span 
-                  class="meaning-separator"
-                  v-if="showParticiple"
-                > - </span>
-                <span 
-                  class="participle-meaning"
-                  :class="{ highlight: highlightedVerb === verb && highlightedField === 2 }"
-                  v-if="showParticiple"
-                >{{ getMeaningPart(verb[3], 2) }}</span>
+            <td class="present-meaning-cell">
+              {{ getPresentMeanings(verbData) }}
+            </td>
+            <td class="past-meaning-cell">
+              {{ getPastMeanings(verbData) }}
+            </td>
+            <td 
+              class="participle-meaning-cell"
+              :style="{ display: showParticiple ? '' : 'none' }"
+            >
+              {{ getParticipleMeanings(verbData) }}
+            </td>
+            <td class="note-cell">
+              <div v-for="(meaning, index) in verbData.meanings" :key="index">
+                {{ meaning.note }}
+                <hr v-if="index < verbData.meanings.length - 1">
               </div>
             </td>
           </tr>
@@ -119,79 +118,82 @@
 export default {
   name: 'VerbTable',
   props: {
-    verbs: Array,
-    soundEnabled: Boolean
+    verbs: Object,
+    soundEnabled: Boolean,
+    showParticiple: Boolean
   },
   data() {
     return {
       searchQuery: '',
-      showParticiple: true,
+      // showParticiple: false,
       currentSort: 'default',
       currentPage: 1,
-      rowsPerPage: 25,
-      highlightedVerb: null,
-      highlightedField: null
+      rowsPerPage: 25
     }
   },
   computed: {
     filteredData() {
-      if (!this.searchQuery) return [...this.verbs];
+      if (!this.searchQuery) return this.verbs;
       
       const query = this.searchQuery.toLowerCase();
-      return this.verbs.filter(verb => {
-        return (
-          verb[0].toLowerCase().includes(query) ||
-          verb[1].toLowerCase().includes(query) ||
-          verb[2].toLowerCase().includes(query) ||
-          verb[3].toLowerCase().includes(query) ||
-          verb[4].toLowerCase().includes(query) ||
-          verb[5].toLowerCase().includes(query) ||
-          verb[6].toLowerCase().includes(query)
-        );
-      });
+      return Object.fromEntries(
+        Object.entries(this.verbs).filter(([verbKey, verbData]) => {
+          return (
+            verbKey.toLowerCase().includes(query) ||
+            verbData.present.toLowerCase().includes(query) ||
+            verbData.past.toLowerCase().includes(query) ||
+            verbData.participle.toLowerCase().includes(query) ||
+            JSON.stringify(verbData.meanings).toLowerCase().includes(query) ||
+            verbData.phonetics.present.toLowerCase().includes(query) ||
+            verbData.phonetics.past.toLowerCase().includes(query) ||
+            verbData.phonetics.participle.toLowerCase().includes(query)
+          );
+        })
+      )
     },
     sortedData() {
-      const data = [...this.filteredData];
+      const data = Object.entries(this.filteredData);
       
       switch(this.currentSort) {
         case 'identical':
-          return data.sort((a, b) => {
-            const aIdentical = (a[0] === a[1] && a[1] === a[2]) ? 0 : 1;
-            const bIdentical = (b[0] === b[1] && b[1] === b[2]) ? 0 : 1;
-            return aIdentical - bIdentical || a[0].localeCompare(b[0]);
-          });
+          return Object.fromEntries(data.sort(([aKey, a], [bKey, b]) => {
+            const aIdentical = (a.present === a.past && a.past === a.participle) ? 0 : 1;
+            const bIdentical = (b.present === b.past && b.past === b.participle) ? 0 : 1;
+            return aIdentical - bIdentical || a.present.localeCompare(b.present);
+          }));
           
         case 'easy':
           const commonVerbs = ["be", "have", "do", "say", "go", "get", "make", "take", "come", "see"];
-          return data.sort((a, b) => {
-            const scoreA = a[0].length + 
-                         (a[0] === a[1] && a[1] === a[2] ? 0 : 5) + 
-                         (commonVerbs.includes(a[0]) ? -10 : 0);
-            const scoreB = b[0].length + 
-                         (b[0] === b[1] && b[1] === b[2] ? 0 : 5) + 
-                         (commonVerbs.includes(b[0]) ? -10 : 0);
-            return scoreA - scoreB || a[0].localeCompare(b[0]);
-          });
+          return Object.fromEntries(data.sort(([aKey, a], [bKey, b]) => {
+            const scoreA = a.present.length + 
+                         (a.present === a.past && a.past === a.participle ? 0 : 5) + 
+                         (commonVerbs.includes(aKey) ? -10 : 0);
+            const scoreB = b.present.length + 
+                         (b.present === b.past && b.past === b.participle ? 0 : 5) + 
+                         (commonVerbs.includes(bKey) ? -10 : 0);
+            return scoreA - scoreB || a.present.localeCompare(b.present);
+          }));
           
         case 'common':
           const commonOrder = ["be", "have", "do", "say", "go", "get", "make", "take", "come", "see"];
-          return data.sort((a, b) => {
-            const aIndex = commonOrder.indexOf(a[0]);
-            const bIndex = commonOrder.indexOf(b[0]);
+          return Object.fromEntries(data.sort(([aKey, a], [bKey, b]) => {
+            const aIndex = commonOrder.indexOf(aKey);
+            const bIndex = commonOrder.indexOf(bKey);
             return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
-          });
+          }));
           
         default:
-          return data.sort((a, b) => a[0].localeCompare(b[0]));
+          return Object.fromEntries(data.sort(([aKey, a], [bKey, b]) => a.present.localeCompare(b.present)));
       }
     },
     paginatedData() {
+      const sortedEntries = Object.entries(this.sortedData);
       const start = (this.currentPage - 1) * this.rowsPerPage;
       const end = start + this.rowsPerPage;
-      return this.sortedData.slice(start, end);
+      return Object.fromEntries(sortedEntries.slice(start, end));
     },
     totalPages() {
-      return Math.ceil(this.sortedData.length / this.rowsPerPage);
+      return Math.ceil(Object.keys(this.sortedData).length / this.rowsPerPage);
     },
     pageInfo() {
       const sortNames = {
@@ -206,7 +208,7 @@ export default {
   },
   methods: {
     toggleParticiple() {
-      this.showParticiple = !this.showParticiple;
+      //this.showParticiple = !this.showParticiple;
       this.$emit('toggle-participle');
     },
     prevPage() {
@@ -215,18 +217,19 @@ export default {
     nextPage() {
       if (this.currentPage < this.totalPages) this.currentPage++;
     },
-    getMeaningPart(meaning, index) {
-      const parts = typeof meaning === 'string' ? meaning.split(" - ") : ['', '', ''];
-      return parts[index] || '';
+    getPresentMeanings(verbData) {
+      return verbData.meanings.map(meaning => meaning.present).join(" - ");
     },
-    highlightMeaning(verb, fieldIndex) {
-      this.highlightedVerb = verb;
-      this.highlightedField = fieldIndex;
-      
-      // Emitir evento para pronunciar la palabra
-      const word = verb[fieldIndex];
+    getPastMeanings(verbData) {
+      return verbData.meanings.map(meaning => meaning.past).join(" - ");
+    },
+    getParticipleMeanings(verbData) {
+      return verbData.meanings.map(meaning => meaning.participle).join(" - ");
+    },
+    setActiveMeaning(verbKey, field) {
+      const word = this.paginatedData[verbKey][field];
       this.$emit('speak-word', word);
-    }
+    },
   },
   watch: {
     searchQuery() {
@@ -244,7 +247,7 @@ export default {
 
 <style scoped>
 .content-wrapper {
-  max-width: 900px;
+  /* max-width: 900px; */
   margin: 0 auto;
   padding: 80px 20px 20px;
   width: 100%;

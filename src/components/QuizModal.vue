@@ -22,7 +22,7 @@
           </button>
         </div>
         <div class="quiz-body">
-          <div id="quiz-reference" class="quiz-reference">{{ currentVerb ? currentVerb[3] : '' }}</div>
+          <div id="quiz-reference" class="quiz-reference">{{ currentVerb ? getVerbReference(currentVerb) : '' }}</div>
           <div id="quiz-question" class="quiz-question">{{ questionText }}</div>
           <input 
             type="text" 
@@ -62,11 +62,12 @@ export default {
   name: 'QuizModal',
   props: {
     show: Boolean,
-    verbs: Array,
+    verbs: Object,
     showParticiple: Boolean
   },
   data() {
     return {
+      currentVerbKey: null,
       currentVerb: null,
       questionText: '',
       userAnswer: '',
@@ -74,15 +75,18 @@ export default {
       isCorrect: false,
       score: 0,
       attempts: 0,
-      usedVerbIndices: [],
+      usedVerbKeys: [],
       questionTypes: [
-        { type: 'base_to_past', text: (verb) => `¿Cuál es el pasado de "${verb[0]}"?` },
-        { type: 'base_to_participle', text: (verb) => `¿Cuál es el participio de "${verb[0]}"?` },
-        { type: 'past_to_base', text: (verb) => `¿Cuál es el presente de "${verb[1]}"?` }
+        { type: 'base_to_past', text: (verb, verbKey) => `¿Cuál es el pasado de "${verbKey}"?` },
+        { type: 'base_to_participle', text: (verb, verbKey) => `¿Cuál es el participio de "${verbKey}"?` },
+        { type: 'past_to_present', text: (verb, verbKey) => `¿Cuál es el presente de "${verb.past}"?` }
       ]
     }
   },
   methods: {
+    getVerbReference(verb) {
+      return verb.meanings.map(m => m.present).join(" / ");
+    },
     launchConfetti() {
       const canvas = this.$refs.confettiCanvas;
       const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
@@ -98,42 +102,45 @@ export default {
         return true;
       });
 
-      const unusedVerbIndices = this.verbs
-        .map((_, index) => index)
-        .filter(index => !this.usedVerbIndices.includes(index));
+      const unusedVerbKeys = Object.keys(this.verbs)
+        .filter(key => !this.usedVerbKeys.includes(key));
 
-      if (unusedVerbIndices.length === 0) {
-        this.usedVerbIndices = [];
-        unusedVerbIndices.push(...Array.from({length: this.verbs.length}, (_, i) => i));
+      if (unusedVerbKeys.length === 0) {
+        this.usedVerbKeys = [];
+        unusedVerbKeys.push(...Object.keys(this.verbs));
       }
 
-      const randomIndex = unusedVerbIndices[Math.floor(Math.random() * unusedVerbIndices.length)];
-      this.currentVerb = this.verbs[randomIndex];
-      this.usedVerbIndices.push(randomIndex);
+      const randomKey = unusedVerbKeys[Math.floor(Math.random() * unusedVerbKeys.length)];
+      this.currentVerbKey = randomKey;
+      this.currentVerb = this.verbs[randomKey];
+      // hack
+      // this.currentVerbKey = "have";
+      // this.currentVerb = this.verbs["have"];
+      this.usedVerbKeys.push(randomKey);
 
-      const hasSpecialRules = this.currentVerb[7]?.gameRules;
+      const hasSpecialRules = this.currentVerb.gameRules;
       
       if (hasSpecialRules) {
         const forms = {
-          base: this.currentVerb[0].split(' / ').map(f => f.trim()),
-          past: this.currentVerb[1].split(' / ').map(f => f.trim())
+          present: this.currentVerb.present.split(' / ').map(f => f.trim()),
+          past: this.currentVerb.past.split(' / ').map(f => f.trim())
         };
 
         const direction = Math.random();
         
         if (direction < 0.4) {
-          const randomBase = forms.base[Math.floor(Math.random() * forms.base.length)];
+          const randomBase = forms.present[Math.floor(Math.random() * forms.present.length)];
           this.questionText = `¿Cuál es el pasado de "${randomBase}"?`;
         } else if (direction < 0.8) {
           const randomPast = forms.past[Math.floor(Math.random() * forms.past.length)];
           this.questionText = `¿Cuál es el presente de "${randomPast}"?`;
         } else {
-          const randomBase = forms.base[Math.floor(Math.random() * forms.base.length)];
+          const randomBase = forms.present[Math.floor(Math.random() * forms.present.length)];
           this.questionText = `¿Cuál es el participio de "${randomBase}"?`;
         }
       } else {
         const randomType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
-        this.questionText = randomType.text(this.currentVerb);
+        this.questionText = randomType.text(this.currentVerb, this.currentVerbKey);
       }
 
       this.userAnswer = '';
@@ -148,37 +155,41 @@ export default {
       let isCorrect = false;
       let correctAnswer = '';
 
-      const gameRules = currentVerb[7]?.gameRules;
-      const verbBase = currentVerb[0].toLowerCase().split('/').map(s => s.trim());
-      const verbPast = currentVerb[1].toLowerCase().split('/').map(s => s.trim());
-      const verbParticiple = currentVerb[2].toLowerCase().split('/').map(s => s.trim().replace('*', ''));
+      const gameRules = currentVerb.gameRules;
+      const verbPresent = currentVerb.present.toLowerCase().split('/').map(s => s.trim());
+      const verbPast = currentVerb.past.toLowerCase().split('/').map(s => s.trim());
+      const verbParticiple = currentVerb.participle.toLowerCase().split('/').map(s => s.trim().replace('*', ''));
 
       if (gameRules) {
-        if (this.questionText.includes('pasado de')) {
-          const baseForm = this.questionText.match(/"(.+?)"/)[1].toLowerCase();
-          correctAnswer = gameRules.baseToPast[baseForm].join(' o ');
-          isCorrect = gameRules.baseToPast[baseForm].includes(userAnswer);
+        if (this.questionText.includes('presente de')) {
+          const PresentForm = this.questionText.match(/"(.+?)"/)[1].toLowerCase();
+          correctAnswer = gameRules.pastToBase[PresentForm].join(' o ');
+          isCorrect = gameRules.pastToBase[PresentForm].some(ans => 
+            ans.toLowerCase() === userAnswer
+          );
         } 
-        else if (this.questionText.includes('presente de')) {
+        else if (this.questionText.includes('pasado de')) {
           const pastForm = this.questionText.match(/"(.+?)"/)[1].toLowerCase();
-          correctAnswer = gameRules.pastToBase[pastForm].join(' o ');
-          isCorrect = gameRules.pastToBase[pastForm].includes(userAnswer);
+          correctAnswer = gameRules.baseToPast[pastForm].join(' o ');
+          isCorrect = gameRules.baseToPast[pastForm].some(ans => 
+            ans.toLowerCase() === userAnswer
+          );
         }
         else if (this.questionText.includes('participio de')) {
-          correctAnswer = currentVerb[2];
+          correctAnswer = currentVerb.participle;
           isCorrect = verbParticiple.includes(userAnswer);
         }
       } else {
         if (this.questionText.includes('presente de')) {
-          correctAnswer = currentVerb[0];
-          isCorrect = verbBase.includes(userAnswer);
+          correctAnswer = currentVerb.present;
+          isCorrect = verbPresent.includes(userAnswer);
         } 
         else if (this.questionText.includes('pasado de')) {
-          correctAnswer = currentVerb[1];
+          correctAnswer = currentVerb.past;
           isCorrect = verbPast.includes(userAnswer);
         }
         else if (this.questionText.includes('participio de')) {
-          correctAnswer = currentVerb[2];
+          correctAnswer = currentVerb.participle;
           isCorrect = verbParticiple.includes(userAnswer);
         }
       }
@@ -197,7 +208,7 @@ export default {
     },
     close() {
       this.$emit('close');
-      this.usedVerbIndices = [];
+      this.usedVerbKeys = [];
       this.feedback = '';
       this.isCorrect = false;
     }
