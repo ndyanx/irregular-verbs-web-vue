@@ -351,7 +351,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 15px;
 }
 
 .game-mode-selector {
@@ -433,9 +432,7 @@ export default {
   display: flex;
   justify-content: center; /* o 'space-between' si quieres separación */
   align-items: center;
-  gap: 16px; /* espacio entre los dos elementos */
   flex-wrap: wrap; /* por si en pantallas pequeñas se debe ajustar */
-  margin-top: 15px;
 }
 
 .quiz-feedback,
