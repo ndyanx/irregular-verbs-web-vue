@@ -77,8 +77,8 @@ export default {
       attempts: 0,
       usedVerbKeys: [],
       questionTypes: [
-        { type: 'base_to_past', text: (verb, verbKey) => `¿Cuál es el pasado de "${verbKey}"?` },
-        { type: 'base_to_participle', text: (verb, verbKey) => `¿Cuál es el participio de "${verbKey}"?` },
+        { type: 'base_to_past', text: (verb, verbKey) => `¿Cuál es el pasado de "${verb.present}"?` },
+        { type: 'base_to_participle', text: (verb, verbKey) => `¿Cuál es el participio de "${verb.present}"?` },
         { type: 'past_to_present', text: (verb, verbKey) => `¿Cuál es el presente de "${verb.past}"?` }
       ]
     }
