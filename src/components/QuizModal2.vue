@@ -23,9 +23,6 @@
         </div>
         
         <div class="quiz-body" :class="{ 'has-feedback': feedback }">
-          <div class="quiz-instructions">
-            <p>Selecciona el verbo que corresponda al significado mostrado:</p>
-          </div>
 
           <div class="meaning-display">
             {{ currentVerb ? getVerbReference(currentVerb) : '' }}
@@ -43,7 +40,7 @@
               }"
               @click="selectVerb(index)"
             >
-              <div v-if="gameMode === 'base'">{{ verb.present }}</div>
+              <div v-if="gameMode === 'present'">{{ verb.present }}</div>
               <div v-if="gameMode === 'past'">{{ verb.past }}</div>
               <div v-if="gameMode === 'participle'">{{ verb.participle }}</div>
             </div>
@@ -110,7 +107,7 @@ export default {
       correctIndices: [],
       gameMode: 'past',
       gameModes: [
-        { value: 'base', label: 'Presente' },
+        { value: 'present', label: 'Presente' },
         { value: 'past', label: 'Pasado' },
         { value: 'participle', label: 'Participio' },
       ]
@@ -118,7 +115,7 @@ export default {
   },
   methods: {
     getVerbReference(verb) {
-      return verb.meanings.map(m => m.present).join(" / ");
+      return verb.meanings.map(m => m[this.gameMode]).join(" / ");
     },
     launchConfetti() {
       const canvas = this.$refs.confettiCanvas;
@@ -151,7 +148,7 @@ export default {
           
           // Verificar que no sea la respuesta correcta
           if (
-            (this.gameMode === 'base' && verb.present !== this.currentVerb.present) ||
+            (this.gameMode === 'present' && verb.present !== this.currentVerb.present) ||
             (this.gameMode === 'past' && verb.past !== this.currentVerb.past) ||
             (this.gameMode === 'participle' && verb.participle !== this.currentVerb.participle)
           ) {
@@ -167,7 +164,7 @@ export default {
       // Encontrar los índices de las respuestas correctas
       this.correctIndices = this.shuffledVerbs
         .map((verb, index) => {
-          if (this.gameMode === 'base' && verb.present === this.currentVerb.present) return index;
+          if (this.gameMode === 'present' && verb.present === this.currentVerb.present) return index;
           if (this.gameMode === 'past' && verb.past === this.currentVerb.past) return index;
           if (this.gameMode === 'participle' && verb.participle === this.currentVerb.participle) return index;
           return -1;
@@ -282,12 +279,6 @@ export default {
 
 .icon-btn:hover {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.quiz-instructions {
-  margin-bottom: 15px;
-  text-align: center;
-  color: var(--text-light);
 }
 
 .meaning-display {
