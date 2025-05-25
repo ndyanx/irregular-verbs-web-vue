@@ -255,7 +255,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .quiz-header h3 {
@@ -438,14 +438,7 @@ export default {
 .quiz-feedback,
 .quiz-stats {
   margin: 0; /* elimina el margin-top individual */
-}
-
-.quiz-feedback {
   margin-top: 15px;
-  padding: 12px;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 500;
 }
 
 .quiz-feedback.correct {
@@ -456,12 +449,6 @@ export default {
 .quiz-feedback.wrong {
   color: var(--danger);
   /* background-color: rgba(247, 37, 133, 0.1); */
-}
-
-.quiz-stats {
-  margin-top: 15px;
-  text-align: center;
-  color: var(--text-light);
 }
 
 .confetti-canvas {
