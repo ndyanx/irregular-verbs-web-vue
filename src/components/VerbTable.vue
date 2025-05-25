@@ -1,18 +1,20 @@
 <template>
-  <div :style="{ maxWidth: showParticiple ? '1300px' : '1000px' }" class="content-wrapper" >
+  <div :style="{ maxWidth: showParticiple ? '1300px' : '1000px' }" class="content-wrapper">
     <h1>Verbos Irregulares en Inglés</h1>
     
     <div class="search-container">
       <input 
         type="text" 
-        v-model="searchQuery"
+        v-model.trim="searchQuery"
         placeholder="Buscar verbos..."
         class="search-input"
+        @keyup.enter="resetPagination"
       >
       <button 
         class="icon-btn-text"
         @click="toggleParticiple"
         :class="{ active: showParticiple }"
+        aria-label="Toggle participle column"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -23,6 +25,7 @@
       <select 
         v-model="currentSort"
         class="sort-selector"
+        @change="resetPagination"
       >
         <option value="default">Orden: A-Z</option>
         <option value="identical">Formas idénticas</option>
@@ -37,42 +40,42 @@
           <tr>
             <th>Presente</th>
             <th>Pasado</th>
-            <th :style="{ display: showParticiple ? '' : 'none' }">Participio</th>
+            <th v-show="showParticiple">Participio</th>
             <th>s. Presente</th>
             <th>s. Pasado</th>
-            <th :style="{ display: showParticiple ? '' : 'none' }">s. Participio</th>
+            <th v-show="showParticiple">s. Participio</th>
             <th>Notas</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(verbData, verbKey) in paginatedData" :key="verbKey">
-            <td class="present-cell" @click="setActiveMeaning(verbKey, 'present')">
+            <td class="present-cell" @click="speakWord(verbData.present)">
               {{ verbData.present }}<br><small>{{ verbData.phonetics.present }}</small>
             </td>
-            <td class="past-cell" @click="setActiveMeaning(verbKey, 'past')">
+            <td class="past-cell" @click="speakWord(verbData.past)">
               {{ verbData.past }}<br><small>{{ verbData.phonetics.past }}</small>
             </td>
             <td 
               class="participle-cell"
-              @click="setActiveMeaning(verbKey, 'participle')"
-              :style="{ display: showParticiple ? '' : 'none' }"
+              @click="speakWord(verbData.participle)"
+              v-show="showParticiple"
             >
               {{ verbData.participle }}<br><small>{{ verbData.phonetics.participle }}</small>
             </td>
             <td class="present-meaning-cell">
-              {{ getPresentMeanings(verbData) }}
+              {{ joinMeanings(verbData.meanings, 'present') }}
             </td>
             <td class="past-meaning-cell">
-              {{ getPastMeanings(verbData) }}
+              {{ joinMeanings(verbData.meanings, 'past') }}
             </td>
             <td 
               class="participle-meaning-cell"
-              :style="{ display: showParticiple ? '' : 'none' }"
+              v-show="showParticiple"
             >
-              {{ getParticipleMeanings(verbData) }}
+              {{ joinMeanings(verbData.meanings, 'participle') }}
             </td>
             <td class="note-cell">
-              <div v-for="(meaning, index) in verbData.meanings" :key="index">
+              <div v-for="(meaning, index) in verbData.meanings" :key="`${verbKey}-note-${index}`">
                 {{ meaning.note }}
                 <hr v-if="index < verbData.meanings.length - 1">
               </div>
@@ -87,6 +90,7 @@
         class="pagination-btn"
         @click="prevPage"
         :disabled="currentPage === 1"
+        aria-label="Página anterior"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="15 18 9 12 15 6"></polyline>
@@ -98,13 +102,18 @@
         class="pagination-btn"
         @click="nextPage"
         :disabled="currentPage === totalPages"
+        aria-label="Página siguiente"
       >
         Siguiente
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="9 18 15 12 9 6"></polyline>
         </svg>
       </button>
-      <select v-model="rowsPerPage">
+      <select 
+        v-model="rowsPerPage"
+        @change="resetPagination"
+        aria-label="Filas por página"
+      >
         <option value="10">10</option>
         <option value="25" selected>25</option>
         <option value="50">50</option>
@@ -115,21 +124,32 @@
 </template>
 
 <script>
+const COMMON_VERBS = ["be", "have", "do", "say", "go", "get", "make", "take", "come", "see"];
+const SORT_NAMES = {
+  default: 'A-Z',
+  identical: 'Formas Idénticas',
+  easy: 'Más Fáciles',
+  common: 'Más Comunes'
+};
+
 export default {
   name: 'VerbTable',
   props: {
-    verbs: Object,
+    verbs: {
+      type: Object,
+      required: true,
+      validator: value => Object.keys(value).length > 0
+    },
     soundEnabled: Boolean,
     showParticiple: Boolean
   },
   data() {
     return {
       searchQuery: '',
-      // showParticiple: false,
       currentSort: 'default',
       currentPage: 1,
       rowsPerPage: 25
-    }
+    };
   },
   computed: {
     filteredData() {
@@ -138,116 +158,100 @@ export default {
       const query = this.searchQuery.toLowerCase();
       return Object.fromEntries(
         Object.entries(this.verbs).filter(([verbKey, verbData]) => {
-          return (
-            verbKey.toLowerCase().includes(query) ||
-            verbData.present.toLowerCase().includes(query) ||
-            verbData.past.toLowerCase().includes(query) ||
-            verbData.participle.toLowerCase().includes(query) ||
-            JSON.stringify(verbData.meanings).toLowerCase().includes(query) ||
-            verbData.phonetics.present.toLowerCase().includes(query) ||
-            verbData.phonetics.past.toLowerCase().includes(query) ||
-            verbData.phonetics.participle.toLowerCase().includes(query)
+          const searchFields = [
+            verbKey,
+            verbData.present,
+            verbData.past,
+            verbData.participle,
+            ...Object.values(verbData.phonetics),
+            ...verbData.meanings.flatMap(meaning => Object.values(meaning))
+          ];
+          
+          return searchFields.some(field => 
+            String(field).toLowerCase().includes(query)
           );
         })
-      )
+      );
     },
     sortedData() {
       const data = Object.entries(this.filteredData);
       
-      switch(this.currentSort) {
-        case 'identical':
-          return Object.fromEntries(data.sort(([aKey, a], [bKey, b]) => {
-            const aIdentical = (a.present === a.past && a.past === a.participle) ? 0 : 1;
-            const bIdentical = (b.present === b.past && b.past === b.participle) ? 0 : 1;
-            return aIdentical - bIdentical || a.present.localeCompare(b.present);
-          }));
-          
-        case 'easy':
-          const commonVerbs = ["be", "have", "do", "say", "go", "get", "make", "take", "come", "see"];
-          return Object.fromEntries(data.sort(([aKey, a], [bKey, b]) => {
-            const scoreA = a.present.length + 
-                         (a.present === a.past && a.past === a.participle ? 0 : 5) + 
-                         (commonVerbs.includes(aKey) ? -10 : 0);
-            const scoreB = b.present.length + 
-                         (b.present === b.past && b.past === b.participle ? 0 : 5) + 
-                         (commonVerbs.includes(bKey) ? -10 : 0);
-            return scoreA - scoreB || a.present.localeCompare(b.present);
-          }));
-          
-        case 'common':
-          const commonOrder = ["be", "have", "do", "say", "go", "get", "make", "take", "come", "see"];
-          return Object.fromEntries(data.sort(([aKey, a], [bKey, b]) => {
-            const aIndex = commonOrder.indexOf(aKey);
-            const bIndex = commonOrder.indexOf(bKey);
-            return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
-          }));
-          
-        default:
-          return Object.fromEntries(data.sort(([aKey, a], [bKey, b]) => a.present.localeCompare(b.present)));
-      }
+      const sortStrategies = {
+        identical: ([, a], [, b]) => {
+          const aIdentical = (a.present === a.past && a.past === a.participle) ? 0 : 1;
+          const bIdentical = (b.present === b.past && b.past === b.participle) ? 0 : 1;
+          return aIdentical - bIdentical || a.present.localeCompare(b.present);
+        },
+        easy: ([aKey, a], [bKey, b]) => {
+          const scoreA = this.calculateDifficultyScore(aKey, a);
+          const scoreB = this.calculateDifficultyScore(bKey, b);
+          return scoreA - scoreB || a.present.localeCompare(b.present);
+        },
+        common: ([aKey], [bKey]) => {
+          const aIndex = COMMON_VERBS.indexOf(aKey);
+          const bIndex = COMMON_VERBS.indexOf(bKey);
+          return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+        },
+        default: ([, a], [, b]) => a.present.localeCompare(b.present)
+      };
+
+      return Object.fromEntries(data.sort(sortStrategies[this.currentSort]));
     },
     paginatedData() {
-      const sortedEntries = Object.entries(this.sortedData);
       const start = (this.currentPage - 1) * this.rowsPerPage;
       const end = start + this.rowsPerPage;
-      return Object.fromEntries(sortedEntries.slice(start, end));
+      return Object.fromEntries(
+        Object.entries(this.sortedData).slice(start, end)
+      );
     },
     totalPages() {
       return Math.ceil(Object.keys(this.sortedData).length / this.rowsPerPage);
     },
     pageInfo() {
-      const sortNames = {
-        default: 'A-Z',
-        identical: 'Formas Idénticas',
-        easy: 'Más Fáciles',
-        common: 'Más Comunes'
-      };
-      
-      return `Página ${this.currentPage} de ${this.totalPages} | ${sortNames[this.currentSort]}`;
+      return `Página ${this.currentPage} de ${this.totalPages} | ${SORT_NAMES[this.currentSort]}`;
     }
   },
   methods: {
     toggleParticiple() {
-      //this.showParticiple = !this.showParticiple;
       this.$emit('toggle-participle');
     },
     prevPage() {
-      if (this.currentPage > 1) this.currentPage--;
+      this.currentPage = Math.max(1, this.currentPage - 1);
     },
     nextPage() {
-      if (this.currentPage < this.totalPages) this.currentPage++;
+      this.currentPage = Math.min(this.totalPages, this.currentPage + 1);
     },
-    getPresentMeanings(verbData) {
-      return verbData.meanings.map(meaning => meaning.present).join(" - ");
+    resetPagination() {
+      this.currentPage = 1;
     },
-    getPastMeanings(verbData) {
-      return verbData.meanings.map(meaning => meaning.past).join(" - ");
+    joinMeanings(meanings, field) {
+      return meanings.map(meaning => meaning[field]).join(" - ");
     },
-    getParticipleMeanings(verbData) {
-      return verbData.meanings.map(meaning => meaning.participle).join(" - ");
+    speakWord(word) {
+      if (this.soundEnabled) {
+        this.$emit('speak-word', word);
+      }
     },
-    setActiveMeaning(verbKey, field) {
-      const word = this.paginatedData[verbKey][field];
-      this.$emit('speak-word', word);
-    },
+    calculateDifficultyScore(verbKey, verbData) {
+      const isIdentical = verbData.present === verbData.past && 
+                         verbData.past === verbData.participle;
+      const isCommon = COMMON_VERBS.includes(verbKey);
+      
+      return verbData.present.length + 
+             (isIdentical ? 0 : 5) + 
+             (isCommon ? -10 : 0);
+    }
   },
   watch: {
     searchQuery() {
-      this.currentPage = 1;
-    },
-    currentSort() {
-      this.currentPage = 1;
-    },
-    rowsPerPage() {
-      this.currentPage = 1;
+      this.resetPagination();
     }
   }
-}
+};
 </script>
 
 <style scoped>
 .content-wrapper {
-  /* max-width: 900px; */
   margin: 0 auto;
   padding: 80px 20px 20px;
   width: 100%;
@@ -256,8 +260,6 @@ export default {
 h1 {
   text-align: center;
   margin-bottom: 30px;
-  font-weight: 600;
-  color: var(--primary);
   font-size: 2.2rem;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
@@ -275,22 +277,14 @@ h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: gradientText 6s ease infinite;
-  text-align: center;
 }
 
 @keyframes gradientText {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* ============ BARRA DE BÚSQUEDA ============ */
 .search-container {
   display: flex;
   gap: 12px;
@@ -353,7 +347,6 @@ h1 {
   min-width: 180px;
 }
 
-/* ============ TABLA RESPONSIVE ============ */
 .table-container {
   background: var(--card);
   border-radius: 12px;
@@ -373,15 +366,12 @@ th, td {
   padding: 16px;
   text-align: left;
   border-bottom: 1px solid var(--border);
-  white-space: nowrap;
 }
 
-/* th {
-  background: var(--primary);
-  color: white;
-  font-weight: 500;
+th {
+  white-space: nowrap;
   text-align: center;
-} */
+}
 
 td {
   background: var(--card);
@@ -397,22 +387,6 @@ tbody tr:hover td {
   background: rgba(67, 97, 238, 0.05);
 }
 
-.highlight {
-  color: white !important;
-  font-weight: 500 !important;
-  padding: 2px !important;
-  transition: background-color 0.3s ease !important;
-}
-
-:root:not(.dark-mode) .highlight {
-  background-color: var(--primary) !important;
-}
-
-.dark-mode .highlight {
-  background-color: var(--primary-light) !important;
-}
-
-/* ============ PAGINACIÓN ============ */
 .pagination-controls {
   display: flex;
   align-items: center;
@@ -467,12 +441,11 @@ tbody tr:hover td {
 .rainbow-header::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset: 0;
   background: linear-gradient(270deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #4895ef, #f72585);
   background-size: 400% 400%;
   animation: rainbowBG 6s linear infinite;
   z-index: -1;
-  pointer-events: none;
 }
 
 .rainbow-header th {
@@ -481,20 +454,13 @@ tbody tr:hover td {
   color: white;
   font-weight: bold;
   z-index: 1;
-  text-align: center;
 }
 
 @keyframes rainbowBG {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 400% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
 }
 
-
-/* ============ RESPONSIVE ============ */
 @media (max-width: 768px) {
   .content-wrapper {
     padding: 70px 15px 15px;

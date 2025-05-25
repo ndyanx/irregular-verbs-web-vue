@@ -3,17 +3,19 @@
     <canvas ref="confettiCanvas" class="confetti-canvas"></canvas>
 
     <div 
-      id="quiz-modal" 
       class="quiz-modal"
       @click.self="close"
+      role="dialog"
+      aria-labelledby="quiz-title"
+      aria-modal="true"
     >
       <div class="quiz-content">
         <div class="quiz-header">
-          <h3>Juego de Verbos Irregulares</h3>
+          <h3 id="quiz-title">Juego de Verbos Irregulares</h3>
           <button 
-            id="close-quiz" 
             class="icon-btn"
             @click="close"
+            aria-label="Cerrar juego"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -22,31 +24,32 @@
           </button>
         </div>
         <div class="quiz-body">
-          <div id="quiz-reference" class="quiz-reference">{{ currentVerb ? getVerbReference(currentVerb) : '' }}</div>
-          <div id="quiz-question" class="quiz-question">{{ questionText }}</div>
+          <div class="quiz-reference">{{ currentVerb ? getVerbReference(currentVerb) : '' }}</div>
+          <div class="quiz-question">{{ questionText }}</div>
           <input 
             type="text" 
-            id="quiz-answer" 
             class="quiz-input" 
             placeholder="Escribe tu respuesta..."
-            v-model="userAnswer"
+            v-model.trim="userAnswer"
             @keyup.enter="checkAnswer"
+            ref="answerInput"
+            aria-label="Respuesta"
           >
           <button 
-            id="quiz-submit" 
             class="quiz-submit"
             @click="checkAnswer"
+            :disabled="!userAnswer.trim()"
           >
             Comprobar
           </button>
           <div 
-            id="quiz-feedback" 
             class="quiz-feedback"
             :class="{ correct: isCorrect, wrong: !isCorrect && feedback }"
+            aria-live="polite"
           >
             {{ feedback }}
           </div>
-          <div id="quiz-stats" class="quiz-stats">
+          <div class="quiz-stats">
             Aciertos: {{ score }} / Intentos: {{ attempts }}
           </div>
         </div>
@@ -58,12 +61,28 @@
 <script>
 import confetti from 'canvas-confetti';
 
+const QUESTION_TYPES = [
+  { type: 'base_to_past', text: (verb, verbKey) => `¿Cuál es el pasado de "${verb.present}"?` },
+  { type: 'base_to_participle', text: (verb, verbKey) => `¿Cuál es el participio de "${verb.present}"?` },
+  { type: 'past_to_present', text: (verb, verbKey) => `¿Cuál es el presente de "${verb.past}"?` }
+];
+
 export default {
   name: 'QuizModal',
   props: {
-    show: Boolean,
-    verbs: Object,
-    showParticiple: Boolean
+    show: {
+      type: Boolean,
+      required: true
+    },
+    verbs: {
+      type: Object,
+      required: true,
+      validator: value => Object.keys(value).length > 0
+    },
+    showParticiple: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -76,11 +95,19 @@ export default {
       score: 0,
       attempts: 0,
       usedVerbKeys: [],
-      questionTypes: [
-        { type: 'base_to_past', text: (verb, verbKey) => `¿Cuál es el pasado de "${verb.present}"?` },
-        { type: 'base_to_participle', text: (verb, verbKey) => `¿Cuál es el participio de "${verb.present}"?` },
-        { type: 'past_to_present', text: (verb, verbKey) => `¿Cuál es el presente de "${verb.past}"?` }
-      ]
+      confetti: null
+    };
+  },
+  computed: {
+    availableQuestionTypes() {
+      return QUESTION_TYPES.filter(type => {
+        if (type.type.includes('participle')) return this.showParticiple;
+        return true;
+      });
+    },
+    unusedVerbKeys() {
+      return Object.keys(this.verbs)
+        .filter(key => !this.usedVerbKeys.includes(key));
     }
   },
   methods: {
@@ -89,142 +116,179 @@ export default {
     },
     launchConfetti() {
       const canvas = this.$refs.confettiCanvas;
-      const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+      const myConfetti = confetti.create(canvas, { 
+        resize: true, 
+        useWorker: true 
+      });
       myConfetti({
         particleCount: 150,
         spread: 80,
         origin: { y: 0.6 }
       });
     },
-    generateNewQuestion() {
-      const availableTypes = this.questionTypes.filter(type => {
-        if (type.type.includes('participle')) return this.showParticiple;
-        return true;
-      });
-
-      const unusedVerbKeys = Object.keys(this.verbs)
-        .filter(key => !this.usedVerbKeys.includes(key));
-
-      if (unusedVerbKeys.length === 0) {
+    getRandomVerbKey() {
+      if (this.unusedVerbKeys.length === 0) {
         this.usedVerbKeys = [];
-        unusedVerbKeys.push(...Object.keys(this.verbs));
+        return this.getRandomFromArray(Object.keys(this.verbs));
       }
-
-      const randomKey = unusedVerbKeys[Math.floor(Math.random() * unusedVerbKeys.length)];
-      this.currentVerbKey = randomKey;
-      this.currentVerb = this.verbs[randomKey];
-      // hack
-      // this.currentVerbKey = "have";
-      // this.currentVerb = this.verbs["have"];
-      this.usedVerbKeys.push(randomKey);
-
-      const hasSpecialRules = this.currentVerb.gameRules;
+      return this.getRandomFromArray(this.unusedVerbKeys);
+    },
+    getRandomFromArray(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    },
+    generateSpecialQuestion(forms) {
+      const direction = Math.random();
       
-      if (hasSpecialRules) {
+      if (direction < 0.4) {
+        const randomBase = this.getRandomFromArray(forms.present);
+        return `¿Cuál es el pasado de "${randomBase}"?`;
+      } 
+      if (direction < 0.8) {
+        const randomPast = this.getRandomFromArray(forms.past);
+        return `¿Cuál es el presente de "${randomPast}"?`;
+      }
+      
+      const randomBase = this.getRandomFromArray(forms.present);
+      return `¿Cuál es el participio de "${randomBase}"?`;
+    },
+    generateQuestionText() {
+      if (this.currentVerb.gameRules) {
         const forms = {
           present: this.currentVerb.present.split(' / ').map(f => f.trim()),
           past: this.currentVerb.past.split(' / ').map(f => f.trim())
         };
-
-        const direction = Math.random();
-        
-        if (direction < 0.4) {
-          const randomBase = forms.present[Math.floor(Math.random() * forms.present.length)];
-          this.questionText = `¿Cuál es el pasado de "${randomBase}"?`;
-        } else if (direction < 0.8) {
-          const randomPast = forms.past[Math.floor(Math.random() * forms.past.length)];
-          this.questionText = `¿Cuál es el presente de "${randomPast}"?`;
-        } else {
-          const randomBase = forms.present[Math.floor(Math.random() * forms.present.length)];
-          this.questionText = `¿Cuál es el participio de "${randomBase}"?`;
-        }
-      } else {
-        const randomType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
-        this.questionText = randomType.text(this.currentVerb, this.currentVerbKey);
+        return this.generateSpecialQuestion(forms);
       }
+      
+      const randomType = this.getRandomFromArray(this.availableQuestionTypes);
+      return randomType.text(this.currentVerb, this.currentVerbKey);
+    },
+    generateNewQuestion() {
+      this.currentVerbKey = this.getRandomVerbKey();
+      this.currentVerb = this.verbs[this.currentVerbKey];
+      this.usedVerbKeys.push(this.currentVerbKey);
 
+      this.questionText = this.generateQuestionText();
       this.userAnswer = '';
       this.feedback = '';
       this.isCorrect = false;
+      
+      this.$nextTick(() => {
+        this.$refs.answerInput.focus();
+      });
+    },
+    normalizeAnswer(answer) {
+      return answer.trim().toLowerCase().replace('*', '');
+    },
+    splitVerbForms(forms) {
+      return forms.toLowerCase().split('/').map(s => this.normalizeAnswer(s));
+    },
+    checkSpecialCaseAnswer() {
+      const quotedText = this.questionText.match(/"(.+?)"/)[1].toLowerCase();
+      
+      if (this.questionText.includes('presente de')) {
+        const correctAnswers = this.currentVerb.gameRules.pastToBase[quotedText];
+        return {
+          isCorrect: correctAnswers.some(ans => 
+            this.normalizeAnswer(ans) === this.normalizeAnswer(this.userAnswer)
+          ),
+          correctAnswer: correctAnswers.join(' o ')
+        };
+      }
+      
+      if (this.questionText.includes('pasado de')) {
+        const correctAnswers = this.currentVerb.gameRules.baseToPast[quotedText];
+        return {
+          isCorrect: correctAnswers.some(ans => 
+            this.normalizeAnswer(ans) === this.normalizeAnswer(this.userAnswer)
+          ),
+          correctAnswer: correctAnswers.join(' o ')
+        };
+      }
+      
+      return {
+        isCorrect: this.splitVerbForms(this.currentVerb.participle)
+          .includes(this.normalizeAnswer(this.userAnswer)),
+        correctAnswer: this.currentVerb.participle
+      };
+    },
+    checkRegularAnswer() {
+      if (this.questionText.includes('presente de')) {
+        return {
+          isCorrect: this.splitVerbForms(this.currentVerb.present)
+            .includes(this.normalizeAnswer(this.userAnswer)),
+          correctAnswer: this.currentVerb.present
+        };
+      }
+      
+      if (this.questionText.includes('pasado de')) {
+        return {
+          isCorrect: this.splitVerbForms(this.currentVerb.past)
+            .includes(this.normalizeAnswer(this.userAnswer)),
+          correctAnswer: this.currentVerb.past
+        };
+      }
+      
+      return {
+        isCorrect: this.splitVerbForms(this.currentVerb.participle)
+          .includes(this.normalizeAnswer(this.userAnswer)),
+        correctAnswer: this.currentVerb.participle
+      };
     },
     checkAnswer() {
       if (!this.userAnswer.trim()) return;
       
-      const userAnswer = this.userAnswer.trim().toLowerCase();
-      const currentVerb = this.currentVerb;
-      let isCorrect = false;
-      let correctAnswer = '';
-
-      const gameRules = currentVerb.gameRules;
-      const verbPresent = currentVerb.present.toLowerCase().split('/').map(s => s.trim());
-      const verbPast = currentVerb.past.toLowerCase().split('/').map(s => s.trim());
-      const verbParticiple = currentVerb.participle.toLowerCase().split('/').map(s => s.trim().replace('*', ''));
-
-      if (gameRules) {
-        if (this.questionText.includes('presente de')) {
-          const PresentForm = this.questionText.match(/"(.+?)"/)[1].toLowerCase();
-          correctAnswer = gameRules.pastToBase[PresentForm].join(' o ');
-          isCorrect = gameRules.pastToBase[PresentForm].some(ans => 
-            ans.toLowerCase() === userAnswer
-          );
-        } 
-        else if (this.questionText.includes('pasado de')) {
-          const pastForm = this.questionText.match(/"(.+?)"/)[1].toLowerCase();
-          correctAnswer = gameRules.baseToPast[pastForm].join(' o ');
-          isCorrect = gameRules.baseToPast[pastForm].some(ans => 
-            ans.toLowerCase() === userAnswer
-          );
-        }
-        else if (this.questionText.includes('participio de')) {
-          correctAnswer = currentVerb.participle;
-          isCorrect = verbParticiple.includes(userAnswer);
-        }
-      } else {
-        if (this.questionText.includes('presente de')) {
-          correctAnswer = currentVerb.present;
-          isCorrect = verbPresent.includes(userAnswer);
-        } 
-        else if (this.questionText.includes('pasado de')) {
-          correctAnswer = currentVerb.past;
-          isCorrect = verbPast.includes(userAnswer);
-        }
-        else if (this.questionText.includes('participio de')) {
-          correctAnswer = currentVerb.participle;
-          isCorrect = verbParticiple.includes(userAnswer);
-        }
-      }
+      const { isCorrect, correctAnswer } = this.currentVerb.gameRules 
+        ? this.checkSpecialCaseAnswer() 
+        : this.checkRegularAnswer();
 
       this.attempts++;
+      this.isCorrect = isCorrect;
+      
       if (isCorrect) {
         this.score++;
         this.launchConfetti();
         this.feedback = '¡Correcto!';
-        this.isCorrect = true;
         setTimeout(this.generateNewQuestion, 1500);
       } else {
         this.feedback = `Incorrecto. La respuesta correcta era: ${correctAnswer}`;
-        this.isCorrect = false;
       }
     },
     close() {
       this.$emit('close');
+      this.resetGame();
+    },
+    resetGame() {
       this.usedVerbKeys = [];
       this.feedback = '';
       this.isCorrect = false;
+      this.score = 0;
+      this.attempts = 0;
     }
   },
   watch: {
     show(newVal) {
       if (newVal) {
         this.generateNewQuestion();
+      } else {
+        this.resetGame();
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
-/* Estilos del modal del juego */
+.confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2147483647;
+}
+
 .quiz-modal {
   display: flex;
   position: fixed;
@@ -236,6 +300,8 @@ export default {
   z-index: 1000;
   justify-content: center;
   align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .quiz-content {
@@ -292,8 +358,13 @@ export default {
   transition: all 0.3s ease;
 }
 
-.quiz-submit:hover {
+.quiz-submit:hover:not(:disabled) {
   background-color: var(--primary-light);
+}
+
+.quiz-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .quiz-feedback {
@@ -307,7 +378,7 @@ export default {
   font-size: 1.2rem;
   margin-bottom: 15px;
   text-align: center;
-  padding: 5px 0px;
+  padding: 5px 0;
   color: white;
   background-color: black;
   border-radius: 12px;
@@ -325,26 +396,11 @@ export default {
   color: var(--text-light);
 }
 
-/* Animaciones */
-/* @keyframes correctAnswer {
-  0% { background-color: rgba(76, 201, 240, 0.1); }
-  50% { background-color: rgba(76, 201, 240, 0.3); }
-  100% { background-color: rgba(76, 201, 240, 0.1); }
-}
-
-@keyframes wrongAnswer {
-  0% { background-color: rgba(247, 37, 133, 0.1); }
-  50% { background-color: rgba(247, 37, 133, 0.3); }
-  100% { background-color: rgba(247, 37, 133, 0.1); }
-} */
-
 .correct {
-  animation: correctAnswer 1s ease;
   color: var(--success);
 }
 
 .wrong {
-  animation: wrongAnswer 1s ease;
   color: var(--danger);
 }
 
@@ -367,13 +423,18 @@ export default {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-.confetti-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 2147483647; /* asegúrate que esté por encima del modal */
+@media (max-width: 480px) {
+  .quiz-content {
+    width: 95%;
+    padding: 15px;
+  }
+  
+  .quiz-question {
+    font-size: 1.1rem;
+  }
+  
+  .quiz-reference {
+    font-size: 1rem;
+  }
 }
 </style>
