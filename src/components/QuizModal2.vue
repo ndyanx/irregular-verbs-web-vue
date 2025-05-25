@@ -71,13 +71,15 @@
               Siguiente
             </button>
           </div>
+          
+          <div class="quiz-row">
+            <div class="quiz-feedback" :class="{ correct: isCorrect, wrong: !isCorrect && feedback }">
+              {{ feedback }}
+            </div>
 
-          <div class="quiz-feedback" :class="{ correct: isCorrect, wrong: !isCorrect && feedback }">
-            {{ feedback }}
-          </div>
-
-          <div class="quiz-stats">
-            Aciertos: {{ score }} / Intentos: {{ attempts }}
+            <div class="quiz-stats">
+              Aciertos: {{ score }} / Intentos: {{ attempts }}
+            </div>
           </div>
         </div>
       </div>
@@ -426,6 +428,20 @@ export default {
 /* .quiz-next:hover {
   background-color: #3ab7d8;
 } */
+
+.quiz-row {
+  display: flex;
+  justify-content: center; /* o 'space-between' si quieres separación */
+  align-items: center;
+  gap: 16px; /* espacio entre los dos elementos */
+  flex-wrap: wrap; /* por si en pantallas pequeñas se debe ajustar */
+  margin-top: 15px;
+}
+
+.quiz-feedback,
+.quiz-stats {
+  margin: 0; /* elimina el margin-top individual */
+}
 
 .quiz-feedback {
   margin-top: 15px;
