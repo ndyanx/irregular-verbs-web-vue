@@ -438,7 +438,8 @@ export default {
 .quiz-feedback,
 .quiz-stats {
   margin: 0; /* elimina el margin-top individual */
-  margin-top: 15px;
+  margin-top: 10px;
+  padding: 5px;
 }
 
 .quiz-feedback.correct {
