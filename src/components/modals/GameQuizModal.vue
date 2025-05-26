@@ -68,7 +68,7 @@ const QUESTION_TYPES = [
 ];
 
 export default {
-  name: 'QuizModal',
+  name: 'GameQuizModal',
   props: {
     show: {
       type: Boolean,

@@ -1,0 +1,2317 @@
+{
+  "arise": {
+    "present": "arise",
+    "past": "arose",
+    "participle": "arisen",
+    "phonetics": {
+      "present": "aráis",
+      "past": "aróus",
+      "participle": "arísn"
+    },
+    "meanings": [
+      {
+        "present": "surgir",
+        "past": "surgió",
+        "participle": "surgido",
+        "note": "Para problemas o situaciones que aparecen"
+      }
+    ]
+  },
+  "awake": {
+    "present": "awake",
+    "past": "awoke",
+    "participle": "awoken",
+    "phonetics": {
+      "present": "awéik",
+      "past": "awóuk",
+      "participle": "awóuken"
+    },
+    "meanings": [
+      {
+        "present": "despertar",
+        "past": "despertó",
+        "participle": "despertado",
+        "note": "El acto de dejar de dormir"
+      }
+    ]
+  },
+  "be": {
+    "present": "am / are / is",
+    "past": "was / were",
+    "participle": "been",
+    "phonetics": {
+      "present": "em / ar / is",
+      "past": "wós / wér",
+      "participle": "bín"
+    },
+    "gameRules": {
+      "baseToPast": {
+        "am": ["was"],
+        "is": ["was"],
+        "are": ["were"]
+      },
+      "pastToBase": {
+        "was": ["am", "is"],
+        "were": ["are"]
+      }
+    },
+    "meanings": [
+      {
+        "present": "ser",
+        "past": "fue",
+        "participle": "sido",
+        "note": "Para estados permanentes"
+      },
+      {
+        "present": "estar",
+        "past": "estuvo",
+        "participle": "estado",
+        "note": "Para estados temporales"
+      }
+    ]
+  },
+  "bear": {
+    "present": "bear",
+    "past": "bore",
+    "participle": "borne / born",
+    "phonetics": {
+      "present": "ber",
+      "past": "bor",
+      "participle": "born / born"
+    },
+    "meanings": [
+      {
+        "present": "soportar",
+        "past": "soportó",
+        "participle": "soportado",
+        "note": "Para tolerar algo difícil"
+      },
+      {
+        "present": "nacer",
+        "past": "nació",
+        "participle": "nacido",
+        "note": "Usado con el sentido de dar a luz (born)"
+      }
+    ]
+  },
+  "beat": {
+    "present": "beat",
+    "past": "beat",
+    "participle": "beaten",
+    "phonetics": {
+      "present": "bít",
+      "past": "bít",
+      "participle": "bíten"
+    },
+    "meanings": [
+      {
+        "present": "golpear",
+        "past": "golpeó",
+        "participle": "golpeado",
+        "note": "Para dar golpes físicos"
+      },
+      {
+        "present": "vencer",
+        "past": "venció",
+        "participle": "vencido",
+        "note": "En competiciones o batallas"
+      }
+    ]
+  },
+  "become": {
+    "present": "become",
+    "past": "became",
+    "participle": "become",
+    "phonetics": {
+      "present": "bikám",
+      "past": "bikéim",
+      "participle": "bikám"
+    },
+    "meanings": [
+      {
+        "present": "convertirse",
+        "past": "se convirtió",
+        "participle": "convertido",
+        "note": "Para cambios de estado o forma"
+      }
+    ]
+  },
+  "begin": {
+    "present": "begin",
+    "past": "began",
+    "participle": "begun",
+    "phonetics": {
+      "present": "bigín",
+      "past": "bigán",
+      "participle": "bigán"
+    },
+    "meanings": [
+      {
+        "present": "empezar",
+        "past": "empezó",
+        "participle": "empezado",
+        "note": "Para iniciar acciones o procesos"
+      }
+    ]
+  },
+  "bend": {
+    "present": "bend",
+    "past": "bent",
+    "participle": "bent",
+    "phonetics": {
+      "present": "bend",
+      "past": "bent",
+      "participle": "bent"
+    },
+    "meanings": [
+      {
+        "present": "doblar",
+        "past": "dobló",
+        "participle": "doblado",
+        "note": "Para cambiar la forma de algo curvándolo"
+      }
+    ]
+  },
+  "bet": {
+    "present": "bet",
+    "past": "bet",
+    "participle": "bet",
+    "phonetics": {
+      "present": "bet",
+      "past": "bet",
+      "participle": "bet"
+    },
+    "meanings": [
+      {
+        "present": "apostar",
+        "past": "apostó",
+        "participle": "apostado",
+        "note": "En juegos de azar o competencias"
+      }
+    ]
+  },
+  "bind": {
+    "present": "bind",
+    "past": "bound",
+    "participle": "bound",
+    "phonetics": {
+      "present": "báind",
+      "past": "báund",
+      "participle": "báund"
+    },
+    "meanings": [
+      {
+        "present": "atar",
+        "past": "ató",
+        "participle": "atado",
+        "note": "Para sujetar cosas con cuerdas o similares"
+      },
+      {
+        "present": "unir",
+        "past": "unió",
+        "participle": "unido",
+        "note": "Para conectar elementos entre sí"
+      }
+    ]
+  },
+  "bite": {
+    "present": "bite",
+    "past": "bit",
+    "participle": "bitten",
+    "phonetics": {
+      "present": "báit",
+      "past": "bít",
+      "participle": "bíten"
+    },
+    "meanings": [
+      {
+        "present": "morder",
+        "past": "mordió",
+        "participle": "mordido",
+        "note": "Acción de cortar con los dientes"
+      }
+    ]
+  },
+  "bleed": {
+    "present": "bleed",
+    "past": "bled",
+    "participle": "bled",
+    "phonetics": {
+      "present": "blíd",
+      "past": "bled",
+      "participle": "bled"
+    },
+    "meanings": [
+      {
+        "present": "sangrar",
+        "past": "sangró",
+        "participle": "sangrado",
+        "note": "Para pérdida de sangre"
+      }
+    ]
+  },
+  "blow": {
+    "present": "blow",
+    "past": "blew",
+    "participle": "blown",
+    "phonetics": {
+      "present": "blóu",
+      "past": "blú",
+      "participle": "blóun"
+    },
+    "meanings": [
+      {
+        "present": "soplar",
+        "past": "sopló",
+        "participle": "soplado",
+        "note": "Para mover aire con la boca o el viento"
+      }
+    ]
+  },
+  "break": {
+    "present": "break",
+    "past": "broke",
+    "participle": "broken",
+    "phonetics": {
+      "present": "bréik",
+      "past": "bróuk",
+      "participle": "bróuken"
+    },
+    "meanings": [
+      {
+        "present": "romper",
+        "past": "rompió",
+        "participle": "roto",
+        "note": "Para dividir algo en partes por fuerza"
+      }
+    ]
+  },
+  "bring": {
+    "present": "bring",
+    "past": "brought",
+    "participle": "brought",
+    "phonetics": {
+      "present": "bring",
+      "past": "brot",
+      "participle": "brot"
+    },
+    "meanings": [
+      {
+        "present": "traer",
+        "past": "trajo",
+        "participle": "traído",
+        "note": "Para llevar algo hacia donde está el hablante"
+      }
+    ]
+  },
+  "build": {
+    "present": "build",
+    "past": "built",
+    "participle": "built",
+    "phonetics": {
+      "present": "bild",
+      "past": "bilt",
+      "participle": "bilt"
+    },
+    "meanings": [
+      {
+        "present": "construir",
+        "past": "construyó",
+        "participle": "construido",
+        "note": "Para edificar o crear estructuras"
+      }
+    ]
+  },
+  "burn": {
+    "present": "burn",
+    "past": "burned / burnt",
+    "participle": "burned / burnt",
+    "phonetics": {
+      "present": "bern",
+      "past": "bernd / bernt",
+      "participle": "bernd / bernt"
+    },
+    "meanings": [
+      {
+        "present": "quemar",
+        "past": "quemó",
+        "participle": "quemado",
+        "note": "Para consumir con fuego o calor"
+      }
+    ]
+  },
+  "burst": {
+    "present": "burst",
+    "past": "burst",
+    "participle": "burst",
+    "phonetics": {
+      "present": "berst",
+      "past": "berst",
+      "participle": "berst"
+    },
+    "meanings": [
+      {
+        "present": "explotar",
+        "past": "explotó",
+        "participle": "explotado",
+        "note": "Para romperse violentamente por presión interna"
+      }
+    ]
+  },
+  "buy": {
+    "present": "buy",
+    "past": "bought",
+    "participle": "bought",
+    "phonetics": {
+      "present": "bái",
+      "past": "bot",
+      "participle": "bot"
+    },
+    "meanings": [
+      {
+        "present": "comprar",
+        "past": "compró",
+        "participle": "comprado",
+        "note": "Para adquirir algo a cambio de dinero"
+      }
+    ]
+  },
+  "catch": {
+    "present": "catch",
+    "past": "caught",
+    "participle": "caught",
+    "phonetics": {
+      "present": "kach",
+      "past": "kot",
+      "participle": "kot"
+    },
+    "meanings": [
+      {
+        "present": "atrapar",
+        "past": "atrapó",
+        "participle": "atrapado",
+        "note": "Para capturar algo que está en movimiento"
+      }
+    ]
+  },
+  "choose": {
+    "present": "choose",
+    "past": "chose",
+    "participle": "chosen",
+    "phonetics": {
+      "present": "chus",
+      "past": "chóus",
+      "participle": "chóusen"
+    },
+    "meanings": [
+      {
+        "present": "elegir",
+        "past": "eligió",
+        "participle": "elegido",
+        "note": "Para seleccionar entre opciones"
+      }
+    ]
+  },
+  "come": {
+    "present": "come",
+    "past": "came",
+    "participle": "come",
+    "phonetics": {
+      "present": "kam",
+      "past": "kéim",
+      "participle": "kam"
+    },
+    "meanings": [
+      {
+        "present": "venir",
+        "past": "vino",
+        "participle": "venido",
+        "note": "Para moverse hacia donde está el hablante"
+      }
+    ]
+  },
+  "cost": {
+    "present": "cost",
+    "past": "cost",
+    "participle": "cost",
+    "phonetics": {
+      "present": "kost",
+      "past": "kost",
+      "participle": "kost"
+    },
+    "meanings": [
+      {
+        "present": "costar",
+        "past": "costó",
+        "participle": "costado",
+        "note": "Para indicar el precio de algo"
+      }
+    ]
+  },
+  "cut": {
+    "present": "cut",
+    "past": "cut",
+    "participle": "cut",
+    "phonetics": {
+      "present": "kat",
+      "past": "kat",
+      "participle": "kat"
+    },
+    "meanings": [
+      {
+        "present": "cortar",
+        "past": "cortó",
+        "participle": "cortado",
+        "note": "Para dividir con un instrumento afilado"
+      }
+    ]
+  },
+  "deal": {
+    "present": "deal",
+    "past": "dealt",
+    "participle": "dealt",
+    "phonetics": {
+      "present": "díl",
+      "past": "delt",
+      "participle": "delt"
+    },
+    "meanings": [
+      {
+        "present": "tratar",
+        "past": "trató",
+        "participle": "tratado",
+        "note": "Para manejar una situación o negociar"
+      }
+    ]
+  },
+  "dig": {
+    "present": "dig",
+    "past": "dug",
+    "participle": "dug",
+    "phonetics": {
+      "present": "dig",
+      "past": "dag",
+      "participle": "dag"
+    },
+    "meanings": [
+      {
+        "present": "cavar",
+        "past": "cavó",
+        "participle": "cavado",
+        "note": "Para hacer agujeros en la tierra"
+      }
+    ]
+  },
+  "do": {
+    "present": "do",
+    "past": "did",
+    "participle": "done",
+    "phonetics": {
+      "present": "du",
+      "past": "did",
+      "participle": "dan"
+    },
+    "meanings": [
+      {
+        "present": "hacer",
+        "past": "hizo",
+        "participle": "hecho",
+        "note": "Acción general de realizar algo"
+      }
+    ]
+  },
+  "draw": {
+    "present": "draw",
+    "past": "drew",
+    "participle": "drawn",
+    "phonetics": {
+      "present": "dro",
+      "past": "dru",
+      "participle": "dron"
+    },
+    "meanings": [
+      {
+        "present": "dibujar",
+        "past": "dibujó",
+        "participle": "dibujado",
+        "note": "Para crear imágenes con lápiz o pincel"
+      },
+      {
+        "present": "sacar",
+        "past": "sacó",
+        "participle": "sacado",
+        "note": "Para extraer algo (ej. sangre, conclusiones)"
+      }
+    ]
+  },
+  "dream": {
+    "present": "dream",
+    "past": "dreamed / dreamt",
+    "participle": "dreamed / dreamt",
+    "phonetics": {
+      "present": "drím",
+      "past": "drímt / drámt",
+      "participle": "drímt / drámt"
+    },
+    "meanings": [
+      {
+        "present": "soñar",
+        "past": "soñó",
+        "participle": "soñado",
+        "note": "Para experiencias durante el sueño"
+      }
+    ]
+  },
+  "drink": {
+    "present": "drink",
+    "past": "drank",
+    "participle": "drunk",
+    "phonetics": {
+      "present": "drink",
+      "past": "drank",
+      "participle": "drank"
+    },
+    "meanings": [
+      {
+        "present": "beber",
+        "past": "bebió",
+        "participle": "bebido",
+        "note": "Para ingerir líquidos"
+      }
+    ]
+  },
+  "drive": {
+    "present": "drive",
+    "past": "drove",
+    "participle": "driven",
+    "phonetics": {
+      "present": "dráiv",
+      "past": "dróuv",
+      "participle": "dríven"
+    },
+    "meanings": [
+      {
+        "present": "conducir",
+        "past": "condujo",
+        "participle": "conducido",
+        "note": "Para operar un vehículo"
+      }
+    ]
+  },
+  "eat": {
+    "present": "eat",
+    "past": "ate",
+    "participle": "eaten",
+    "phonetics": {
+      "present": "ít",
+      "past": "éit",
+      "participle": "íten"
+    },
+    "meanings": [
+      {
+        "present": "comer",
+        "past": "comió",
+        "participle": "comido",
+        "note": "Para ingerir alimentos"
+      }
+    ]
+  },
+  "fall": {
+    "present": "fall",
+    "past": "fell",
+    "participle": "fallen",
+    "phonetics": {
+      "present": "fol",
+      "past": "fel",
+      "participle": "fólen"
+    },
+    "meanings": [
+      {
+        "present": "caer",
+        "past": "cayó",
+        "participle": "caído",
+        "note": "Para moverse hacia abajo por gravedad"
+      }
+    ]
+  },
+  "feed": {
+    "present": "feed",
+    "past": "fed",
+    "participle": "fed",
+    "phonetics": {
+      "present": "fíd",
+      "past": "fed",
+      "participle": "fed"
+    },
+    "meanings": [
+      {
+        "present": "alimentar",
+        "past": "alimentó",
+        "participle": "alimentado",
+        "note": "Para dar comida a alguien"
+      }
+    ]
+  },
+  "feel": {
+    "present": "feel",
+    "past": "felt",
+    "participle": "felt",
+    "phonetics": {
+      "present": "fíl",
+      "past": "felt",
+      "participle": "felt"
+    },
+    "meanings": [
+      {
+        "present": "sentir",
+        "past": "sintió",
+        "participle": "sentido",
+        "note": "Para percibir emociones o sensaciones físicas"
+      }
+    ]
+  },
+  "fight": {
+    "present": "fight",
+    "past": "fought",
+    "participle": "fought",
+    "phonetics": {
+      "present": "fáit",
+      "past": "fot",
+      "participle": "fot"
+    },
+    "meanings": [
+      {
+        "present": "pelear",
+        "past": "peleó",
+        "participle": "peleado",
+        "note": "Para participar en una lucha física o verbal"
+      }
+    ]
+  },
+  "find": {
+    "present": "find",
+    "past": "found",
+    "participle": "found",
+    "phonetics": {
+      "present": "fáind",
+      "past": "fáund",
+      "participle": "fáund"
+    },
+    "meanings": [
+      {
+        "present": "encontrar",
+        "past": "encontró",
+        "participle": "encontrado",
+        "note": "Para descubrir algo que se buscaba"
+      }
+    ]
+  },
+  "fly": {
+    "present": "fly",
+    "past": "flew",
+    "participle": "flown",
+    "phonetics": {
+      "present": "flái",
+      "past": "flú",
+      "participle": "flóun"
+    },
+    "meanings": [
+      {
+        "present": "volar",
+        "past": "voló",
+        "participle": "volado",
+        "note": "Para moverse por el aire"
+      }
+    ]
+  },
+  "forget": {
+    "present": "forget",
+    "past": "forgot",
+    "participle": "forgotten",
+    "phonetics": {
+      "present": "forguét",
+      "past": "forgót",
+      "participle": "forgóten"
+    },
+    "meanings": [
+      {
+        "present": "olvidar",
+        "past": "olvidó",
+        "participle": "olvidado",
+        "note": "Para perder el recuerdo de algo"
+      }
+    ]
+  },
+  "forgive": {
+    "present": "forgive",
+    "past": "forgave",
+    "participle": "forgiven",
+    "phonetics": {
+      "present": "forguív",
+      "past": "forguéiv",
+      "participle": "forguíven"
+    },
+    "meanings": [
+      {
+        "present": "perdonar",
+        "past": "perdonó",
+        "participle": "perdonado",
+        "note": "Para dejar de guardar rencor"
+      }
+    ]
+  },
+  "freeze": {
+    "present": "freeze",
+    "past": "froze",
+    "participle": "frozen",
+    "phonetics": {
+      "present": "frís",
+      "past": "fróus",
+      "participle": "fróusen"
+    },
+    "meanings": [
+      {
+        "present": "congelar",
+        "past": "congeló",
+        "participle": "congelado",
+        "note": "Para convertir líquido en sólido por frío"
+      }
+    ]
+  },
+  "get": {
+    "present": "get",
+    "past": "got",
+    "participle": "gotten",
+    "phonetics": {
+      "present": "guét",
+      "past": "got",
+      "participle": "góten"
+    },
+    "meanings": [
+      {
+        "present": "obtener",
+        "past": "obtuvo",
+        "participle": "obtenido",
+        "note": "Para adquirir algo"
+      },
+      {
+        "present": "llegar",
+        "past": "llegó",
+        "participle": "llegado",
+        "note": "Para alcanzar un destino"
+      },
+      {
+        "present": "ponerse",
+        "past": "se puso",
+        "participle": "puesto",
+        "note": "Para cambios de estado (ej. get angry)"
+      }
+    ]
+  },
+  "give": {
+    "present": "give",
+    "past": "gave",
+    "participle": "given",
+    "phonetics": {
+      "present": "guív",
+      "past": "guéiv",
+      "participle": "guíven"
+    },
+    "meanings": [
+      {
+        "present": "dar",
+        "past": "dio",
+        "participle": "dado",
+        "note": "Para entregar algo a alguien"
+      }
+    ]
+  },
+  "go": {
+    "present": "go",
+    "past": "went",
+    "participle": "gone",
+    "phonetics": {
+      "present": "góu",
+      "past": "wént",
+      "participle": "gón"
+    },
+    "meanings": [
+      {
+        "present": "ir",
+        "past": "fue",
+        "participle": "ido",
+        "note": "Para moverse a otro lugar"
+      }
+    ]
+  },
+  "grind": {
+    "present": "grind",
+    "past": "ground",
+    "participle": "ground",
+    "phonetics": {
+      "present": "gráind",
+      "past": "gráund",
+      "participle": "gráund"
+    },
+    "meanings": [
+      {
+        "present": "moler",
+        "past": "molió",
+        "participle": "molido",
+        "note": "Para reducir a polvo o pequeñas partes"
+      }
+    ]
+  },
+  "grow": {
+    "present": "grow",
+    "past": "grew",
+    "participle": "grown",
+    "phonetics": {
+      "present": "gróu",
+      "past": "grú",
+      "participle": "gróun"
+    },
+    "meanings": [
+      {
+        "present": "crecer",
+        "past": "creció",
+        "participle": "crecido",
+        "note": "Para aumento de tamaño o desarrollo"
+      },
+      {
+        "present": "cultivar",
+        "past": "cultivó",
+        "participle": "cultivado",
+        "note": "Para plantas o cultivos"
+      }
+    ]
+  },
+  "hang": {
+    "present": "hang",
+    "past": "hung",
+    "participle": "hung",
+    "phonetics": {
+      "present": "hang",
+      "past": "hang",
+      "participle": "hang"
+    },
+    "meanings": [
+      {
+        "present": "colgar",
+        "past": "colgó",
+        "participle": "colgado",
+        "note": "Para suspender algo de un punto"
+      }
+    ]
+  },
+  "have": {
+    "present": "have / has",
+    "past": "had",
+    "participle": "had",
+    "phonetics": {
+      "present": "hav / has",
+      "past": "had",
+      "participle": "had"
+    },
+    "meanings": [
+      {
+        "present": "tener",
+        "past": "tuvo",
+        "participle": "tenido",
+        "note": "Para posesión o características"
+      }
+    ]
+  },
+  "hear": {
+    "present": "hear",
+    "past": "heard",
+    "participle": "heard",
+    "phonetics": {
+      "present": "jír",
+      "past": "jerd",
+      "participle": "jerd"
+    },
+    "meanings": [
+      {
+        "present": "oír",
+        "past": "oyó",
+        "participle": "oído",
+        "note": "Para percibir sonidos"
+      }
+    ]
+  },
+  "hide": {
+    "present": "hide",
+    "past": "hid",
+    "participle": "hidden",
+    "phonetics": {
+      "present": "jáid",
+      "past": "jid",
+      "participle": "jíden"
+    },
+    "meanings": [
+      {
+        "present": "esconder",
+        "past": "escondió",
+        "participle": "escondido",
+        "note": "Para ocultar algo o alguien"
+      }
+    ]
+  },
+  "hit": {
+    "present": "hit",
+    "past": "hit",
+    "participle": "hit",
+    "phonetics": {
+      "present": "jit",
+      "past": "jit",
+      "participle": "jit"
+    },
+    "meanings": [
+      {
+        "present": "golpear",
+        "past": "golpeó",
+        "participle": "golpeado",
+        "note": "Para dar un impacto físico"
+      },
+      {
+        "present": "impactar",
+        "past": "impactó",
+        "participle": "impactado",
+        "note": "Para chocar con fuerza"
+      }
+    ]
+  },
+  "hold": {
+    "present": "hold",
+    "past": "held",
+    "participle": "held",
+    "phonetics": {
+      "present": "jóuld",
+      "past": "jeld",
+      "participle": "jeld"
+    },
+    "meanings": [
+      {
+        "present": "sostener",
+        "past": "sostuvo",
+        "participle": "sostenido",
+        "note": "Para agarrar o mantener algo"
+      }
+    ]
+  },
+  "hurt": {
+    "present": "hurt",
+    "past": "hurt",
+    "participle": "hurt",
+    "phonetics": {
+      "present": "jert",
+      "past": "jert",
+      "participle": "jert"
+    },
+    "meanings": [
+      {
+        "present": "herir",
+        "past": "hirió",
+        "participle": "herido",
+        "note": "Para causar dolor físico"
+      },
+      {
+        "present": "doler",
+        "past": "dolió",
+        "participle": "dolido",
+        "note": "Para sentir dolor"
+      }
+    ]
+  },
+  "keep": {
+    "present": "keep",
+    "past": "kept",
+    "participle": "kept",
+    "phonetics": {
+      "present": "kíp",
+      "past": "kept",
+      "participle": "kept"
+    },
+    "meanings": [
+      {
+        "present": "guardar",
+        "past": "guardó",
+        "participle": "guardado",
+        "note": "Para conservar algo"
+      },
+      {
+        "present": "mantener",
+        "past": "mantuvo",
+        "participle": "mantenido",
+        "note": "Para continuar un estado"
+      }
+    ]
+  },
+  "know": {
+    "present": "know",
+    "past": "knew",
+    "participle": "known",
+    "phonetics": {
+      "present": "nóu",
+      "past": "niú",
+      "participle": "nóun"
+    },
+    "meanings": [
+      {
+        "present": "saber",
+        "past": "supo",
+        "participle": "sabido",
+        "note": "Para tener conocimiento de algo"
+      },
+      {
+        "present": "conocer",
+        "past": "conoció",
+        "participle": "conocido",
+        "note": "Para estar familiarizado con alguien/algo"
+      }
+    ]
+  },
+  "lay": {
+    "present": "lay",
+    "past": "laid",
+    "participle": "laid",
+    "phonetics": {
+      "present": "léi",
+      "past": "léid",
+      "participle": "léid"
+    },
+    "meanings": [
+      {
+        "present": "poner",
+        "past": "puso",
+        "participle": "puesto",
+        "note": "Para colocar algo horizontalmente"
+      }
+    ]
+  },
+  "lead": {
+    "present": "lead",
+    "past": "led",
+    "participle": "led",
+    "phonetics": {
+      "present": "líd",
+      "past": "led",
+      "participle": "led"
+    },
+    "meanings": [
+      {
+        "present": "guiar",
+        "past": "guió",
+        "participle": "guiado",
+        "note": "Para dirigir o mostrar el camino"
+      }
+    ]
+  },
+  "learn": {
+    "present": "learn",
+    "past": "learned / learnt",
+    "participle": "learned / learnt",
+    "phonetics": {
+      "present": "lern",
+      "past": "lernd / lernt",
+      "participle": "lernd / lernt"
+    },
+    "meanings": [
+      {
+        "present": "aprender",
+        "past": "aprendió",
+        "participle": "aprendido",
+        "note": "Para adquirir conocimiento"
+      }
+    ]
+  },
+  "leave": {
+    "present": "leave",
+    "past": "left",
+    "participle": "left",
+    "phonetics": {
+      "present": "lív",
+      "past": "left",
+      "participle": "left"
+    },
+    "meanings": [
+      {
+        "present": "dejar",
+        "past": "dejó",
+        "participle": "dejado",
+        "note": "Para abandonar algo o permitir"
+      },
+      {
+        "present": "irse",
+        "past": "se fue",
+        "participle": "ido",
+        "note": "Para partir de un lugar"
+      }
+    ]
+  },
+  "lend": {
+    "present": "lend",
+    "past": "lent",
+    "participle": "lent",
+    "phonetics": {
+      "present": "lend",
+      "past": "lent",
+      "participle": "lent"
+    },
+    "meanings": [
+      {
+        "present": "prestar",
+        "past": "prestó",
+        "participle": "prestado",
+        "note": "Para dar algo temporalmente"
+      }
+    ]
+  },
+  "let": {
+    "present": "let",
+    "past": "let",
+    "participle": "let",
+    "phonetics": {
+      "present": "let",
+      "past": "let",
+      "participle": "let"
+    },
+    "meanings": [
+      {
+        "present": "permitir",
+        "past": "permitió",
+        "participle": "permitido",
+        "note": "Para dar autorización"
+      }
+    ]
+  },
+  "lie": {
+    "present": "lie",
+    "past": "lay / lied",
+    "participle": "lain / lied",
+    "phonetics": {
+      "present": "lái",
+      "past": "léi / láid",
+      "participle": "léin / láid"
+    },
+    "meanings": [
+      {
+        "present": "mentir",
+        "past": "mintió",
+        "participle": "mentido",
+        "note": "Para decir algo falso (lied)"
+      },
+      {
+        "present": "yacer",
+        "past": "yació",
+        "participle": "yacido",
+        "note": "Para estar en posición horizontal (lay/lain)"
+      }
+    ]
+  },
+  "light": {
+    "present": "light",
+    "past": "lit",
+    "participle": "lit",
+    "phonetics": {
+      "present": "láit",
+      "past": "lit",
+      "participle": "lit"
+    },
+    "meanings": [
+      {
+        "present": "encender",
+        "past": "encendió",
+        "participle": "encendido",
+        "note": "Para hacer que algo comience a arder"
+      }
+    ]
+  },
+  "lose": {
+    "present": "lose",
+    "past": "lost",
+    "participle": "lost",
+    "phonetics": {
+      "present": "lús",
+      "past": "lost",
+      "participle": "lost"
+    },
+    "meanings": [
+      {
+        "present": "perder",
+        "past": "perdió",
+        "participle": "perdido",
+        "note": "Para dejar de tener algo"
+      }
+    ]
+  },
+  "make": {
+    "present": "make",
+    "past": "made",
+    "participle": "made",
+    "phonetics": {
+      "present": "méik",
+      "past": "méid",
+      "participle": "méid"
+    },
+    "meanings": [
+      {
+        "present": "hacer",
+        "past": "hizo",
+        "participle": "hecho",
+        "note": "Para crear o fabricar algo"
+      }
+    ]
+  },
+  "mean": {
+    "present": "mean",
+    "past": "meant",
+    "participle": "meant",
+    "phonetics": {
+      "present": "mín",
+      "past": "ment",
+      "participle": "ment"
+    },
+    "meanings": [
+      {
+        "present": "significar",
+        "past": "significó",
+        "participle": "significado",
+        "note": "Para representar un concepto"
+      }
+    ]
+  },
+  "meet": {
+    "present": "meet",
+    "past": "met",
+    "participle": "met",
+    "phonetics": {
+      "present": "mít",
+      "past": "met",
+      "participle": "met"
+    },
+    "meanings": [
+      {
+        "present": "conocer",
+        "past": "conoció",
+        "participle": "conocido",
+        "note": "Para encontrarse por primera vez"
+      },
+      {
+        "present": "reunirse",
+        "past": "se reunió",
+        "participle": "reunido",
+        "note": "Para juntarse con alguien"
+      }
+    ]
+  },
+  "pay": {
+    "present": "pay",
+    "past": "paid",
+    "participle": "paid",
+    "phonetics": {
+      "present": "péi",
+      "past": "péid",
+      "participle": "péid"
+    },
+    "meanings": [
+      {
+        "present": "pagar",
+        "past": "pagó",
+        "participle": "pagado",
+        "note": "Para dar dinero a cambio de algo"
+      }
+    ]
+  },
+  "put": {
+    "present": "put",
+    "past": "put",
+    "participle": "put",
+    "phonetics": {
+      "present": "put",
+      "past": "put",
+      "participle": "put"
+    },
+    "meanings": [
+      {
+        "present": "poner",
+        "past": "puso",
+        "participle": "puesto",
+        "note": "Para colocar algo en un lugar"
+      }
+    ]
+  },
+  "quit": {
+    "present": "quit",
+    "past": "quit",
+    "participle": "quit",
+    "phonetics": {
+      "present": "kuít",
+      "past": "kuít",
+      "participle": "kuít"
+    },
+    "meanings": [
+      {
+        "present": "dejar",
+        "past": "dejó",
+        "participle": "dejado",
+        "note": "Para abandonar una actividad"
+      }
+    ]
+  },
+  "read": {
+    "present": "read",
+    "past": "read",
+    "participle": "read",
+    "phonetics": {
+      "present": "ríd",
+      "past": "red",
+      "participle": "red"
+    },
+    "meanings": [
+      {
+        "present": "leer",
+        "past": "leyó",
+        "participle": "leído",
+        "note": "Para interpretar texto escrito"
+      }
+    ]
+  },
+  "ride": {
+    "present": "ride",
+    "past": "rode",
+    "participle": "ridden",
+    "phonetics": {
+      "present": "ráid",
+      "past": "róud",
+      "participle": "ríden"
+    },
+    "meanings": [
+      {
+        "present": "montar",
+        "past": "montó",
+        "participle": "montado",
+        "note": "Para viajar en animal o vehículo"
+      }
+    ]
+  },
+  "ring": {
+    "present": "ring",
+    "past": "rang",
+    "participle": "rung",
+    "phonetics": {
+      "present": "ring",
+      "past": "rang",
+      "participle": "rang"
+    },
+    "meanings": [
+      {
+        "present": "sonar",
+        "past": "sonó",
+        "participle": "sonado",
+        "note": "Para producir sonido de campana/timbre"
+      }
+    ]
+  },
+  "rise": {
+    "present": "rise",
+    "past": "rose",
+    "participle": "risen",
+    "phonetics": {
+      "present": "ráis",
+      "past": "róus",
+      "participle": "rísn"
+    },
+    "meanings": [
+      {
+        "present": "levantarse",
+        "past": "se levantó",
+        "participle": "levantado",
+        "note": "Para pasar de posición baja a alta"
+      }
+    ]
+  },
+  "run": {
+    "present": "run",
+    "past": "ran",
+    "participle": "run",
+    "phonetics": {
+      "present": "ran",
+      "past": "ran",
+      "participle": "ran"
+    },
+    "meanings": [
+      {
+        "present": "correr",
+        "past": "corrió",
+        "participle": "corrido",
+        "note": "Para moverse rápidamente a pie"
+      },
+      {
+        "present": "funcionar",
+        "past": "funcionó",
+        "participle": "funcionado",
+        "note": "Para describir operación de máquinas/sistemas"
+      }
+    ]
+  },
+  "say": {
+    "present": "say",
+    "past": "said",
+    "participle": "said",
+    "phonetics": {
+      "present": "séi",
+      "past": "sed",
+      "participle": "sed"
+    },
+    "meanings": [
+      {
+        "present": "decir",
+        "past": "dijo",
+        "participle": "dicho",
+        "note": "Para expresar con palabras"
+      }
+    ]
+  },
+  "see": {
+    "present": "see",
+    "past": "saw",
+    "participle": "seen",
+    "phonetics": {
+      "present": "sí",
+      "past": "so",
+      "participle": "sín"
+    },
+    "meanings": [
+      {
+        "present": "ver",
+        "past": "vio",
+        "participle": "visto",
+        "note": "Para percibir con los ojos"
+      }
+    ]
+  },
+  "seek": {
+    "present": "seek",
+    "past": "sought",
+    "participle": "sought",
+    "phonetics": {
+      "present": "sík",
+      "past": "sot",
+      "participle": "sot"
+    },
+    "meanings": [
+      {
+        "present": "buscar",
+        "past": "buscó",
+        "participle": "buscado",
+        "note": "Para intentar encontrar algo"
+      }
+    ]
+  },
+  "sell": {
+    "present": "sell",
+    "past": "sold",
+    "participle": "sold",
+    "phonetics": {
+      "present": "sel",
+      "past": "sold",
+      "participle": "sold"
+    },
+    "meanings": [
+      {
+        "present": "vender",
+        "past": "vendió",
+        "participle": "vendido",
+        "note": "Para transferir propiedad a cambio de dinero"
+      }
+    ]
+  },
+  "send": {
+    "present": "send",
+    "past": "sent",
+    "participle": "sent",
+    "phonetics": {
+      "present": "send",
+      "past": "sent",
+      "participle": "sent"
+    },
+    "meanings": [
+      {
+        "present": "enviar",
+        "past": "envió",
+        "participle": "enviado",
+        "note": "Para hacer que algo vaya a otro lugar"
+      }
+    ]
+  },
+  "set": {
+    "present": "set",
+    "past": "set",
+    "participle": "set",
+    "phonetics": {
+      "present": "set",
+      "past": "set",
+      "participle": "set"
+    },
+    "meanings": [
+      {
+        "present": "poner",
+        "past": "puso",
+        "participle": "puesto",
+        "note": "Para colocar algo en posición"
+      },
+      {
+        "present": "establecer",
+        "past": "estableció",
+        "participle": "establecido",
+        "note": "Para fijar parámetros o configuraciones"
+      }
+    ]
+  },
+  "shake": {
+    "present": "shake",
+    "past": "shook",
+    "participle": "shaken",
+    "phonetics": {
+      "present": "shéik",
+      "past": "shuk",
+      "participle": "shéiken"
+    },
+    "meanings": [
+      {
+        "present": "sacudir",
+        "past": "sacudió",
+        "participle": "sacudido",
+        "note": "Para mover algo rápidamente de un lado a otro"
+      }
+    ]
+  },
+  "shine": {
+    "present": "shine",
+    "past": "shone / shined",
+    "participle": "shone / shined",
+    "phonetics": {
+      "present": "sháin",
+      "past": "shón / sháind",
+      "participle": "shón / sháind"
+    },
+    "meanings": [
+      {
+        "present": "brillar",
+        "past": "brilló",
+        "participle": "brillado",
+        "note": "Para emitir luz (shone)"
+      },
+      {
+        "present": "lustrar",
+        "past": "lustró",
+        "participle": "lustrado",
+        "note": "Para pulir algo (shined)"
+      }
+    ]
+  },
+  "shoot": {
+    "present": "shoot",
+    "past": "shot",
+    "participle": "shot",
+    "phonetics": {
+      "present": "shút",
+      "past": "shot",
+      "participle": "shot"
+    },
+    "meanings": [
+      {
+        "present": "disparar",
+        "past": "disparó",
+        "participle": "disparado",
+        "note": "Para lanzar proyectiles con un arma"
+      }
+    ]
+  },
+  "show": {
+    "present": "show",
+    "past": "showed",
+    "participle": "shown",
+    "phonetics": {
+      "present": "shóu",
+      "past": "shóud",
+      "participle": "shóun"
+    },
+    "meanings": [
+      {
+        "present": "mostrar",
+        "past": "mostró",
+        "participle": "mostrado",
+        "note": "Para hacer algo visible o evidente"
+      }
+    ]
+  },
+  "shrink": {
+    "present": "shrink",
+    "past": "shrank",
+    "participle": "shrunk",
+    "phonetics": {
+      "present": "shrink",
+      "past": "shrank",
+      "participle": "shrank"
+    },
+    "meanings": [
+      {
+        "present": "encoger",
+        "past": "encogió",
+        "participle": "encogido",
+        "note": "Para reducir de tamaño"
+      }
+    ]
+  },
+  "shut": {
+    "present": "shut",
+    "past": "shut",
+    "participle": "shut",
+    "phonetics": {
+      "present": "shat",
+      "past": "shat",
+      "participle": "shat"
+    },
+    "meanings": [
+      {
+        "present": "cerrar",
+        "past": "cerró",
+        "participle": "cerrado",
+        "note": "Para mover algo a posición que impide paso"
+      }
+    ]
+  },
+  "sing": {
+    "present": "sing",
+    "past": "sang",
+    "participle": "sung",
+    "phonetics": {
+      "present": "sing",
+      "past": "sang",
+      "participle": "sang"
+    },
+    "meanings": [
+      {
+        "present": "cantar",
+        "past": "cantó",
+        "participle": "cantado",
+        "note": "Para producir sonidos musicales con la voz"
+      }
+    ]
+  },
+  "sink": {
+    "present": "sink",
+    "past": "sank",
+    "participle": "sunk",
+    "phonetics": {
+      "present": "sink",
+      "past": "sank",
+      "participle": "sank"
+    },
+    "meanings": [
+      {
+        "present": "hundir",
+        "past": "hundió",
+        "participle": "hundido",
+        "note": "Para ir hacia el fondo en líquido"
+      }
+    ]
+  },
+  "sit": {
+    "present": "sit",
+    "past": "sat",
+    "participle": "sat",
+    "phonetics": {
+      "present": "sit",
+      "past": "sat",
+      "participle": "sat"
+    },
+    "meanings": [
+      {
+        "present": "sentar",
+        "past": "sentó",
+        "participle": "sentado",
+        "note": "Para apoyar el cuerpo en una superficie"
+      }
+    ]
+  },
+  "sleep": {
+    "present": "sleep",
+    "past": "slept",
+    "participle": "slept",
+    "phonetics": {
+      "present": "slíp",
+      "past": "slept",
+      "participle": "slept"
+    },
+    "meanings": [
+      {
+        "present": "dormir",
+        "past": "durmió",
+        "participle": "dormido",
+        "note": "Para estar en estado de reposo inconsciente"
+      }
+    ]
+  },
+  "slide": {
+    "present": "slide",
+    "past": "slid",
+    "participle": "slid",
+    "phonetics": {
+      "present": "sláid",
+      "past": "slid",
+      "participle": "slid"
+    },
+    "meanings": [
+      {
+        "present": "deslizar",
+        "past": "deslizó",
+        "participle": "deslizado",
+        "note": "Para moverse suavemente sobre superficie"
+      }
+    ]
+  },
+  "speak": {
+    "present": "speak",
+    "past": "spoke",
+    "participle": "spoken",
+    "phonetics": {
+      "present": "spík",
+      "past": "spóuk",
+      "participle": "spóuken"
+    },
+    "meanings": [
+      {
+        "present": "hablar",
+        "past": "habló",
+        "participle": "hablado",
+        "note": "Para comunicarse verbalmente"
+      }
+    ]
+  },
+  "speed": {
+    "present": "speed",
+    "past": "sped",
+    "participle": "sped",
+    "phonetics": {
+      "present": "spíd",
+      "past": "sped",
+      "participle": "sped"
+    },
+    "meanings": [
+      {
+        "present": "acelerar",
+        "past": "aceleró",
+        "participle": "acelerado",
+        "note": "Para aumentar la velocidad"
+      }
+    ]
+  },
+  "spend": {
+    "present": "spend",
+    "past": "spent",
+    "participle": "spent",
+    "phonetics": {
+      "present": "spend",
+      "past": "spent",
+      "participle": "spent"
+    },
+    "meanings": [
+      {
+        "present": "gastar",
+        "past": "gastó",
+        "participle": "gastado",
+        "note": "Para usar dinero o recursos"
+      }
+    ]
+  },
+  "split": {
+    "present": "split",
+    "past": "split",
+    "participle": "split",
+    "phonetics": {
+      "present": "split",
+      "past": "split",
+      "participle": "split"
+    },
+    "meanings": [
+      {
+        "present": "dividir",
+        "past": "dividió",
+        "participle": "dividido",
+        "note": "Para separar en partes"
+      }
+    ]
+  },
+  "spread": {
+    "present": "spread",
+    "past": "spread",
+    "participle": "spread",
+    "phonetics": {
+      "present": "spred",
+      "past": "spred",
+      "participle": "spred"
+    },
+    "meanings": [
+      {
+        "present": "extender",
+        "past": "extendió",
+        "participle": "extendido",
+        "note": "Para desplegar sobre una superficie"
+      }
+    ]
+  },
+  "stand": {
+    "present": "stand",
+    "past": "stood",
+    "participle": "stood",
+    "phonetics": {
+      "present": "stand",
+      "past": "stud",
+      "participle": "stud"
+    },
+    "meanings": [
+      {
+        "present": "estar de pie",
+        "past": "estuvo de pie",
+        "participle": "estado de pie",
+        "note": "Para mantenerse en posición vertical"
+      }
+    ]
+  },
+  "steal": {
+    "present": "steal",
+    "past": "stole",
+    "participle": "stolen",
+    "phonetics": {
+      "present": "stíl",
+      "past": "stól",
+      "participle": "stólen"
+    },
+    "meanings": [
+      {
+        "present": "robar",
+        "past": "robó",
+        "participle": "robado",
+        "note": "Para tomar algo ilegalmente"
+      }
+    ]
+  },
+  "stick": {
+    "present": "stick",
+    "past": "stuck",
+    "participle": "stuck",
+    "phonetics": {
+      "present": "stik",
+      "past": "stak",
+      "participle": "stak"
+    },
+    "meanings": [
+      {
+        "present": "pegar",
+        "past": "pegó",
+        "participle": "pegado",
+        "note": "Para adherir una cosa a otra"
+      }
+    ]
+  },
+  "sting": {
+    "present": "sting",
+    "past": "stung",
+    "participle": "stung",
+    "phonetics": {
+      "present": "sting",
+      "past": "stang",
+      "participle": "stang"
+    },
+    "meanings": [
+      {
+        "present": "picar",
+        "past": "picó",
+        "participle": "picado",
+        "note": "Para inyectar veneno (insectos)"
+      }
+    ]
+  },
+  "stink": {
+    "present": "stink",
+    "past": "stank",
+    "participle": "stunk",
+    "phonetics": {
+      "present": "stink",
+      "past": "stank",
+      "participle": "stank"
+    },
+    "meanings": [
+      {
+        "present": "apestar",
+        "past": "apestó",
+        "participle": "apestado",
+        "note": "Para oler muy mal"
+      }
+    ]
+  },
+  "strike": {
+    "present": "strike",
+    "past": "struck",
+    "participle": "struck",
+    "phonetics": {
+      "present": "stráik",
+      "past": "strak",
+      "participle": "strak"
+    },
+    "meanings": [
+      {
+        "present": "golpear",
+        "past": "golpeó",
+        "participle": "golpeado",
+        "note": "Para dar un impacto fuerte"
+      }
+    ]
+  },
+  "swear": {
+    "present": "swear",
+    "past": "swore",
+    "participle": "sworn",
+    "phonetics": {
+      "present": "swer",
+      "past": "swor",
+      "participle": "sworn"
+    },
+    "meanings": [
+      {
+        "present": "jurar",
+        "past": "juró",
+        "participle": "jurado",
+        "note": "Para hacer una promesa solemne"
+      },
+      {
+        "present": "maldecir",
+        "past": "maldijo",
+        "participle": "maldicho",
+        "note": "Para decir palabrotas"
+      }
+    ]
+  },
+  "sweep": {
+    "present": "sweep",
+    "past": "swept",
+    "participle": "swept",
+    "phonetics": {
+      "present": "swíp",
+      "past": "swept",
+      "participle": "swept"
+    },
+    "meanings": [
+      {
+        "present": "barrer",
+        "past": "barrió",
+        "participle": "barrido",
+        "note": "Para limpiar con escoba"
+      }
+    ]
+  },
+  "swim": {
+    "present": "swim",
+    "past": "swam",
+    "participle": "swum",
+    "phonetics": {
+      "present": "swim",
+      "past": "swam",
+      "participle": "swam"
+    },
+    "meanings": [
+      {
+        "present": "nadar",
+        "past": "nadó",
+        "participle": "nadado",
+        "note": "Para moverse en el agua"
+      }
+    ]
+  },
+  "take": {
+    "present": "take",
+    "past": "took",
+    "participle": "taken",
+    "phonetics": {
+      "present": "téik",
+      "past": "tuk",
+      "participle": "téiken"
+    },
+    "meanings": [
+      {
+        "present": "tomar",
+        "past": "tomó",
+        "participle": "tomado",
+        "note": "Para coger algo con la mano"
+      },
+      {
+        "present": "llevar",
+        "past": "llevó",
+        "participle": "llevado",
+        "note": "Para transportar algo"
+      }
+    ]
+  },
+  "teach": {
+    "present": "teach",
+    "past": "taught",
+    "participle": "taught",
+    "phonetics": {
+      "present": "tích",
+      "past": "tot",
+      "participle": "tot"
+    },
+    "meanings": [
+      {
+        "present": "enseñar",
+        "past": "enseñó",
+        "participle": "enseñado",
+        "note": "Para impartir conocimiento"
+      }
+    ]
+  },
+  "tear": {
+    "present": "tear",
+    "past": "tore",
+    "participle": "torn",
+    "phonetics": {
+      "present": "ter",
+      "past": "tor",
+      "participle": "torn"
+    },
+    "meanings": [
+      {
+        "present": "romper",
+        "past": "rompió",
+        "participle": "roto",
+        "note": "Para separar algo con fuerza (papel, tela)"
+      },
+      {
+        "present": "rasgar",
+        "past": "rasgó",
+        "participle": "rasgado",
+        "note": "Para hacer cortes irregulares"
+      }
+    ]
+  },
+  "tell": {
+    "present": "tell",
+    "past": "told",
+    "participle": "told",
+    "phonetics": {
+      "present": "tel",
+      "past": "told",
+      "participle": "told"
+    },
+    "meanings": [
+      {
+        "present": "decir",
+        "past": "dijo",
+        "participle": "dicho",
+        "note": "Para comunicar información"
+      }
+    ]
+  },
+  "think": {
+    "present": "think",
+    "past": "thought",
+    "participle": "thought",
+    "phonetics": {
+      "present": "zink",
+      "past": "zot",
+      "participle": "zot"
+    },
+    "meanings": [
+      {
+        "present": "pensar",
+        "past": "pensó",
+        "participle": "pensado",
+        "note": "Para usar la mente para considerar algo"
+      }
+    ]
+  },
+  "throw": {
+    "present": "throw",
+    "past": "threw",
+    "participle": "thrown",
+    "phonetics": {
+      "present": "zróu",
+      "past": "zru",
+      "participle": "zróun"
+    },
+    "meanings": [
+      {
+        "present": "lanzar",
+        "past": "lanzó",
+        "participle": "lanzado",
+        "note": "Para propulsar algo por el aire"
+      }
+    ]
+  },
+  "understand": {
+    "present": "understand",
+    "past": "understood",
+    "participle": "understood",
+    "phonetics": {
+      "present": "anderstánd",
+      "past": "anderstúd",
+      "participle": "anderstúd"
+    },
+    "meanings": [
+      {
+        "present": "entender",
+        "past": "entendió",
+        "participle": "entendido",
+        "note": "Para comprender el significado"
+      }
+    ]
+  },
+  "wake": {
+    "present": "wake",
+    "past": "woke / waked",
+    "participle": "woken / waked / woke",
+    "phonetics": {
+      "present": "wéik",
+      "past": "wóuk / wéikt",
+      "participle": "wóuken / wéikt / wóuk"
+    },
+    "meanings": [
+      {
+        "present": "despertar",
+        "past": "despertó",
+        "participle": "despertado",
+        "note": "Para dejar de dormir"
+      }
+    ]
+  },
+  "wear": {
+    "present": "wear",
+    "past": "wore",
+    "participle": "worn",
+    "phonetics": {
+      "present": "wer",
+      "past": "wor",
+      "participle": "worn"
+    },
+    "meanings": [
+      {
+        "present": "usar",
+        "past": "usó",
+        "participle": "usado",
+        "note": "Para llevar puesto (ropa, accesorios)"
+      }
+    ]
+  },
+  "wed": {
+    "present": "wed",
+    "past": "wedded / wed",
+    "participle": "wedded / wed",
+    "phonetics": {
+      "present": "wed",
+      "past": "wédid / wed",
+      "participle": "wédid / wed"
+    },
+    "meanings": [
+      {
+        "present": "casar",
+        "past": "casó",
+        "participle": "casado",
+        "note": "Para unirse en matrimonio"
+      }
+    ]
+  },
+  "weep": {
+    "present": "weep",
+    "past": "wept",
+    "participle": "wept",
+    "phonetics": {
+      "present": "wíp",
+      "past": "wept",
+      "participle": "wept"
+    },
+    "meanings": [
+      {
+        "present": "llorar",
+        "past": "lloró",
+        "participle": "llorado",
+        "note": "Para derramar lágrimas"
+      }
+    ]
+  },
+  "wet": {
+    "present": "wet",
+    "past": "wet / wetted",
+    "participle": "wet / wetted",
+    "phonetics": {
+      "present": "wet",
+      "past": "wet / wétid",
+      "participle": "wet / wétid"
+    },
+    "meanings": [
+      {
+        "present": "mojar",
+        "past": "mojó",
+        "participle": "mojado",
+        "note": "Para humedecer algo"
+      }
+    ]
+  },
+  "win": {
+    "present": "win",
+    "past": "won",
+    "participle": "won",
+    "phonetics": {
+      "present": "win",
+      "past": "won",
+      "participle": "won"
+    },
+    "meanings": [
+      {
+        "present": "ganar",
+        "past": "ganó",
+        "participle": "ganado",
+        "note": "Para obtener victoria en competencia"
+      }
+    ]
+  },
+  "wind": {
+    "present": "wind",
+    "past": "wound",
+    "participle": "wound",
+    "phonetics": {
+      "present": "wáind",
+      "past": "wáund",
+      "participle": "wáund"
+    },
+    "meanings": [
+      {
+        "present": "enrollar",
+        "past": "enrolló",
+        "participle": "enrollado",
+        "note": "Para dar vueltas a algo alrededor de un eje"
+      }
+    ]
+  },
+  "write": {
+    "present": "write",
+    "past": "wrote",
+    "participle": "written",
+    "phonetics": {
+      "present": "ráit",
+      "past": "róut",
+      "participle": "ríten"
+    },
+    "meanings": [
+      {
+        "present": "escribir",
+        "past": "escribió",
+        "participle": "escrito",
+        "note": "Para redactar textos"
+      }
+    ]
+  }
+}

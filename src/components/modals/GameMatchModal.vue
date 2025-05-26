@@ -80,7 +80,7 @@
 import confetti from 'canvas-confetti';
 
 export default {
-  name: 'MatchVerbsModal',
+  name: 'GameMatchModal',
   props: {
     show: Boolean,
     verbs: Object,
