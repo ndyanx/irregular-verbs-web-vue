@@ -155,7 +155,7 @@ export default {
       this.resetQuestionState();
     },
     selectVerb(index) {
-      if (this.feedback) return;
+      if (this.feedback || this.selectedVerbs.length > 0) return;
       
       this.selectedVerbs = [index];
       

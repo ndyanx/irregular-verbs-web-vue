@@ -54,7 +54,7 @@
             <button 
               class="submit-btn" 
               @click="checkAnswer"
-              :disabled="timeOver || !userAnswer.trim()"
+              :disabled="timeOver || !userAnswer.trim() || isChecking || answerLock"
             >
               {{ timeOver ? 'Tiempo terminado' : 'Comprobar' }}
             </button>
@@ -104,7 +104,9 @@ export default {
       includeParticiple: false,
       timeBonus: 5,
       timeOver: false,
-      confetti: null
+      confetti: null,
+      isChecking: false,
+      answerLock: false
     };
   },
   computed: {
@@ -169,7 +171,7 @@ export default {
       this.$nextTick(() => this.$refs.answerInput.focus());
     },
     checkAnswer() {
-      if (!this.userAnswer.trim() || this.timeOver) return;
+      if (!this.userAnswer.trim() || this.timeOver || this.isChecking || this.answerLock) return;
       
       const verb = this.verbs[this.currentVerbKey];
       const expectedForms = [
@@ -184,11 +186,18 @@ export default {
       this.feedback = isCorrect ? `¡Correcto! +${this.timeBonus}s` : `Incorrecto. Opciones: ${expectedForms.join(' o ')}`;
       
       if (isCorrect) {
+        this.answerLock = true;
         this.score++;
         this.timeLeft = Math.min(this.timeLeft + this.timeBonus, this.totalTime); // Limitar al tiempo máximo
         this.launchConfetti();
+        setTimeout(() => {
+          this.generateQuestion();
+          this.isChecking = false;
+          this.answerLock = false;
+        }, 1500);
       } else {
         this.attempts++;
+        this.isChecking = false;
       }
       
       this.lastCorrect = isCorrect;

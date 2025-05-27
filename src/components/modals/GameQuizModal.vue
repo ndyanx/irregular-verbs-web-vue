@@ -38,9 +38,9 @@
           <button 
             class="quiz-submit"
             @click="checkAnswer"
-            :disabled="!userAnswer.trim()"
+            :disabled="!userAnswer.trim() || isChecking || answerLock"
           >
-            Comprobar
+             {{ timeOver ? 'Tiempo terminado' : 'Comprobar' }}
           </button>
           <div 
             class="quiz-feedback"
@@ -95,7 +95,9 @@ export default {
       score: 0,
       attempts: 0,
       usedVerbKeys: [],
-      confetti: null
+      confetti: null,
+      isChecking: false,
+      answerLock: false
     };
   },
   computed: {
@@ -236,7 +238,9 @@ export default {
       };
     },
     checkAnswer() {
-      if (!this.userAnswer.trim()) return;
+      if (!this.userAnswer.trim() || this.isChecking || this.answerLock) return;
+
+      this.isChecking = true;
       
       const { isCorrect, correctAnswer } = this.currentVerb.gameRules 
         ? this.checkSpecialCaseAnswer() 
@@ -246,11 +250,17 @@ export default {
       this.feedback = this.isCorrect ? '¡Correcto! 🎉' : `Incorrecto. La respuesta correcta era: ${correctAnswer}`;
       
       if (isCorrect) {
+        this.answerLock = true;
         this.score++;
         this.launchConfetti();
-        setTimeout(this.generateNewQuestion, 1500);
+        setTimeout(() => {
+          this.generateNewQuestion();
+          this.isChecking = false;
+          this.answerLock = false;
+        }, 1500);
       } else {
         this.attempts++;
+        this.isChecking = false;
       }
     },
     close() {
