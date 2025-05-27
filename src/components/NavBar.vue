@@ -45,6 +45,7 @@
         <div v-if="dropdownOpen" class="dropdown-menu">
           <button @click="openQuiz('classic')">Juego Clásico</button>
           <button @click="openQuiz('match')">Emparejar Verbos</button>
+          <button @click="openQuiz('race')">Carrera de Verbos</button>
         </div>
       </div>
     </div>

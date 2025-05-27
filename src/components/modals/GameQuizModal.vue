@@ -50,7 +50,7 @@
             {{ feedback }}
           </div>
           <div class="quiz-stats">
-            Aciertos: {{ score }} / Intentos: {{ attempts }}
+            ✅ {{ score }} | ❌ {{ attempts }}
           </div>
         </div>
       </div>
@@ -242,16 +242,15 @@ export default {
         ? this.checkSpecialCaseAnswer() 
         : this.checkRegularAnswer();
 
-      this.attempts++;
       this.isCorrect = isCorrect;
+      this.feedback = this.isCorrect ? '¡Correcto! 🎉' : `Incorrecto. La respuesta correcta era: ${correctAnswer}`;
       
       if (isCorrect) {
         this.score++;
         this.launchConfetti();
-        this.feedback = '¡Correcto!';
         setTimeout(this.generateNewQuestion, 1500);
       } else {
-        this.feedback = `Incorrecto. La respuesta correcta era: ${correctAnswer}`;
+        this.attempts++;
       }
     },
     close() {

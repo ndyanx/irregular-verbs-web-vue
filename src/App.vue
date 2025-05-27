@@ -28,6 +28,12 @@
       :verbs="verbs"
       @close="showQuiz = null"
     />
+
+    <GameRaceModal
+      :show="showQuiz === 'race'" 
+      :verbs="verbs"
+      @close="showQuiz = null"
+    />
     
     <Footer />
   </div>
@@ -39,6 +45,7 @@ import NavBar from './components/NavBar.vue';
 import VerbTable from './components/VerbTable.vue';
 import GameQuizModal from './components/modals/GameQuizModal.vue';
 import GameMatchModal from './components/modals/GameMatchModal.vue';
+import GameRaceModal from './components/modals/GameRaceModal.vue';
 import Footer from './components/Footer.vue';
 
 export default {
@@ -48,6 +55,7 @@ export default {
     VerbTable,
     GameQuizModal,
     GameMatchModal,
+    GameRaceModal,
     Footer
   },
   data() {

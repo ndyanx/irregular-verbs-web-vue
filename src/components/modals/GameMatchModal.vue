@@ -67,7 +67,7 @@
               {{ feedback }}
             </div>
             <div class="quiz-stats">
-              Aciertos: {{ score }} / Intentos: {{ attempts }}
+              ✅ {{ score }} | ❌ {{ attempts }}
             </div>
           </div>
         </div>
@@ -158,7 +158,6 @@ export default {
       if (this.feedback) return;
       
       this.selectedVerbs = [index];
-      this.attempts++;
       
       this.isCorrect = this.correctIndices.includes(index);
       this.feedback = this.isCorrect ? '¡Correcto! 🎉' : 'Incorrecto 😢';
@@ -166,6 +165,8 @@ export default {
       if (this.isCorrect) {
         this.score++;
         this.launchConfetti();
+      } else {
+        this.attempts++;
       }
     },
     resetQuestionState() {
