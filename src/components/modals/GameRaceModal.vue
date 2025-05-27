@@ -181,7 +181,7 @@ export default {
       ];
       
       const isCorrect = expectedForms.includes(this.userAnswer.toLowerCase().trim());
-      this.feedback = this.isCorrect ? `¡Correcto! +${this.timeBonus}s` : `Incorrecto. Opciones: ${expectedForms.join(' o ')}`;
+      this.feedback = isCorrect ? `¡Correcto! +${this.timeBonus}s` : `Incorrecto. Opciones: ${expectedForms.join(' o ')}`;
       
       if (isCorrect) {
         this.score++;
