@@ -252,7 +252,9 @@ export default {
       if (isCorrect) {
         this.answerLock = true;
         this.score++;
-        this.launchConfetti();
+        if (this.score % 3 === 0) {
+          this.launchConfetti();
+        }
         setTimeout(() => {
           this.generateNewQuestion();
           this.isChecking = false;

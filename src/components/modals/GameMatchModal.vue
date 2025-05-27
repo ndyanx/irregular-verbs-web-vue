@@ -164,7 +164,9 @@ export default {
       
       if (this.isCorrect) {
         this.score++;
-        this.launchConfetti();
+        if (this.score % 3 === 0) {
+          this.launchConfetti();
+        }
       } else {
         this.attempts++;
       }

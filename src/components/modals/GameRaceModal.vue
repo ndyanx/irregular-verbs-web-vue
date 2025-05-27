@@ -189,7 +189,9 @@ export default {
         this.answerLock = true;
         this.score++;
         this.timeLeft = Math.min(this.timeLeft + this.timeBonus, this.totalTime); // Limitar al tiempo máximo
-        this.launchConfetti();
+        if (this.score % 3 === 0) {
+          this.launchConfetti();
+        }
         setTimeout(() => {
           this.generateQuestion();
           this.isChecking = false;
