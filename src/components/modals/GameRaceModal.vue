@@ -366,6 +366,7 @@ export default {
 /* Toggle switch */
 .toggle-container {
   margin-bottom: 12px;
+  -webkit-tap-highlight-color: transparent; /* Elimina el destello azul */
 }
 
 .toggle-label {

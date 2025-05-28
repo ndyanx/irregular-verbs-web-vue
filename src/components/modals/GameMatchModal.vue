@@ -382,6 +382,7 @@ export default {
   cursor: pointer;
   font-weight: 500;
   font-size: 0.85rem;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mode-btn:hover {
