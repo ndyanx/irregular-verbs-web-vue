@@ -14,71 +14,100 @@
         class="icon-btn-text"
         @click="toggleParticiple"
         :class="{ active: showParticiple }"
-        aria-label="Toggle participle column"
+        :aria-label="`${showParticiple ? 'Ocultar' : 'Mostrar'} columna de participio`"
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
           <circle cx="12" cy="12" r="3"></circle>
         </svg>
-        <span>{{ showParticiple ? 'Participio' : 'Mostrar Participio' }}</span>
+        <span>{{ showParticiple ? 'Ocultar Participio' : 'Mostrar Participio' }}</span>
       </button>
       <select 
         v-model="currentSort"
         class="sort-selector"
         @change="resetPagination"
+        aria-label="Seleccionar orden de clasificación"
       >
-        <option value="default">Orden: A-Z</option>
-        <option value="identical">Formas idénticas</option>
-        <option value="easy">Más fáciles</option>
-        <option value="common">Más comunes</option>
+        <option 
+          v-for="(label, key) in SORT_NAMES" 
+          :key="key" 
+          :value="key"
+        >
+          Orden: {{ label }}
+        </option>
       </select>
     </div>
     
     <div class="table-container">
-      <table>
+      <table role="table" aria-label="Tabla de verbos irregulares">
         <thead class="rainbow-header">
-          <tr>
-            <th>Presente</th>
-            <th>Pasado</th>
-            <th v-show="showParticiple">Participio</th>
-            <th>s. Presente</th>
-            <th>s. Pasado</th>
-            <th v-show="showParticiple">s. Participio</th>
-            <th>Notas</th>
+          <tr role="row">
+            <th scope="col">Presente</th>
+            <th scope="col">Pasado</th>
+            <th v-show="showParticiple" scope="col">Participio</th>
+            <th scope="col">s. Presente</th>
+            <th scope="col">s. Pasado</th>
+            <th v-show="showParticiple" scope="col">s. Participio</th>
+            <th scope="col">Notas</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(verbData, verbKey) in paginatedData" :key="verbKey">
-            <td class="present-cell" @click="speakWord(verbData.present)">
-              {{ verbData.present }}<br><small>{{ verbData.phonetics.present }}</small>
-            </td>
-            <td class="past-cell" @click="speakWord(verbData.past)">
-              {{ verbData.past }}<br><small>{{ verbData.phonetics.past }}</small>
+          <tr 
+            v-for="(verbData, verbKey) in paginatedData" 
+            :key="verbKey"
+            role="row"
+          >
+            <td 
+              class="present-cell clickable-cell" 
+              @click="speakWord(verbData.present)"
+              :tabindex="soundEnabled ? 0 : -1"
+              @keyup.enter="speakWord(verbData.present)"
+              role="button"
+              :aria-label="`Pronunciar ${verbData.present}`"
+            >
+              {{ verbData.present }}<br>
+              <small class="phonetic">{{ verbData.phonetics.present }}</small>
             </td>
             <td 
-              class="participle-cell"
-              @click="speakWord(verbData.participle)"
-              v-show="showParticiple"
+              class="past-cell clickable-cell" 
+              @click="speakWord(verbData.past)"
+              :tabindex="soundEnabled ? 0 : -1"
+              @keyup.enter="speakWord(verbData.past)"
+              role="button"
+              :aria-label="`Pronunciar ${verbData.past}`"
             >
-              {{ verbData.participle }}<br><small>{{ verbData.phonetics.participle }}</small>
+              {{ verbData.past }}<br>
+              <small class="phonetic">{{ verbData.phonetics.past }}</small>
+            </td>
+            <td 
+              v-show="showParticiple"
+              class="participle-cell clickable-cell"
+              @click="speakWord(verbData.participle)"
+              :tabindex="soundEnabled ? 0 : -1"
+              @keyup.enter="speakWord(verbData.participle)"
+              role="button"
+              :aria-label="`Pronunciar ${verbData.participle}`"
+            >
+              {{ verbData.participle }}<br>
+              <small class="phonetic">{{ verbData.phonetics.participle }}</small>
             </td>
             <td class="present-meaning-cell">
-              {{ joinMeanings(verbData.meanings, 'present') }}
+              {{ getMeaningsText(verbData.meanings, 'present') }}
             </td>
             <td class="past-meaning-cell">
-              {{ joinMeanings(verbData.meanings, 'past') }}
+              {{ getMeaningsText(verbData.meanings, 'past') }}
             </td>
             <td 
-              class="participle-meaning-cell"
               v-show="showParticiple"
+              class="participle-meaning-cell"
             >
-              {{ joinMeanings(verbData.meanings, 'participle') }}
+              {{ getMeaningsText(verbData.meanings, 'participle') }}
             </td>
             <td class="note-cell">
-              <div v-for="(meaning, index) in verbData.meanings" :key="`${verbKey}-note-${index}`">
+              <template v-for="(meaning, index) in verbData.meanings" :key="`${verbKey}-note-${index}`">
                 {{ meaning.note }}
-                <hr v-if="index < verbData.meanings.length - 1">
-              </div>
+                <hr v-if="index < verbData.meanings.length - 1" class="note-separator">
+              </template>
             </td>
           </tr>
         </tbody>
@@ -90,47 +119,59 @@
         class="pagination-btn"
         @click="prevPage"
         :disabled="currentPage === 1"
-        aria-label="Página anterior"
+        aria-label="Ir a página anterior"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
         Anterior
       </button>
-      <span class="page-info">{{ pageInfo }}</span>
+      
+      <span class="page-info" aria-live="polite">
+        {{ pageInfoText }}
+      </span>
+      
       <button 
         class="pagination-btn"
         @click="nextPage"
         :disabled="currentPage === totalPages"
-        aria-label="Página siguiente"
+        aria-label="Ir a página siguiente"
       >
         Siguiente
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <polyline points="9 18 15 12 9 6"></polyline>
         </svg>
       </button>
+      
       <select 
-        v-model="rowsPerPage"
+        v-model.number="rowsPerPage"
         @change="resetPagination"
-        aria-label="Filas por página"
+        aria-label="Seleccionar número de filas por página"
+        class="rows-selector"
       >
-        <option value="10">10</option>
-        <option value="25" selected>25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
+        <option 
+          v-for="option in rowsPerPageOptions" 
+          :key="option" 
+          :value="option"
+        >
+          {{ option }}
+        </option>
       </select>
     </div>
   </div>
 </template>
 
 <script>
-const COMMON_VERBS = ["be", "have", "do", "say", "go", "get", "make", "take", "come", "see"];
-const SORT_NAMES = {
+// Constantes movidas fuera del componente para mejor rendimiento
+const COMMON_VERBS = Object.freeze(["be", "have", "do", "say", "go", "get", "make", "take", "come", "see"]);
+const SORT_NAMES = Object.freeze({
   default: 'A-Z',
   identical: 'Formas Idénticas',
   easy: 'Más Fáciles',
   common: 'Más Comunes'
-};
+});
+
+const ROWS_PER_PAGE_OPTIONS = Object.freeze([10, 25, 50, 100]);
 
 export default {
   name: 'VerbTable',
@@ -138,113 +179,176 @@ export default {
     verbs: {
       type: Object,
       required: true,
-      validator: value => Object.keys(value).length > 0
+      validator: value => value && typeof value === 'object' && Object.keys(value).length > 0
     },
-    soundEnabled: Boolean,
-    showParticiple: Boolean
+    soundEnabled: {
+      type: Boolean,
+      default: false
+    },
+    showParticiple: {
+      type: Boolean,
+      default: false
+    }
   },
+  
+  emits: ['toggle-participle', 'speak-word'],
+  
   data() {
     return {
       searchQuery: '',
       currentSort: 'default',
       currentPage: 1,
-      rowsPerPage: 25
+      rowsPerPage: 25,
+      // Constantes expuestas para el template
+      SORT_NAMES,
+      rowsPerPageOptions: ROWS_PER_PAGE_OPTIONS
     };
   },
+  
   computed: {
     filteredData() {
       if (!this.searchQuery) return this.verbs;
       
       const query = this.searchQuery.toLowerCase();
-      return Object.fromEntries(
-        Object.entries(this.verbs).filter(([verbKey, verbData]) => {
-          const searchFields = [
-            verbKey,
-            verbData.present,
-            verbData.past,
-            verbData.participle,
-            ...Object.values(verbData.phonetics),
-            ...verbData.meanings.flatMap(meaning => Object.values(meaning))
-          ];
-          
-          return searchFields.some(field => 
-            String(field).toLowerCase().includes(query)
-          );
-        })
-      );
-    },
-    sortedData() {
-      const data = Object.entries(this.filteredData);
+      const filteredEntries = Object.entries(this.verbs).filter(([verbKey, verbData]) => {
+        // Optimización: crear array de campos de búsqueda más eficientemente
+        const searchableText = [
+          verbKey,
+          verbData.present,
+          verbData.past,
+          verbData.participle,
+          verbData.phonetics.present,
+          verbData.phonetics.past,
+          verbData.phonetics.participle,
+          ...verbData.meanings.flatMap(meaning => [
+            meaning.present,
+            meaning.past,
+            meaning.participle,
+            meaning.note
+          ])
+        ].join(' ').toLowerCase();
+        
+        return searchableText.includes(query);
+      });
       
-      const sortStrategies = {
+      return Object.fromEntries(filteredEntries);
+    },
+    
+    sortedData() {
+      const entries = Object.entries(this.filteredData);
+      
+      const sortFunctions = {
         identical: ([, a], [, b]) => {
-          const aIdentical = (a.present === a.past && a.past === a.participle) ? 0 : 1;
-          const bIdentical = (b.present === b.past && b.past === b.participle) ? 0 : 1;
-          return aIdentical - bIdentical || a.present.localeCompare(b.present);
+          const aScore = this.getIdenticalScore(a);
+          const bScore = this.getIdenticalScore(b);
+          return aScore - bScore || a.present.localeCompare(b.present);
         },
+        
         easy: ([aKey, a], [bKey, b]) => {
           const scoreA = this.calculateDifficultyScore(aKey, a);
           const scoreB = this.calculateDifficultyScore(bKey, b);
           return scoreA - scoreB || a.present.localeCompare(b.present);
         },
+        
         common: ([aKey], [bKey]) => {
           const aIndex = COMMON_VERBS.indexOf(aKey);
           const bIndex = COMMON_VERBS.indexOf(bKey);
-          return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+          const aPos = aIndex === -1 ? Infinity : aIndex;
+          const bPos = bIndex === -1 ? Infinity : bIndex;
+          return aPos - bPos;
         },
+        
         default: ([, a], [, b]) => a.present.localeCompare(b.present)
       };
 
-      return Object.fromEntries(data.sort(sortStrategies[this.currentSort]));
+      const sortFn = sortFunctions[this.currentSort] || sortFunctions.default;
+      return Object.fromEntries(entries.sort(sortFn));
     },
+    
     paginatedData() {
-      const start = (this.currentPage - 1) * this.rowsPerPage;
-      const end = start + this.rowsPerPage;
-      return Object.fromEntries(
-        Object.entries(this.sortedData).slice(start, end)
-      );
+      const entries = Object.entries(this.sortedData);
+      const startIndex = (this.currentPage - 1) * this.rowsPerPage;
+      const endIndex = startIndex + this.rowsPerPage;
+      
+      return Object.fromEntries(entries.slice(startIndex, endIndex));
     },
+    
     totalPages() {
       return Math.ceil(Object.keys(this.sortedData).length / this.rowsPerPage);
     },
-    pageInfo() {
-      return `Página ${this.currentPage} de ${this.totalPages} | ${SORT_NAMES[this.currentSort]}`;
+    
+    pageInfoText() {
+      const totalItems = Object.keys(this.sortedData).length;
+      const startItem = Math.min((this.currentPage - 1) * this.rowsPerPage + 1, totalItems);
+      const endItem = Math.min(this.currentPage * this.rowsPerPage, totalItems);
+      
+      return `${startItem}-${endItem} de ${totalItems} | ${SORT_NAMES[this.currentSort]}`;
     }
   },
+  
   methods: {
     toggleParticiple() {
       this.$emit('toggle-participle');
     },
+    
     prevPage() {
-      this.currentPage = Math.max(1, this.currentPage - 1);
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
     },
+    
     nextPage() {
-      this.currentPage = Math.min(this.totalPages, this.currentPage + 1);
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
     },
+    
     resetPagination() {
       this.currentPage = 1;
     },
-    joinMeanings(meanings, field) {
-      return meanings.map(meaning => meaning[field]).join(" - ");
+    
+    // Método optimizado para obtener significados
+    getMeaningsText(meanings, field) {
+      return meanings.map(meaning => meaning[field]).filter(Boolean).join(" - ");
     },
+    
     speakWord(word) {
-      if (this.soundEnabled) {
+      if (this.soundEnabled && word) {
         this.$emit('speak-word', word);
       }
     },
+    
+    // Método auxiliar para el ordenamiento por formas idénticas
+    getIdenticalScore(verbData) {
+      return (verbData.present === verbData.past && verbData.past === verbData.participle) ? 0 : 1;
+    },
+    
+    // Método optimizado para calcular dificultad
     calculateDifficultyScore(verbKey, verbData) {
-      const isIdentical = verbData.present === verbData.past && 
-                         verbData.past === verbData.participle;
-      const isCommon = COMMON_VERBS.includes(verbKey);
+      const lengthScore = verbData.present.length;
+      const identicalBonus = this.getIdenticalScore(verbData) === 0 ? 0 : 5;
+      const commonBonus = COMMON_VERBS.includes(verbKey) ? -10 : 0;
       
-      return verbData.present.length + 
-             (isIdentical ? 0 : 5) + 
-             (isCommon ? -10 : 0);
+      return lengthScore + identicalBonus + commonBonus;
     }
   },
+  
   watch: {
-    searchQuery() {
-      this.resetPagination();
+    searchQuery: {
+      handler() {
+        this.resetPagination();
+      },
+      immediate: false
+    },
+    
+    // Validar que la página actual no exceda el total cuando cambian los datos
+    totalPages: {
+      handler(newTotal) {
+        if (this.currentPage > newTotal && newTotal > 0) {
+          this.currentPage = newTotal;
+        }
+      },
+      immediate: true
     }
   }
 };
@@ -276,13 +380,13 @@ h1 {
   background-size: 400% 400%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
   animation: gradientText 6s ease infinite;
 }
 
 @keyframes gradientText {
-  0% { background-position: 0% 50%; }
+  0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 }
 
 .search-container {
@@ -301,7 +405,7 @@ h1 {
   border-radius: 12px;
   background: var(--card);
   color: var(--text);
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .search-input:focus {
@@ -320,18 +424,17 @@ h1 {
   border: none;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
   color: var(--text);
   font-weight: 500;
 }
 
 .icon-btn-text:hover {
-  background: var(--primary);
-  color: white;
+  transform: translateY(-1px);
 }
 
-.icon-btn-text svg {
-  transition: all 0.3s ease;
+.icon-btn-text:active {
+  transform: translateY(0);
 }
 
 .sort-selector {
@@ -345,6 +448,23 @@ h1 {
   transition: all 0.3s ease;
   appearance: none;
   min-width: 180px;
+}
+
+.rows-selector {
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  /* appearance: none; */
+}
+
+.sort-selector:focus,
+.rows-selector:focus {
+  outline: none;
+  border-color: var(--primary);
 }
 
 .table-container {
@@ -364,27 +484,56 @@ table {
 
 th, td {
   padding: 16px;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid var(--border);
 }
 
 th {
   white-space: nowrap;
-  text-align: center;
+  font-weight: 600;
 }
 
 td {
   background: var(--card);
-  text-align: center;
+  transition: background-color 0.2s ease;
 }
 
-td:nth-child(4) {
+/* Alineación específica para columnas de significado */
+.present-meaning-cell,
+.past-meaning-cell,
+.participle-meaning-cell,
+.note-cell {
   text-align: left;
   white-space: normal;
 }
 
+.clickable-cell {
+  cursor: pointer;
+  user-select: none;
+}
+
+.clickable-cell:hover {
+  background: rgba(67, 97, 238, 0.1) !important;
+}
+
+.clickable-cell:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
 tbody tr:hover td {
   background: rgba(67, 97, 238, 0.05);
+}
+
+.phonetic {
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.note-separator {
+  margin: 8px 0;
+  border: none;
+  border-top: 1px solid var(--border);
 }
 
 .pagination-controls {
@@ -406,31 +555,32 @@ tbody tr:hover td {
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
 }
 
-.pagination-btn:hover {
+.pagination-btn:hover:not(:disabled) {
   background: var(--primary);
   color: white;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .pagination-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .page-info {
   font-weight: 500;
   color: var(--text-light);
-}
-
-.pagination-controls select {
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
+  text-align: center;
+  min-width: 120px;
 }
 
 .rainbow-header {
@@ -461,6 +611,7 @@ tbody tr:hover td {
   100% { background-position: 400% 50%; }
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
   .content-wrapper {
     padding: 70px 15px 15px;
@@ -470,8 +621,11 @@ tbody tr:hover td {
     flex-direction: column;
   }
   
-  .search-input, .sort-selector, .icon-btn-text {
+  .search-input, 
+  .sort-selector, 
+  .icon-btn-text {
     width: 100%;
+    min-width: auto;
   }
   
   .pagination-controls {
@@ -502,6 +656,33 @@ tbody tr:hover td {
   th, td {
     padding: 8px 4px;
     font-size: 13px;
+  }
+  
+  .page-info {
+    font-size: 12px;
+    min-width: auto;
+  }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+  .search-input:focus,
+  .sort-selector:focus,
+  .rows-selector:focus {
+    box-shadow: 0 0 0 3px black;
+  }
+  
+  .clickable-cell:focus {
+    outline: 3px solid black;
   }
 }
 </style>

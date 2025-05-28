@@ -2,22 +2,30 @@
   <div v-if="show">
     <canvas ref="confettiCanvas" class="confetti-canvas"></canvas>
 
-    <div class="quiz-modal" @click.self="close">
+    <div class="quiz-modal" @click.self="close" role="dialog" aria-labelledby="quiz-title" aria-modal="true">
       <div class="quiz-content">
+        <!-- Header compacto -->
         <div class="quiz-header">
-          <h3>Carrera de Verbos ⏱️</h3>
+          <div class="header-left">
+            <h3 id="quiz-title">🌚 Carrera de Verbos</h3>
+            <div class="quiz-stats">
+              <span class="stat-item correct">✅ {{ score }}</span>
+              <span class="stat-item wrong">❌ {{ attempts }}</span>
+            </div>
+          </div>
           <button 
-            class="icon-btn"
+            class="close-btn"
             @click="close"
             aria-label="Cerrar juego"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </button>
         </div>
-        
+
+        <!-- Contenido principal -->
         <div class="quiz-body">
           <!-- Configuración de Participio -->
           <div class="toggle-container">
@@ -35,44 +43,53 @@
           </div>
 
           <!-- Temporizador -->
-          <div class="time-bar">
-            <div class="time-left" :style="{ width: `${Math.min(100, (timeLeft / totalTime) * 100)}%` }"></div>
-            <span class="time-text">{{ timeLeft }}s</span>
+          <div class="time-container">
+            <div class="time-bar">
+              <div class="time-left" :style="{ width: `${Math.min(100, (timeLeft / totalTime) * 100)}%` }"></div>
+            </div>
+            <div class="time-text">{{ timeLeft }}s</div>
           </div>
           
           <!-- Pregunta -->
           <div class="quiz-display">
-            <p class="instruction">Escribe la forma que falta:</p>
-            <div class="current-form">{{ currentQuestion }}</div>
+            <div class="quiz-reference">Escribe la forma que falta:</div>
+            <div class="quiz-question">{{ currentQuestion }}</div>
             <input 
               v-model="userAnswer" 
               :placeholder="placeholderText"
               ref="answerInput"
               :disabled="timeOver"
               @keyup.enter="checkAnswer"
+              class="quiz-input"
             />
             <button 
-              class="submit-btn" 
+              class="quiz-submit" 
               @click="checkAnswer"
               :disabled="timeOver || !userAnswer.trim() || isChecking || answerLock"
             >
-              {{ timeOver ? 'Tiempo terminado' : 'Comprobar' }}
+              <span v-if="timeOver">⏰ Tiempo terminado</span>
+              <span v-else>✓ Comprobar</span>
             </button>
             <button 
               v-if="timeOver"
-              class="restart-btn"
+              class="next-btn"
               @click="resetGame"
             >
-              Reiniciar Juego
+              🔄 Reiniciar Juego
             </button>
           </div>
           
-          <!-- Feedback y estadísticas -->
-          <div class="quiz-feedback" :class="{ correct: lastCorrect, wrong: !lastCorrect && feedback }">
+          <!-- Feedback -->
+          <div 
+            class="quiz-feedback"
+            :class="{ 
+              'correct': lastCorrect && feedback, 
+              'wrong': !lastCorrect && feedback
+            }"
+            v-show="feedback"
+            aria-live="polite"
+          >
             {{ feedback }}
-          </div>
-          <div class="quiz-stats">
-            ✅ {{ score }} | ❌ {{ attempts }}
           </div>
         </div>
       </div>
@@ -104,7 +121,6 @@ export default {
       includeParticiple: false,
       timeBonus: 5,
       timeOver: false,
-      confetti: null,
       isChecking: false,
       answerLock: false
     };
@@ -173,6 +189,8 @@ export default {
     checkAnswer() {
       if (!this.userAnswer.trim() || this.timeOver || this.isChecking || this.answerLock) return;
       
+      this.isChecking = true;
+      
       const verb = this.verbs[this.currentVerbKey];
       const expectedForms = [
         ...(this.currentFormType !== 'present' ? verb.present.toLowerCase().split(' / ') : []),
@@ -183,27 +201,33 @@ export default {
       ];
       
       const isCorrect = expectedForms.includes(this.userAnswer.toLowerCase().trim());
-      this.feedback = isCorrect ? `¡Correcto! +${this.timeBonus}s` : `Incorrecto. Opciones: ${expectedForms.join(' o ')}`;
+      this.feedback = isCorrect ? `¡Correcto! +${this.timeBonus}s` : `Era: ${expectedForms.join(' o ')}`;
       
       if (isCorrect) {
         this.answerLock = true;
         this.score++;
-        this.timeLeft = Math.min(this.timeLeft + this.timeBonus, this.totalTime); // Limitar al tiempo máximo
-        if (this.score % 3 === 0) {
+        this.timeLeft = Math.min(this.timeLeft + this.timeBonus, this.totalTime);
+        
+        if (this.score % 5 === 0) {
           this.launchConfetti();
         }
+        
         setTimeout(() => {
           this.generateQuestion();
+          this.feedback = '';
           this.isChecking = false;
           this.answerLock = false;
-        }, 1500);
+        }, 1000);
       } else {
         this.attempts++;
-        this.isChecking = false;
+        setTimeout(() => {
+          this.generateQuestion();
+          this.feedback = '';
+          this.isChecking = false;
+        }, 1500); // Mostrar feedback un poco más para respuestas incorrectas
       }
       
       this.lastCorrect = isCorrect;
-      setTimeout(this.generateQuestion, 1500);
     },
     close() {
       clearInterval(this.timer);
@@ -235,87 +259,125 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  z-index: 2147483647;
+  z-index: 9999;
 }
 
-/* Estructura principal */
 .quiz-modal {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
   z-index: 1000;
-}
-
-.icon-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
   display: flex;
-  align-items: center;
   justify-content: center;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  background-color: var(--card);
-  color: var(--text);
-}
-
-.icon-btn:hover {
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  align-items: center;
+  padding: 12px;
+  box-sizing: border-box;
 }
 
 .quiz-content {
-  background: var(--card);
-  border-radius: 12px;
-  width: 95%;
-  max-width: 400px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 420px;
   padding: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
 }
 
-/* Cabecera */
+/* Header optimizado */
 .quiz-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
 }
 
-.icon-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 5px;
+.header-left {
+  flex: 1;
+  min-width: 0;
 }
 
-/* Toggle de participio */
-.toggle-container {
-  margin-bottom: 15px;
+.quiz-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+.quiz-stats {
   display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.stat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-item.correct {
+  color: #10b981;
+}
+
+.stat-item.wrong {
+  color: #ef4444;
+}
+
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #f9fafb;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.close-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Contenido principal */
+.quiz-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Toggle switch */
+.toggle-container {
+  margin-bottom: 12px;
 }
 
 .toggle-label {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
   cursor: pointer;
 }
 
 .toggle-text {
-  font-size: 14px;
-  color: #555;
+  font-size: 0.9rem;
+  color: #6b7280;
 }
 
 .toggle-switch {
@@ -337,7 +399,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: #e5e7eb;
   border-radius: 24px;
   transition: .3s;
 }
@@ -355,7 +417,7 @@ export default {
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background-color: #4CAF50;
+  background-color: #10b981;
 }
 
 .toggle-switch input:checked + .toggle-slider:before {
@@ -363,27 +425,28 @@ export default {
 }
 
 /* Temporizador */
+.time-container {
+  margin-bottom: 12px;
+}
+
 .time-bar {
   height: 8px;
-  background: #e0e0e0;
+  background: #e5e7eb;
   border-radius: 4px;
-  margin-bottom: 15px;
-  position: relative;
+  overflow: hidden;
 }
 
 .time-left {
   height: 100%;
-  background: var(--primary-light);
-  border-radius: 4px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   transition: width 1s linear;
 }
 
 .time-text {
-  position: absolute;
-  right: 0;
-  top: -20px;
-  font-size: 12px;
-  color: #555;
+  text-align: right;
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 4px;
 }
 
 /* Área de juego */
@@ -393,99 +456,199 @@ export default {
   gap: 12px;
 }
 
-.instruction {
+.quiz-reference {
+  font-size: 0.95rem;
   text-align: center;
-  margin: 0;
-  color: #666;
-  font-size: 14px;
-}
-
-.current-form {
-  font-size: 1.2rem;
-  font-weight: 500;
-  text-align: center;
-  color: #333;
-  margin: 5px 0;
-  border-radius: 12px;
-}
-
-.dark-mode .current-form {
-   background-color: white;
-   color: black;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  text-align: center;
-}
-
-input:disabled {
-  background: #f5f5f5;
-}
-
-/* Botones */
-.submit-btn, .restart-btn {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.submit-btn {
-  background: var(--primary-light);
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  border-radius: 10px;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
-.submit-btn:disabled {
-  background: #cccccc;
+.quiz-question {
+  font-size: 1.1rem;
+  padding: 14px 16px;
+  background: white;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 500;
+  color: #1f2937;
+  line-height: 1.4;
+  border: 1px solid #e5e7eb;
+}
+
+.quiz-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #ffffff;
+  color: #1f2937;
+  min-width: 0;
+  text-align: center;
+}
+
+.quiz-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.quiz-input:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.submit-btn:active:not(:disabled) {
-  background: var(--primary-light);
-}
-
-.restart-btn {
-  background: #2196F3;
+.quiz-submit {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  margin-top: 8px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
-.restart-btn:active {
-  background: #0b7dda;
+.quiz-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.quiz-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.next-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #10b981, #34d399);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.next-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 /* Feedback */
 .quiz-feedback {
+  padding: 10px 14px;
+  border-radius: 10px;
   text-align: center;
-  padding: 10px;
-  border-radius: 8px;
-  margin: 10px 0;
-  font-size: 14px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.3;
 }
 
 .quiz-feedback.correct {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #10b981;
 }
 
 .quiz-feedback.wrong {
-  background: #ffebee;
-  color: #c62828;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
 }
 
-/* Estadísticas */
-.quiz-stats {
-  text-align: center;
-  font-size: 14px;
-  color: #555;
-  margin-top: 10px;
+/* Responsive */
+@media (max-width: 480px) {
+  .quiz-modal {
+    padding: 8px;
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+  
+  .quiz-content {
+    max-width: none;
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    max-height: calc(100vh - 80px);
+  }
+  
+  .quiz-header h3 {
+    font-size: 1rem;
+  }
+  
+  .quiz-question {
+    font-size: 1rem;
+    padding: 12px 14px;
+  }
+  
+  .quiz-reference {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+  
+  .quiz-input {
+    font-size: 16px;
+    padding: 12px;
+  }
+  
+  .quiz-submit, .next-btn {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .quiz-content {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  
+  .quiz-header h3 {
+    color: #f9fafb;
+  }
+  
+  .quiz-question {
+    background: #1f2937;
+    color: #f9fafb;
+    border-color: #374151;
+  }
+  
+  .quiz-input {
+    background: #1f2937;
+    color: #f9fafb;
+    border-color: #374151;
+  }
+  
+  .close-btn {
+    background: #374151;
+    color: #9ca3af;
+  }
+  
+  .close-btn:hover {
+    background: #dc2626;
+    color: white;
+  }
+  
+  .toggle-slider {
+    background-color: #4b5563;
+  }
+  
+  .time-bar {
+    background-color: #4b5563;
+  }
 }
 </style>

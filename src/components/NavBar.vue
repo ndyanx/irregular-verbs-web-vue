@@ -56,8 +56,14 @@
 export default {
   name: 'NavBar',
   props: {
-    soundEnabled: Boolean,
-    darkMode: Boolean
+    soundEnabled: {
+      type: Boolean,
+      default: false
+    },
+    darkMode: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -66,18 +72,30 @@ export default {
   },
   methods: {
     toggleSound() {
-      this.$emit('toggle-sound');
+      this.$emit('toggle-sound')
     },
     toggleDarkMode() {
-      this.$emit('toggle-dark-mode');
+      this.$emit('toggle-dark-mode')
     },
     toggleDropdown() {
-      this.dropdownOpen = !this.dropdownOpen;
+      this.dropdownOpen = !this.dropdownOpen
     },
     openQuiz(type) {
-      this.dropdownOpen = false;
-      this.$emit('open-quiz', type);
+      this.dropdownOpen = false
+      this.$emit('open-quiz', type)
+    },
+    handleClickOutside(event) {
+      if (!this.$el.contains(event.target)) {
+        this.dropdownOpen = false
+      }
     }
+  },
+  mounted() {
+    // Cerrar dropdown cuando se hace clic fuera
+    document.addEventListener('click', this.handleClickOutside)
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this.handleClickOutside)
   }
 }
 </script>
@@ -102,23 +120,28 @@ export default {
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
   background-color: var(--card);
 }
 
+.icon-btn:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* Botón de sonido */
 .sound-btn .sound-icon {
   stroke: #f72585;
-  transition: all 0.3s ease;
+  transition: stroke 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sound-btn .sound-wave {
   stroke: #f72585;
   opacity: 0;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sound-btn.active {
@@ -149,7 +172,7 @@ export default {
 .mode-btn .moon-icon {
   stroke: var(--text);
   fill: none;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
 }
 
@@ -160,21 +183,12 @@ export default {
 .mode-btn.active .moon-icon {
   stroke: white;
   fill: white;
-  animation: moonRotate 0.5s ease-out forwards;
-}
-
-.icon-btn svg {
-  display: block;
-  margin: auto;
+  animation: moonRotate 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes moonRotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(25deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(25deg); }
 }
 
 @keyframes pulse {
@@ -216,23 +230,27 @@ export default {
   background: var(--card);
   z-index: 0;
   overflow: hidden;
-  transition: transform 0.2s ease, color 0.3s ease, background 0.3s ease;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-btn-with-text:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .quiz-btn-with-text::before {
   content: '';
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
+  inset: -2px;
   z-index: -1;
   background: linear-gradient(270deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #4895ef, #f72585);
   background-size: 400% 400%;
   border-radius: 40px;
   animation: gradientBorder 6s ease infinite;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0.7;
 }
 
@@ -251,28 +269,17 @@ export default {
 }
 
 @keyframes gradientBorder {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .quiz-btn-text {
   white-space: nowrap;
 }
 
-.dark-mode .quiz-btn-with-text {
-  color: white;
-}
-
 .dropdown-arrow {
   margin-left: 6px;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dropdown.open .dropdown-arrow {
@@ -291,36 +298,72 @@ export default {
   left: 0;
   background-color: var(--card);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   z-index: 110;
   width: 180px;
   overflow: hidden;
   margin-top: 8px;
+  animation: dropdownSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-menu button {
   width: 100%;
-  padding: 10px 16px;
+  padding: 12px 16px;
   text-align: left;
   background: none;
   border: none;
   color: var(--text);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: 'Inter', sans-serif;
   font-size: 14px;
+  position: relative;
+}
+
+.dropdown-menu button:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.dropdown-menu button::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown-menu button:hover::before {
+  transform: scaleX(1);
 }
 
 .dropdown-menu button:hover {
-  background-color: var(--primary);
-  color: white;
+  background-color: rgba(67, 97, 238, 0.1);
+  color: var(--primary);
+  padding-left: 20px;
 }
 
-/* Responsive */
+/* Responsive optimizado */
 @media (max-width: 768px) {
   .fixed-controls {
     top: 10px;
     right: 10px;
+    gap: 8px;
   }
 
   .quiz-button-container {
@@ -331,6 +374,7 @@ export default {
   .quiz-btn-with-text {
     padding: 6px 12px;
     font-size: 13px;
+    gap: 6px;
   }
 
   .icon-btn {
@@ -343,8 +387,30 @@ export default {
   }
 
   .dropdown-menu button {
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-size: 13px;
+  }
+
+  .dropdown-menu button:hover {
+    padding-left: 18px;
+  }
+}
+
+/* Mejoras de accesibilidad para modo oscuro */
+.dark-mode .quiz-btn-with-text {
+  color: white;
+}
+
+.dark-mode .dropdown-menu {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Reducir movimiento para usuarios sensibles */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>

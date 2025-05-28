@@ -10,47 +10,72 @@
       aria-modal="true"
     >
       <div class="quiz-content">
+        <!-- Header compacto -->
         <div class="quiz-header">
-          <h3 id="quiz-title">Juego de Verbos Irregulares</h3>
+          <div class="header-left">
+            <h3 id="quiz-title">🌚 Verbos Irregulares</h3>
+            <div class="quiz-stats">
+              <span class="stat-item correct">✅ {{ score }}</span>
+              <span class="stat-item wrong">❌ {{ attempts }}</span>
+            </div>
+          </div>
           <button 
-            class="icon-btn"
+            class="close-btn"
             @click="close"
             aria-label="Cerrar juego"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </button>
         </div>
+
+        <!-- Contenido principal optimizado -->
         <div class="quiz-body">
-          <div class="quiz-reference">{{ currentVerb ? getVerbReference(currentVerb) : '' }}</div>
-          <div class="quiz-question">{{ questionText }}</div>
-          <input 
-            type="text" 
-            class="quiz-input" 
-            placeholder="Escribe tu respuesta..."
-            v-model.trim="userAnswer"
-            @keyup.enter="checkAnswer"
-            ref="answerInput"
-            aria-label="Respuesta"
-          >
-          <button 
-            class="quiz-submit"
-            @click="checkAnswer"
-            :disabled="!userAnswer.trim() || isChecking || answerLock"
-          >
-             {{ timeOver ? 'Tiempo terminado' : 'Comprobar' }}
-          </button>
+          <!-- Referencia del verbo -->
+          <div class="quiz-reference" v-if="currentVerb">
+            {{ getVerbReference(currentVerb) }}
+          </div>
+
+          <!-- Pregunta -->
+          <div class="quiz-question">
+            {{ questionText }}
+          </div>
+
+          <!-- Input y botón -->
+          <div class="input-section">
+            <input 
+              type="text" 
+              class="quiz-input" 
+              placeholder="Tu respuesta..."
+              v-model.trim="userAnswer"
+              @keyup.enter="checkAnswer"
+              ref="answerInput"
+              aria-label="Respuesta"
+              :disabled="answerLock"
+            >
+            <button 
+              class="quiz-submit"
+              @click="checkAnswer"
+              :disabled="!userAnswer.trim() || isChecking || answerLock"
+            >
+              <span v-if="isChecking">⏳</span>
+              <span v-else>✓</span>
+            </button>
+          </div>
+
+          <!-- Feedback -->
           <div 
             class="quiz-feedback"
-            :class="{ correct: isCorrect, wrong: !isCorrect && feedback }"
+            :class="{ 
+              'correct': isCorrect && feedback, 
+              'wrong': !isCorrect && feedback
+            }"
+            v-show="feedback"
             aria-live="polite"
           >
             {{ feedback }}
-          </div>
-          <div class="quiz-stats">
-            ✅ {{ score }} | ❌ {{ attempts }}
           </div>
         </div>
       </div>
@@ -62,9 +87,9 @@
 import confetti from 'canvas-confetti';
 
 const QUESTION_TYPES = [
-  { type: 'base_to_past', text: (verb, verbKey) => `¿Cuál es el pasado de "${verb.present}"?` },
-  { type: 'base_to_participle', text: (verb, verbKey) => `¿Cuál es el participio de "${verb.present}"?` },
-  { type: 'past_to_present', text: (verb, verbKey) => `¿Cuál es el presente de "${verb.past}"?` }
+  { type: 'base_to_past', text: (verb, verbKey) => `¿Pasado de "${verb.present}"?` },
+  { type: 'base_to_participle', text: (verb, verbKey) => `¿Participio de "${verb.present}"?` },
+  { type: 'past_to_present', text: (verb, verbKey) => `¿Presente de "${verb.past}"?` }
 ];
 
 export default {
@@ -95,7 +120,6 @@ export default {
       score: 0,
       attempts: 0,
       usedVerbKeys: [],
-      confetti: null,
       isChecking: false,
       answerLock: false
     };
@@ -114,8 +138,9 @@ export default {
   },
   methods: {
     getVerbReference(verb) {
-      return verb.meanings.map(m => m.present).join(" / ");
+      return verb.meanings?.map(m => m.present).join(" / ") || '';
     },
+    
     launchConfetti() {
       const canvas = this.$refs.confettiCanvas;
       const myConfetti = confetti.create(canvas, { 
@@ -128,6 +153,7 @@ export default {
         origin: { y: 0.6 }
       });
     },
+    
     getRandomVerbKey() {
       if (this.unusedVerbKeys.length === 0) {
         this.usedVerbKeys = [];
@@ -135,36 +161,31 @@ export default {
       }
       return this.getRandomFromArray(this.unusedVerbKeys);
     },
+    
     getRandomFromArray(array) {
       return array[Math.floor(Math.random() * array.length)];
     },
-    generateSpecialQuestion(forms) {
-      const direction = Math.random();
-      
-      if (direction < 0.4) {
-        const randomBase = this.getRandomFromArray(forms.present);
-        return `¿Cuál es el pasado de "${randomBase}"?`;
-      } 
-      if (direction < 0.8) {
-        const randomPast = this.getRandomFromArray(forms.past);
-        return `¿Cuál es el presente de "${randomPast}"?`;
-      }
-      
-      const randomBase = this.getRandomFromArray(forms.present);
-      return `¿Cuál es el participio de "${randomBase}"?`;
-    },
+    
     generateQuestionText() {
       if (this.currentVerb.gameRules) {
         const forms = {
           present: this.currentVerb.present.split(' / ').map(f => f.trim()),
           past: this.currentVerb.past.split(' / ').map(f => f.trim())
         };
-        return this.generateSpecialQuestion(forms);
+        
+        if (Math.random() < 0.5) {
+          const randomBase = this.getRandomFromArray(forms.present);
+          return `¿Pasado de "${randomBase}"?`;
+        } else {
+          const randomPast = this.getRandomFromArray(forms.past);
+          return `¿Presente de "${randomPast}"?`;
+        }
       }
       
       const randomType = this.getRandomFromArray(this.availableQuestionTypes);
       return randomType.text(this.currentVerb, this.currentVerbKey);
     },
+    
     generateNewQuestion() {
       this.currentVerbKey = this.getRandomVerbKey();
       this.currentVerb = this.verbs[this.currentVerbKey];
@@ -176,113 +197,113 @@ export default {
       this.isCorrect = false;
       
       this.$nextTick(() => {
-        this.$refs.answerInput.focus();
+        if (this.$refs.answerInput) {
+          this.$refs.answerInput.focus();
+        }
       });
     },
+    
     normalizeAnswer(answer) {
-      return answer.trim().toLowerCase().replace('*', '');
+      return answer.trim().toLowerCase().replace(/[*]/g, '');
     },
+    
     splitVerbForms(forms) {
       return forms.toLowerCase().split('/').map(s => this.normalizeAnswer(s));
     },
-    checkSpecialCaseAnswer() {
-      const quotedText = this.questionText.match(/"(.+?)"/)[1].toLowerCase();
-      
-      if (this.questionText.includes('presente de')) {
-        const correctAnswers = this.currentVerb.gameRules.pastToBase[quotedText];
-        return {
-          isCorrect: correctAnswers.some(ans => 
-            this.normalizeAnswer(ans) === this.normalizeAnswer(this.userAnswer)
-          ),
-          correctAnswer: correctAnswers.join(' o ')
-        };
-      }
-      
-      if (this.questionText.includes('pasado de')) {
-        const correctAnswers = this.currentVerb.gameRules.baseToPast[quotedText];
-        return {
-          isCorrect: correctAnswers.some(ans => 
-            this.normalizeAnswer(ans) === this.normalizeAnswer(this.userAnswer)
-          ),
-          correctAnswer: correctAnswers.join(' o ')
-        };
-      }
-      
-      return {
-        isCorrect: this.splitVerbForms(this.currentVerb.participle)
-          .includes(this.normalizeAnswer(this.userAnswer)),
-        correctAnswer: this.currentVerb.participle
-      };
-    },
-    checkRegularAnswer() {
-      if (this.questionText.includes('presente de')) {
-        return {
-          isCorrect: this.splitVerbForms(this.currentVerb.present)
-            .includes(this.normalizeAnswer(this.userAnswer)),
-          correctAnswer: this.currentVerb.present
-        };
-      }
-      
-      if (this.questionText.includes('pasado de')) {
-        return {
-          isCorrect: this.splitVerbForms(this.currentVerb.past)
-            .includes(this.normalizeAnswer(this.userAnswer)),
-          correctAnswer: this.currentVerb.past
-        };
-      }
-      
-      return {
-        isCorrect: this.splitVerbForms(this.currentVerb.participle)
-          .includes(this.normalizeAnswer(this.userAnswer)),
-        correctAnswer: this.currentVerb.participle
-      };
-    },
+    
     checkAnswer() {
       if (!this.userAnswer.trim() || this.isChecking || this.answerLock) return;
 
       this.isChecking = true;
       
-      const { isCorrect, correctAnswer } = this.currentVerb.gameRules 
-        ? this.checkSpecialCaseAnswer() 
-        : this.checkRegularAnswer();
+      let isCorrect = false;
+      let correctAnswer = '';
+      
+      if (this.currentVerb.gameRules) {
+        const quotedMatch = this.questionText.match(/"(.+?)"/);
+        if (quotedMatch) {
+          const quotedText = quotedMatch[1].toLowerCase();
+          
+          if (this.questionText.includes('Presente de')) {
+            const correctAnswers = this.currentVerb.gameRules.pastToBase[quotedText];
+            isCorrect = correctAnswers?.some(ans => 
+              this.normalizeAnswer(ans) === this.normalizeAnswer(this.userAnswer)
+            ) || false;
+            correctAnswer = correctAnswers?.join(' o ') || '';
+          } else {
+            const correctAnswers = this.currentVerb.gameRules.baseToPast[quotedText];
+            isCorrect = correctAnswers?.some(ans => 
+              this.normalizeAnswer(ans) === this.normalizeAnswer(this.userAnswer)
+            ) || false;
+            correctAnswer = correctAnswers?.join(' o ') || '';
+          }
+        }
+      } else {
+        if (this.questionText.includes('Presente de')) {
+          isCorrect = this.splitVerbForms(this.currentVerb.present || '')
+            .includes(this.normalizeAnswer(this.userAnswer));
+          correctAnswer = this.currentVerb.present || '';
+        } else if (this.questionText.includes('Pasado de')) {
+          isCorrect = this.splitVerbForms(this.currentVerb.past || '')
+            .includes(this.normalizeAnswer(this.userAnswer));
+          correctAnswer = this.currentVerb.past || '';
+        } else {
+          isCorrect = this.splitVerbForms(this.currentVerb.participle || '')
+            .includes(this.normalizeAnswer(this.userAnswer));
+          correctAnswer = this.currentVerb.participle || '';
+        }
+      }
 
       this.isCorrect = isCorrect;
-      this.feedback = this.isCorrect ? '¡Correcto! 🎉' : `Incorrecto. La respuesta correcta era: ${correctAnswer}`;
+      this.feedback = isCorrect 
+        ? '¡Correcto! 🎉' 
+        : `❌ Era: ${correctAnswer}`;
       
       if (isCorrect) {
         this.answerLock = true;
         this.score++;
-        if (this.score % 3 === 0) {
+        
+        if (this.score % 5 === 0) {
           this.launchConfetti();
         }
+        
         setTimeout(() => {
           this.generateNewQuestion();
           this.isChecking = false;
           this.answerLock = false;
-        }, 1500);
+        }, 1200);
       } else {
         this.attempts++;
-        this.isChecking = false;
+        setTimeout(() => {
+          this.isChecking = false;
+          this.userAnswer = '';
+          this.feedback = '';
+        }, 2000);
       }
     },
+    
     close() {
       this.$emit('close');
       this.resetGame();
     },
+    
     resetGame() {
       this.usedVerbKeys = [];
       this.feedback = '';
       this.isCorrect = false;
       this.score = 0;
       this.attempts = 0;
+      this.isChecking = false;
+      this.answerLock = false;
+      this.userAnswer = '';
     }
   },
+  
   watch: {
     show(newVal) {
       if (newVal) {
-        this.generateNewQuestion();
-      } else {
         this.resetGame();
+        this.generateNewQuestion();
       }
     }
   }
@@ -294,158 +315,274 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  z-index: 2147483647;
+  z-index: 9999;
 }
 
 .quiz-modal {
-  display: flex;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.75);
   z-index: 1000;
+  display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 12px;
   box-sizing: border-box;
 }
 
 .quiz-content {
-  background-color: var(--card);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  width: 90%;
-  max-width: 500px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 420px;
   padding: 20px;
   position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
 }
 
 .quiz-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.header-left {
+  flex: 1;
+  min-width: 0;
 }
 
 .quiz-header h3 {
-  font-size: 1.2rem;
-  margin: 0;
-  color: var(--primary);
-}
-
-.quiz-question {
-  font-size: 1.2rem;
-  margin-bottom: 15px;
-  padding: 10px;
-  background-color: rgba(67, 97, 238, 0.1);
-  border-radius: 12px;
-}
-
-.quiz-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  font-size: 1rem;
-  background: var(--card);
-  color: var(--text);
-}
-
-.quiz-submit {
-  width: 100%;
-  padding: 12px;
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-
-.quiz-submit:hover:not(:disabled) {
-  background-color: var(--primary-light);
-}
-
-.quiz-submit:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.quiz-feedback {
-  margin-top: 15px;
-  padding: 10px;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.quiz-reference {
-  font-size: 1.2rem;
-  margin-bottom: 15px;
-  text-align: center;
-  padding: 5px 0;
-  color: white;
-  background-color: black;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-}
-
-.dark-mode .quiz-reference {
-  color: black;
-  background-color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  color: #1f2937;
+  line-height: 1.2;
 }
 
 .quiz-stats {
-  margin-top: 15px;
-  text-align: center;
-  color: var(--text-light);
+  display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-.correct {
-  color: var(--success);
+.stat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 
-.wrong {
-  color: var(--danger);
+.stat-item.correct {
+  color: #10b981;
 }
 
-.icon-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
+.stat-item.wrong {
+  color: #ef4444;
+}
+
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  background-color: var(--card);
-  color: var(--text);
+  background: #f9fafb;
+  color: #6b7280;
+  flex-shrink: 0;
 }
 
-.icon-btn:hover {
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+.close-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.quiz-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.quiz-reference {
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px;
+  font-weight: 500;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.quiz-question {
+  font-size: 1.1rem;
+  padding: 14px 16px;
+  background: white;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 500;
+  color: #1f2937;
+  line-height: 1.4;
+  border: 1px solid #e5e7eb;
+}
+
+.input-section {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.quiz-input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #ffffff;
+  color: #1f2937;
+  min-width: 0;
+}
+
+.quiz-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.quiz-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.quiz-submit {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quiz-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.quiz-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.quiz-feedback {
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.quiz-feedback.correct {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #10b981;
+}
+
+.quiz-feedback.wrong {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
 }
 
 @media (max-width: 480px) {
+  .quiz-modal {
+    padding: 8px;
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+  
   .quiz-content {
-    width: 95%;
-    padding: 15px;
+    max-width: none;
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    max-height: calc(100vh - 80px);
+  }
+  
+  .quiz-header h3 {
+    font-size: 1rem;
   }
   
   .quiz-question {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    padding: 12px 14px;
   }
   
   .quiz-reference {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+  
+  .quiz-input {
+    font-size: 16px;
+    padding: 12px;
+  }
+  
+  .quiz-submit {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .quiz-content {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  
+  .quiz-header h3 {
+    color: #f9fafb;
+  }
+  
+  .quiz-question {
+    background: #1f2937;
+    color: #f9fafb;
+    border-color: #374151;
+  }
+  
+  .quiz-input {
+    background: #1f2937;
+    color: #f9fafb;
+    border-color: #374151;
+  }
+  
+  .close-btn {
+    background: #374151;
+    color: #9ca3af;
+  }
+  
+  .close-btn:hover {
+    background: #dc2626;
+    color: white;
   }
 }
 </style>
