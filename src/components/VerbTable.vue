@@ -410,7 +410,7 @@ h1 {
 
 .search-input:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: linear-gradient(135deg,#667eea,#764ba2);
   box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
 }
 
@@ -464,7 +464,7 @@ h1 {
 .sort-selector:focus,
 .rows-selector:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: linear-gradient(135deg,#667eea,#764ba2);
 }
 
 .table-container {
@@ -561,7 +561,7 @@ tbody tr:hover td {
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: var(--primary);
+  background: linear-gradient(135deg,#667eea,#764ba2);
   color: white;
   transform: translateY(-1px);
 }
