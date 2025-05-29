@@ -1,37 +1,40 @@
 <template>
   <div :class="['app', { 'dark-mode': darkMode }]">
     <NavBar 
-      :soundEnabled="soundEnabled" 
+      :soundEnabled="soundEnabled"
       :darkMode="darkMode"
       @toggle-sound="toggleSound"
       @toggle-dark-mode="toggleDarkMode"
-      @open-quiz="handleOpenQuiz"
+      @open-quiz="showQuiz = $event"
     />
     
-    <VerbTable 
-      :verbs="verbs" 
-      :soundEnabled="soundEnabled"
-      :showParticiple="showParticiple"
-      @toggle-participle="toggleParticiple"
-      @speak-word="speakWord"
-    />
-    
-    <GameQuizModal 
-      :show="showQuiz === 'classic'" 
-      :verbs="verbs"
-      :showParticiple="showParticiple"
-      @close="showQuiz = null"
-    />
-    
-    <GameMatchModal 
-      :show="showQuiz === 'match'" 
-      :verbs="verbs"
-      @close="showQuiz = null"
-    />
+    <main class="home-content">
+      <!-- Hero: Gradiente sutil como Vue.js -->
+      <section class="hero">
+        <h1>Aprende <span class="gradient-text">Verbos Irregulares</span></h1>
+        <p class="subtitle">La forma más eficiente de dominar el inglés</p>
+        <div class="cta-buttons">
+          <router-link to="/verbs" class="btn primary">
+            Comenzar ahora
+          </router-link>
+          <button @click="showQuiz = 'classic'" class="btn outline">
+            Quiz rápido
+          </button>
+        </div>
+      </section>
 
-    <GameRaceModal
-      :show="showQuiz === 'race'" 
-      :verbs="verbs"
+      <!-- Features: Tarjetas con bordes gradientes -->
+      <section class="features">
+        <div v-for="(feature, index) in features" :key="index" class="feature-card">
+          <div class="icon" :style="iconGradient(index)"></div>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </div>
+      </section>
+    </main>
+
+    <QuizModals 
+      :showQuiz="showQuiz"
       @close="showQuiz = null"
     />
     
@@ -40,182 +43,229 @@
 </template>
 
 <script>
-import verbs from '@/assets/data/verbs.json';
-import NavBar from '/src/components/NavBar.vue';
-import VerbTable from '/src/components/VerbTable.vue';
-import GameQuizModal from '/src/components/modals/GameQuizModal.vue';
-import GameMatchModal from '/src/components/modals/GameMatchModal.vue';
-import GameRaceModal from '/src/components/modals/GameRaceModal.vue';
-import Footer from '/src/components/Footer.vue';
+import NavBar from '@/components/NavBar.vue';
+import Footer from '@/components/Footer.vue';
+import QuizModals from '@/components/modals/QuizModals.vue';
 
 export default {
-  name: 'App',
-  components: {
-    NavBar,
-    VerbTable,
-    GameQuizModal,
-    GameMatchModal,
-    GameRaceModal,
-    Footer
-  },
+  name: 'HomeView',
+  components: { NavBar, Footer, QuizModals },
   data() {
     return {
-      verbs: verbs,
-      soundEnabled: false,
       darkMode: false,
+      soundEnabled: false,
       showQuiz: null,
-      showParticiple: false,
-      audioCache: new Map()
-    }
+      features: [
+        {
+          title: "Pronunciación",
+          description: "Audios nativos + síntesis de voz"
+        },
+        {
+          title: "3 Modos de Juego",
+          description: "Aprende practicando"
+        },
+        {
+          title: "Seguimiento",
+          description: "Monitoriza tu progreso"
+        }
+      ],
+      gradients: {
+        light: [
+          'linear-gradient(135deg, #41d1ff 0%, #7367ff 100%)', // Azul a púrpura (como Vue)
+          'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)', // Coral suave
+          'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'  // Lavanda
+        ],
+        dark: [
+          'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // Azul eléctrico
+          'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Rosa/rojo
+          'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'  // Verde/agua
+        ]
+      }
+    };
   },
   methods: {
-    handleOpenQuiz(type) {
-      this.showQuiz = type;
-    },
-    toggleParticiple() {
-      this.showParticiple = !this.showParticiple;
-    },
-    toggleSound() {
-      this.soundEnabled = !this.soundEnabled;
-      localStorage.setItem('soundEnabled', this.soundEnabled);
+    iconGradient(index) {
+      return {
+        background: this.darkMode 
+          ? this.gradients.dark[index]
+          : this.gradients.light[index]
+      };
     },
     toggleDarkMode() {
       this.darkMode = !this.darkMode;
       localStorage.setItem('darkMode', this.darkMode);
       document.body.classList.toggle('dark-mode', this.darkMode);
     },
-    
-    async speakWord(text, lang = 'en-US') {
-      if (!this.soundEnabled || !text) return;
-      
-      const parts = text.replace('*', '').split('/').map(part => part.trim()).filter(part => part);
-      
-      for (let i = 0; i < parts.length; i++) {
-        const part = parts[i];
-        try {
-          await this.playOxfordAudio(part);
-        } catch (error) {
-          console.log(`Oxford audio not available for "${part}", using speechSynthesis`);
-          this.fallbackToSpeechSynthesis(part, lang);
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-        
-        if (i < parts.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      }
-    },
-    
-    async playOxfordAudio(word) {
-      return new Promise((resolve, reject) => {
-        if (this.audioCache.has(word)) {
-          const audio = this.audioCache.get(word);
-          audio.currentTime = 0;
-          audio.play().then(resolve).catch(reject);
-          return;
-        }
-        
-        const audioUrl = this.getOxfordPronunciationURL(word);
-        console.log(`Loading audio for: ${word} from ${audioUrl}`);
-        const audio = new Audio(audioUrl);
-        
-        audio.addEventListener('canplaythrough', () => {
-          this.audioCache.set(word, audio);
-          audio.play().then(resolve).catch(reject);
-        });
-        
-        audio.addEventListener('error', () => {
-          reject(new Error('Audio load failed'));
-        });
-        
-        audio.load();
-      });
-    },
-    
-    getOxfordPronunciationURL(word, variant = 1, format = 'ogg') {
-      const sanitized = word.toLowerCase().replace(/[^a-z]/g, '');
-      const folder1 = sanitized[0];
-      const folder2 = sanitized.slice(0, 3).padEnd(3, '_');
-
-      let folder3;
-      if (sanitized.length === 2) {
-        folder3 = sanitized + '__u';
-      } else if (sanitized.length <= 5) {
-        folder3 = sanitized.padEnd(5, '_');
-      } else {
-        folder3 = sanitized.slice(0, 5);
-      }
-
-      const extension = format === 'ogg' ? 'ogg' : 'mp3';
-      const mediaFolder = format === 'ogg' ? 'us_pron_ogg' : 'us_pron';
-      const fileName = `${sanitized}__us_${variant}.${extension}`;
-
-      return `https://www.oxfordlearnersdictionaries.com/us/media/american_english/${mediaFolder}/${folder1}/${folder2}/${folder3}/${fileName}`;
-    },
-    
-    fallbackToSpeechSynthesis(text, lang) {
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = lang;
-        utterance.rate = 0.9;
-        speechSynthesis.speak(utterance);
-      }
+    toggleSound() {
+      this.soundEnabled = !this.soundEnabled;
+      localStorage.setItem('soundEnabled', this.soundEnabled);
     }
   },
   created() {
-    this.soundEnabled = localStorage.getItem('soundEnabled') === 'true';
     this.darkMode = localStorage.getItem('darkMode') === 'true';
+    this.soundEnabled = localStorage.getItem('soundEnabled') === 'true';
     document.body.classList.add('theme-loaded');
   }
-}
+};
 </script>
 
 <style scoped>
-/* ============ VARIABLES & RESET ============ */
-:root {
-  --primary: #6c51a6;
-  --primary-light: #6c51a6;
-  --text: #2b2d42;
-  --text-light: #8d99ae;
-  --bg: #f8f9fa;
-  --card: #ffffff;
-  --border: #e9ecef;
-  --success: #6c51a6;
-  --danger: #f72585;
-  --warning: #f8961e;
-  --radius: 12px;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --transition: all 0.3s ease;
+.home-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
-
-.dark-mode {
-  --primary: #6c51a6;
-  --primary-light: #6c51a6;
-  --text: #f8f9fa;
-  --text-light: #adb5bd;
-  --bg: #121212;
-  --card: #1e1e1e;
-  --border: #2d2d2d;
+/* Hero: Minimalista con acento de gradiente */
+.hero {
+  text-align: center;
+  padding: 4rem 0;
+  margin-bottom: 3rem;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg);
+.hero h1 {
+  font-size: 3.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
   color: var(--text);
-  line-height: 1.6;
-  transition: var(--transition);
-  padding-bottom: 60px;
 }
 
-.app {
-  min-height: 100vh;
-  transition: var(--transition);
+.gradient-text {
+  display: inline-block;
+  background-image: linear-gradient(
+    270deg,
+    #f72585,
+    #7209b7,
+    #3a0ca3,
+    #4361ee,
+    #4cc9f0,
+    #4895ef,
+    #f72585
+  );
+  background-size: 400% 400%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradientText 6s ease infinite;
+}
+
+@keyframes gradientText {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: var(--text-light);
+  margin-bottom: 2rem;
+}
+
+/* Botones: Estilo Vercel pero con hover gradiente */
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: linear-gradient(90deg, #41d1ff 0%, #7367ff 100%);
+  color: white;
+  border: none;
+  text-decoration: none;
+}
+
+.btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(65, 209, 255, 0.3);
+}
+
+.btn.outline {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
+.btn.outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Features: Tarjetas limpias con iconos gradientes */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.feature-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: transform 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.feature-card p {
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+/* Modo oscuro: Ajustes sutiles */
+.dark-mode .hero h1 {
+  color: white;
+}
+
+.dark-mode .btn.outline {
+  border-color: var(--border-dark);
+  color: white;
+}
+
+.dark-mode .btn.outline:hover {
+  border-color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero {
+    padding: 3rem 0;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .features {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
