@@ -2,7 +2,7 @@
   <header class="header">
     <!-- Navbar para desktop -->
     <div class="navbar-desktop">
-      <a href="/" class="logo-container">
+      <router-link to="/" class="logo-container">
         <div class="logo">
           <div class="logo-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -13,7 +13,7 @@
           </div>
           <span class="logo-text">ICPNX</span>
         </div>
-      </a>
+      </router-link>
 
       <div class="quiz-button-container">
         <div class="dropdown" :class="{ open: dropdownOpen }">
