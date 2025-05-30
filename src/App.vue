@@ -13,7 +13,6 @@ export default {
 /* Estilos globales que deben aplicarse a TODA la app */
 :root {
   --primary: #6c51a6;
-  --primary-light: #6c51a6;
   --text: #2b2d42;
   --text-light: #8d99ae;
   --bg: #f8f9fa;

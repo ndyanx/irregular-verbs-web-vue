@@ -357,7 +357,7 @@ export default {
 <style scoped>
 .content-wrapper {
   margin: 0 auto;
-  padding: 80px 20px 20px;
+  padding: 50px 20px 20px;
   width: 100%;
 }
 
