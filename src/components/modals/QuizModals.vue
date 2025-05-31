@@ -2,36 +2,39 @@
   <div>
     <GameQuizModal 
       :show="showQuiz === 'classic'" 
-      :verbs="verbs"
+      :verbs="filteredVerbs"
       @close="closeModal"
     />
     <GameMatchModal 
       :show="showQuiz === 'match'" 
-      :verbs="verbs"
+      :verbs="filteredVerbs"
       @close="closeModal"
     />
     <GameRaceModal
       :show="showQuiz === 'race'" 
-      :verbs="verbs"
+      :verbs="filteredVerbs"
       @close="closeModal"
     />
   </div>
 </template>
 
 <script>
-import verbs from '@/assets/data/verbs.json';
 import GameQuizModal from './GameQuizModal.vue';
 import GameMatchModal from './GameMatchModal.vue';
 import GameRaceModal from './GameRaceModal.vue';
 
 export default {
   props: {
-    showQuiz: String // 'classic', 'match', 'race' o null
+    showQuiz: String,
+    verbs: {
+      type: Object,
+      required: true
+    }
   },
-  data() {
-    return {
-      verbs: verbs
-    };
+  computed: {
+    filteredVerbs() {
+      return this.verbs;
+    }
   },
   methods: {
     closeModal() {

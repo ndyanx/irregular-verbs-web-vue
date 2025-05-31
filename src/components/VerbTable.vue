@@ -162,8 +162,6 @@
 </template>
 
 <script>
-// Constantes movidas fuera del componente para mejor rendimiento
-const COMMON_VERBS = Object.freeze(["be", "have", "do", "say", "go", "get", "make", "take", "come", "see"]);
 const SORT_NAMES = Object.freeze({
   default: 'A-Z',
   identical: 'Formas Idénticas',
@@ -188,6 +186,11 @@ export default {
     showParticiple: {
       type: Boolean,
       default: false
+    },
+    commonVerbs: {
+      type: Array,
+      required: true,
+      default: () => []
     }
   },
   
@@ -251,8 +254,8 @@ export default {
         },
         
         common: ([aKey], [bKey]) => {
-          const aIndex = COMMON_VERBS.indexOf(aKey);
-          const bIndex = COMMON_VERBS.indexOf(bKey);
+          const aIndex = this.commonVerbs.indexOf(aKey);
+          const bIndex = this.commonVerbs.indexOf(bKey);
           const aPos = aIndex === -1 ? Infinity : aIndex;
           const bPos = bIndex === -1 ? Infinity : bIndex;
           return aPos - bPos;
@@ -327,7 +330,7 @@ export default {
     calculateDifficultyScore(verbKey, verbData) {
       const lengthScore = verbData.present.length;
       const identicalBonus = this.getIdenticalScore(verbData) === 0 ? 0 : 5;
-      const commonBonus = COMMON_VERBS.includes(verbKey) ? -10 : 0;
+      const commonBonus = this.commonVerbs.includes(verbKey) ? -10 : 0;
       
       return lengthScore + identicalBonus + commonBonus;
     }

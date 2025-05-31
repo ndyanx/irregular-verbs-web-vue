@@ -9,16 +9,17 @@
     />
     
     <VerbTable 
-      :verbs="verbs" 
+      :verbs="preparedVerbs" 
       :soundEnabled="settingsStore.soundEnabled"
       :showParticiple="settingsStore.showParticiple"
+      :commonVerbs="verbsStore.commonVerbs"
       @toggle-participle="settingsStore.toggleParticiple"
       @speak-word="speakWord"
     />
     
     <QuizModals 
       :showQuiz="showQuiz"
-      :verbs="verbs"
+      :verbs="preparedVerbs"
       :showParticiple="settingsStore.showParticiple"
       @close="showQuiz = null"
     />
@@ -28,12 +29,12 @@
 </template>
 
 <script>
-import verbs from '@/assets/data/verbs.json';
 import NavBar from '@/components/NavBar.vue';
 import VerbTable from '@/components/VerbTable.vue';
 import QuizModals from '@/components/modals/QuizModals.vue';
 import Footer from '@/components/Footer.vue';
 import { useSettingsStore } from '@/stores/settings';
+import { useVerbsStore } from '@/stores/verbs';
 
 export default {
   name: 'VerbsView',
@@ -45,14 +46,20 @@ export default {
   },
   setup() {
     const settingsStore = useSettingsStore();
-    return { settingsStore };
+    const verbsStore = useVerbsStore();
+    return { settingsStore, verbsStore };
   },
   data() {
     return {
-      verbs: verbs,
       showQuiz: null,
-      audioCache: new Map()
+      audioCache: new Map(),
+      // verbType: 'all' // or 'common' to filter common verbs
     };
+  },
+  computed: {
+    preparedVerbs () {
+      return this.verbsStore.allVerbs;
+    }
   },
   methods: {
     handleOpenQuiz(type) {

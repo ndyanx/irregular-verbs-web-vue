@@ -97,12 +97,11 @@ export default {
   props: {
     show: {
       type: Boolean,
-      required: true
+      required: true,
     },
     verbs: {
       type: Object,
       required: true,
-      validator: value => Object.keys(value).length > 0
     },
     showParticiple: {
       type: Boolean,
@@ -296,7 +295,7 @@ export default {
       this.isChecking = false;
       this.answerLock = false;
       this.userAnswer = '';
-    }
+    },
   },
   
   watch: {

@@ -33,6 +33,7 @@
 
     <QuizModals 
       :showQuiz="showQuiz"
+      :verbs="preparedVerbs"
       @close="showQuiz = null"
     />
     
@@ -45,16 +46,19 @@ import NavBar from '@/components/NavBar.vue';
 import Footer from '@/components/Footer.vue';
 import QuizModals from '@/components/modals/QuizModals.vue';
 import { useSettingsStore } from '@/stores/settings';
+import { useVerbsStore } from '@/stores/verbs';
 
 export default {
   name: 'HomeView',
   components: { NavBar, Footer, QuizModals },
   setup() {
     const settingsStore = useSettingsStore();
-    return { settingsStore };
+    const verbsStore = useVerbsStore();
+    return { settingsStore, verbsStore };
   },
   data() {
     return {
+      // verbType: 'all',
       showQuiz: null,
       features: [
         {
@@ -83,6 +87,11 @@ export default {
         ]
       }
     };
+  },
+  computed: {
+    preparedVerbs () {
+      return this.verbsStore.allVerbs;
+    }
   },
   methods: {
     iconGradient(index) {
