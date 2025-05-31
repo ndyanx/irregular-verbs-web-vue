@@ -374,13 +374,12 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
   padding: 8px 16px;
   border-radius: 30px;
   border: none;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
-  font-weight: 600;
+  font-weight: 550;
   font-size: 14px;
   background: white;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
