@@ -1,15 +1,14 @@
 <template>
-  <div :class="['app', { 'dark-mode': darkMode }]">
+  <div :class="['app', { 'dark-mode': settingsStore.darkMode }]">
     <NavBar 
-      :soundEnabled="soundEnabled"
-      :darkMode="darkMode"
-      @toggle-sound="toggleSound"
-      @toggle-dark-mode="toggleDarkMode"
+      :soundEnabled="settingsStore.soundEnabled"
+      :darkMode="settingsStore.darkMode"
+      @toggle-sound="settingsStore.toggleSound"
+      @toggle-dark-mode="settingsStore.toggleDarkMode"
       @open-quiz="showQuiz = $event"
     />
     
     <main class="home-content">
-      <!-- Hero: Gradiente sutil como Vue.js -->
       <section class="hero">
         <h1>Aprende <span class="gradient-text">Verbos Irregulares</span></h1>
         <p class="subtitle">La forma más eficiente de dominar el inglés</p>
@@ -23,7 +22,6 @@
         </div>
       </section>
 
-      <!-- Features: Tarjetas con bordes gradientes -->
       <section class="features">
         <div v-for="(feature, index) in features" :key="index" class="feature-card">
           <div class="icon" :style="iconGradient(index)"></div>
@@ -46,14 +44,17 @@
 import NavBar from '@/components/NavBar.vue';
 import Footer from '@/components/Footer.vue';
 import QuizModals from '@/components/modals/QuizModals.vue';
+import { useSettingsStore } from '@/stores/settings';
 
 export default {
   name: 'HomeView',
   components: { NavBar, Footer, QuizModals },
+  setup() {
+    const settingsStore = useSettingsStore();
+    return { settingsStore };
+  },
   data() {
     return {
-      darkMode: false,
-      soundEnabled: false,
       showQuiz: null,
       features: [
         {
@@ -71,14 +72,14 @@ export default {
       ],
       gradients: {
         light: [
-          'linear-gradient(135deg, #41d1ff 0%, #7367ff 100%)', // Azul a púrpura (como Vue)
-          'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)', // Coral suave
-          'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'  // Lavanda
+          'linear-gradient(135deg, #41d1ff 0%, #7367ff 100%)',
+          'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',
+          'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'
         ],
         dark: [
-          'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // Azul eléctrico
-          'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Rosa/rojo
-          'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'  // Verde/agua
+          'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+          'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
         ]
       }
     };
@@ -86,24 +87,13 @@ export default {
   methods: {
     iconGradient(index) {
       return {
-        background: this.darkMode 
+        background: this.settingsStore.darkMode 
           ? this.gradients.dark[index]
           : this.gradients.light[index]
       };
-    },
-    toggleDarkMode() {
-      this.darkMode = !this.darkMode;
-      localStorage.setItem('darkMode', this.darkMode);
-      document.body.classList.toggle('dark-mode', this.darkMode);
-    },
-    toggleSound() {
-      this.soundEnabled = !this.soundEnabled;
-      localStorage.setItem('soundEnabled', this.soundEnabled);
     }
   },
   created() {
-    this.darkMode = localStorage.getItem('darkMode') === 'true';
-    this.soundEnabled = localStorage.getItem('soundEnabled') === 'true';
     document.body.classList.add('theme-loaded');
   }
 };

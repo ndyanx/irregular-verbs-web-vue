@@ -1,46 +1,27 @@
 <template>
-  <div :class="['app', { 'dark-mode': darkMode }]">
+  <div :class="['app', { 'dark-mode': settingsStore.darkMode }]">
     <NavBar 
-      :soundEnabled="soundEnabled" 
-      :darkMode="darkMode"
-      @toggle-sound="toggleSound"
-      @toggle-dark-mode="toggleDarkMode"
+      :soundEnabled="settingsStore.soundEnabled" 
+      :darkMode="settingsStore.darkMode"
+      @toggle-sound="settingsStore.toggleSound"
+      @toggle-dark-mode="settingsStore.toggleDarkMode"
       @open-quiz="handleOpenQuiz"
     />
     
     <VerbTable 
       :verbs="verbs" 
-      :soundEnabled="soundEnabled"
-      :showParticiple="showParticiple"
-      @toggle-participle="toggleParticiple"
+      :soundEnabled="settingsStore.soundEnabled"
+      :showParticiple="settingsStore.showParticiple"
+      @toggle-participle="settingsStore.toggleParticiple"
       @speak-word="speakWord"
     />
     
     <QuizModals 
       :showQuiz="showQuiz"
       :verbs="verbs"
-      :showParticiple="showParticiple"
+      :showParticiple="settingsStore.showParticiple"
       @close="showQuiz = null"
     />
-    
-    <!-- <GameQuizModal 
-      :show="showQuiz === 'classic'" 
-      :verbs="verbs"
-      :showParticiple="showParticiple"
-      @close="showQuiz = null"
-    />
-    
-    <GameMatchModal 
-      :show="showQuiz === 'match'" 
-      :verbs="verbs"
-      @close="showQuiz = null"
-    />
-
-    <GameRaceModal
-      :show="showQuiz === 'race'" 
-      :verbs="verbs"
-      @close="showQuiz = null"
-    /> -->
     
     <Footer />
   </div>
@@ -51,48 +32,35 @@ import verbs from '@/assets/data/verbs.json';
 import NavBar from '@/components/NavBar.vue';
 import VerbTable from '@/components/VerbTable.vue';
 import QuizModals from '@/components/modals/QuizModals.vue';
-// import GameQuizModal from '@/components/modals/GameQuizModal.vue';
-// import GameMatchModal from '@/components/modals/GameMatchModal.vue';
-// import GameRaceModal from '@/components/modals/GameRaceModal.vue';
 import Footer from '@/components/Footer.vue';
+import { useSettingsStore } from '@/stores/settings';
 
 export default {
-  name: 'App',
+  name: 'VerbsView',
   components: {
     NavBar,
     VerbTable,
     QuizModals,
     Footer
   },
+  setup() {
+    const settingsStore = useSettingsStore();
+    return { settingsStore };
+  },
   data() {
     return {
       verbs: verbs,
-      soundEnabled: false,
-      darkMode: false,
       showQuiz: null,
-      showParticiple: false,
       audioCache: new Map()
-    }
+    };
   },
   methods: {
     handleOpenQuiz(type) {
       this.showQuiz = type;
     },
-    toggleParticiple() {
-      this.showParticiple = !this.showParticiple;
-    },
-    toggleSound() {
-      this.soundEnabled = !this.soundEnabled;
-      localStorage.setItem('soundEnabled', this.soundEnabled);
-    },
-    toggleDarkMode() {
-      this.darkMode = !this.darkMode;
-      localStorage.setItem('darkMode', this.darkMode);
-      document.body.classList.toggle('dark-mode', this.darkMode);
-    },
     
     async speakWord(text, lang = 'en-US') {
-      if (!this.soundEnabled || !text) return;
+      if (!this.settingsStore.soundEnabled || !text) return;
       
       const parts = text.replace('*', '').split('/').map(part => part.trim()).filter(part => part);
       
@@ -169,11 +137,9 @@ export default {
     }
   },
   created() {
-    this.soundEnabled = localStorage.getItem('soundEnabled') === 'true';
-    this.darkMode = localStorage.getItem('darkMode') === 'true';
     document.body.classList.add('theme-loaded');
   }
-}
+};
 </script>
 
 <style scoped>
