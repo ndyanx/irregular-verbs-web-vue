@@ -379,7 +379,7 @@ export default {
   border: none;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
-  font-weight: 550;
+  font-weight: 600;
   font-size: 14px;
   background: white;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -763,6 +763,10 @@ export default {
   
   .dropdown-menu button:hover {
     padding-left: 18px;
+  }
+
+    .quiz-button-container {
+    left: 65%;
   }
 }
 
