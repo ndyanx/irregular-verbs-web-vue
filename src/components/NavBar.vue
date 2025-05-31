@@ -49,10 +49,12 @@
           <span class="vt-switch-check">
             <span class="vt-switch-icon">
               <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="vt-switch-sound-off">
-                <path d="M3 12v4a2 2 0 0 0 2 2h3l5 4V5l-5 4H5a2 2 0 0 0-2 2z"></path>
-              </svg>
-              <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="vt-switch-sound-on">
-                <path d="M3 12v4a2 2 0 0 0 2 2h3l5 4V5l-5 4H5a2 2 0 0 0-2 2z"></path>
+                <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
+              </svg>   
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="vt-switch-sound-on">
+                <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
+                <path d="M16 12a4.5 4.5 0 0 0-1.5-3.37l.71-.71a5.5 5.5 0 0 1 0 8.16l-.71-.71A4.5 4.5 0 0 0 16 12z" />
+                <path d="M18.5 12a7 7 0 0 0-2.33-5.19l.71-.71a8 8 0 0 1 0 11.8l-.71-.71A7 7 0 0 0 18.5 12z" />
               </svg>
             </span>
           </span>
@@ -156,10 +158,12 @@
               <span class="vt-switch-check">
                 <span class="vt-switch-icon">
                   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="vt-switch-sound-off">
-                    <path d="M3 12v4a2 2 0 0 0 2 2h3l5 4V5l-5 4H5a2 2 0 0 0-2 2z"></path>
-                  </svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="vt-switch-sound-on">
-                    <path d="M3 12v4a2 2 0 0 0 2 2h3l5 4V5l-5 4H5a2 2 0 0 0-2 2z"></path>
+                    <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
+                  </svg>   
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="vt-switch-sound-on">
+                    <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
+                    <path d="M16 12a4.5 4.5 0 0 0-1.5-3.37l.71-.71a5.5 5.5 0 0 1 0 8.16l-.71-.71A4.5 4.5 0 0 0 16 12z" />
+                    <path d="M18.5 12a7 7 0 0 0-2.33-5.19l.71-.71a8 8 0 0 1 0 11.8l-.71-.71A7 7 0 0 0 18.5 12z" />
                   </svg>
                 </span>
               </span>
