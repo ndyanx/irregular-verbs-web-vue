@@ -38,7 +38,7 @@
 
       <div class="controls-container">
         <button 
-          v-if="$route.path !== '/audio'"
+          v-if="$route.path === '/verbs'"
           id="toggle-sound" 
           class="vt-switch vt-switch-sound" 
           type="button" 
@@ -145,7 +145,7 @@
         </button>
 
         <div class="mobile-menu-content">
-          <div class="mobile-control-item" v-if="$route.path !== '/audio'">
+          <div class="mobile-control-item" v-if="$route.path === '/verbs'">
             <span class="mobile-control-label">Sonido</span>
             <button 
               id="toggle-sound-mobile" 
