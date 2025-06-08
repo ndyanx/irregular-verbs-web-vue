@@ -19,6 +19,9 @@
           <button @click="showQuiz = 'classic'" class="btn outline">
             Quiz rápido
           </button>
+          <router-link to="/audio" class="btn outline">
+            Prueba audio
+          </router-link>
         </div>
       </section>
 
@@ -190,6 +193,8 @@ export default {
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
 }
 
 .btn.outline:hover {

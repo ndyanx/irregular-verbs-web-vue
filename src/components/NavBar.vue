@@ -38,6 +38,7 @@
 
       <div class="controls-container">
         <button 
+          v-if="$route.path !== '/audio'"
           id="toggle-sound" 
           class="vt-switch vt-switch-sound" 
           type="button" 
@@ -62,7 +63,7 @@
 
         <button 
           id="toggle-mode" 
-          class="vt-switch vt-switch-appearance" 
+          class="vt-switch vt-switch-appearance"
           type="button" 
           role="switch" 
           aria-label="Alternar modo oscuro"
@@ -144,7 +145,7 @@
         </button>
 
         <div class="mobile-menu-content">
-          <div class="mobile-control-item">
+          <div class="mobile-control-item" v-if="$route.path !== '/audio'">
             <span class="mobile-control-label">Sonido</span>
             <button 
               id="toggle-sound-mobile" 

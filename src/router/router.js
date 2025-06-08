@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import VerbsView from '@/views/VerbsView.vue'
+import AudioView from '@/views/AudioView.vue'
 
 const routes = [
   {
@@ -12,6 +13,11 @@ const routes = [
     path: '/verbs',
     name: 'verbs',
     component: VerbsView
+  },
+  {
+    path: '/audio',
+    name: 'audio',
+    component: AudioView
   }
 ];
 
