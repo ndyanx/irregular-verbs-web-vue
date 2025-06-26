@@ -19,8 +19,8 @@
           <button @click="showQuiz = 'classic'" class="btn outline">
             Quiz rápido
           </button>
-          <router-link to="/audio" class="btn outline">
-            Prueba audio
+          <router-link to="/word" class="btn outline">
+            Buscar palabra
           </router-link>
         </div>
       </section>
@@ -53,7 +53,7 @@ import { useVerbsStore } from '@/stores/verbs';
 
 export default {
   name: 'HomeView',
-  components: { NavBar, Footer, QuizModals },
+  components: { NavBar, QuizModals, Footer },
   setup() {
     const settingsStore = useSettingsStore();
     const verbsStore = useVerbsStore();

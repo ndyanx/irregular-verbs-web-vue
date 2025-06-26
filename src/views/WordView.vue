@@ -5,72 +5,79 @@
       :darkMode="settingsStore.darkMode"
       @toggle-sound="settingsStore.toggleSound"
       @toggle-dark-mode="settingsStore.toggleDarkMode"
+      @open-quiz="showQuiz = $event"
     />
-    
+
     <main class="audio-content">
       <div class="header-wrapper">
         <h1 class="title">
-          <span class="title-gradient">Audio Explorer</span>
+          <span class="title-gradient">Word Explorer</span>
           <span class="title-emoji">🎙️</span>
         </h1>
-        <p class="subtitle">Escucha la pronunciación en diferentes acentos</p>
+        <p class="subtitle">Escuche la pronunciación en inglés y ejemplos.</p>
       </div>
-      
+
       <div class="audio-card">
         <div class="input-group">
           <input 
             v-model="inputWord"
             type="text" 
-            placeholder="Escribe una palabra en inglés..."
-            @keyup.enter="playInputWord"
+            placeholder="Type an English word..."
+            @keyup.enter="fetchWordInfo"
             class="audio-input"
           >
           <button 
-            @click="playInputWord"
+            @click="fetchWordInfo"
             :disabled="!inputWord"
             class="btn primary"
           >
             <span class="btn-content">
-              <span class="btn-text">Reproducir</span>
-              <span class="btn-icon">▶</span>
+              <span class="btn-text">Search</span>
+              <span class="btn-icon">🔎</span>
             </span>
           </button>
         </div>
-        
-        <div class="accent-selector">
-          <div class="selector-title">Acento:</div>
-          <div class="radio-group">
-            <label class="radio-option" :class="{ 'active': accent === 'us' }">
-              <input 
-                type="radio" 
-                v-model="accent" 
-                value="us" 
-                class="radio-input"
-              >
-              <span class="radio-label">🇺🇸 Americano</span>
-            </label>
-            <label class="radio-option" :class="{ 'active': accent === 'uk' }">
-              <input 
-                type="radio" 
-                v-model="accent" 
-                value="uk" 
-                class="radio-input"
-              >
-              <span class="radio-label">🇬🇧 Británico</span>
-            </label>
+
+        <div v-if="wordData" class="word-display">
+          <div class="pronunciation-info">
+            <div class="accent-block" v-for="(data, key) in wordData.pronunciations" :key="key">
+              <strong>{{ key.toUpperCase() }}</strong>
+              <span class="ipa">/{{ data.ipa }}/</span>
+              <button class="play-btn" @click="playAccentAudio(key)">▶</button>
+            </div>
+          </div>
+
+          <div class="definitions" v-for="entry in wordData.entries" :key="entry.pos">
+            <h3>{{ entry.pos }}</h3>
+            <!-- <h3>{{ entry.pos }} <span v-if="entry.cefr">- {{ entry.cefr }}</span></h3> -->
+            <div class="sense" v-for="(sense, idx) in entry.senses" :key="idx">
+              <p class="definition">{{ sense.definition }}</p>
+              <p class="translation">{{ sense.translation }}</p>
+              <ul class="examples">
+                <li v-for="(ex, exIdx) in sense.examples" :key="exIdx">
+                  <strong>- {{ ex.en }}</strong><br>
+                  <em>{{ ex.es }}</em>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        <!-- Barra de estado de audio -->
-        <div v-if="isPlaying" class="audio-status-bar">
+        <div v-if="isSearching" class="audio-status-bar">
           <div class="audio-wave">
             <span class="wave-bar" v-for="n in 5" :key="n" :style="waveBarStyle(n)"></span>
           </div>
-          <span class="playing-text">Reproduciendo: {{ inputWord }}</span>
+          <span class="playing-text">Searching: {{ inputWord }}</span>
         </div>
       </div>
     </main>
-    
+
+    <QuizModals 
+      :showQuiz="showQuiz"
+      :verbs="preparedVerbs"
+      @close="showQuiz = null"
+    />
+
     <Footer />
   </div>
 </template>
@@ -78,42 +85,56 @@
 <script>
 import NavBar from '@/components/NavBar.vue';
 import Footer from '@/components/Footer.vue';
+import QuizModals from '@/components/modals/QuizModals.vue';
 import { useSettingsStore } from '@/stores/settings';
+import { useVerbsStore } from '@/stores/verbs';
 import { useAudioStore } from '@/stores/audio';
 
 export default {
   name: 'AudioView',
-  components: { NavBar, Footer },
+  components: { NavBar, QuizModals, Footer },
   setup() {
     const settingsStore = useSettingsStore();
+    const verbsStore = useVerbsStore();
     const audioStore = useAudioStore();
-    return { settingsStore, audioStore };
+    return { settingsStore, verbsStore, audioStore };
   },
   data() {
     return {
+      showQuiz: null,
       inputWord: '',
-      accent: this.audioStore.currentAccent,
-      isPlaying: false,
-      waveAnimation: Array(5).fill(0)
+      isSearching: false,
+      waveAnimation: Array(5).fill(0),
+      wordData: null
     };
   },
+  computed: {
+    preparedVerbs () {
+      return this.verbsStore.allVerbs;
+    }
+  },
   methods: {
-    async playInputWord() {
+    async fetchWordInfo() {
       if (!this.inputWord.trim()) return;
-      
-      this.isPlaying = true;
+      this.wordData = null;
+      this.isSearching = true;
       this.startWaveAnimation();
-      
       try {
-        await this.audioStore.playWord(this.inputWord, 'en-US', this.accent);
+        const data = await this.audioStore.fetchWordData(this.inputWord);
+        this.wordData = data;
+      } catch (err) {
+        console.error('Error loading word data:', err);
       } finally {
         setTimeout(() => {
-          this.isPlaying = false;
+          this.isSearching = false;
           this.stopWaveAnimation();
-        }, 300);
+        }, 500);
       }
     },
-    
+    playAccentAudio(accent) {
+      if (!this.wordData || !this.wordData.word) return;
+      this.audioStore.playWord(this.wordData.word, 'en-US', accent);
+    },
     startWaveAnimation() {
       this.animationInterval = setInterval(() => {
         this.waveAnimation = this.waveAnimation.map(() => 
@@ -121,22 +142,15 @@ export default {
         );
       }, 200);
     },
-    
     stopWaveAnimation() {
       clearInterval(this.animationInterval);
       this.waveAnimation = Array(5).fill(0);
     },
-    
     waveBarStyle(index) {
       return {
         height: `${this.waveAnimation[index-1]}px`,
         backgroundColor: this.settingsStore.darkMode ? '#7928CA' : '#FF0080'
       };
-    }
-  },
-  watch: {
-    accent(newVal) {
-      this.audioStore.currentAccent = newVal;
     }
   },
   beforeUnmount() {
@@ -250,10 +264,7 @@ export default {
   gap: 0.5rem;
   position: relative;
   z-index: 2;
-}
-
-.btn-icon {
-  font-size: 0.9em;
+  font-size: 0.9rem;
 }
 
 .btn.primary {
@@ -416,6 +427,56 @@ export default {
 
 .dark-mode .radio-option.active {
   background: rgba(121, 40, 202, 0.2);
+}
+
+.word-display {
+  margin-top: 1rem;
+}
+.pronunciation-info {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.accent-block {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.ipa {
+  font-style: italic;
+  font-size: 1.1rem;
+}
+.play-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #7928CA;
+}
+.definitions {
+  margin-bottom: 1.5rem;
+}
+.definitions h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.definition {
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+  color: #8a3bda;
+}
+.translation {
+  color: #ff2b94;
+  margin-bottom: 0.5rem;
+}
+.examples {
+  list-style: none;
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+}
+.examples li {
+  margin-bottom: 0.5rem;
 }
 
 @media (max-width: 640px) {

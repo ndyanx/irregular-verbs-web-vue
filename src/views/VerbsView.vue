@@ -68,7 +68,7 @@ export default {
     
     async speakWord(text, lang = 'en-US') {
       if (!this.settingsStore.soundEnabled || !text) return;
-      await this.audioStore.playWord(text, lang);
+      await this.audioStore.playWord(text, lang, 'us');
     }
   },
   created() {
