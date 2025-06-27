@@ -517,6 +517,7 @@ td {
 
 .clickable-cell:hover {
   background: rgba(67, 97, 238, 0.1) !important;
+  color: var(--primary);
 }
 
 .clickable-cell:focus {
@@ -525,7 +526,7 @@ td {
 }
 
 tbody tr:hover td {
-  background: rgba(67, 97, 238, 0.05);
+  background: rgba(121, 40, 202, 0.08);
 }
 
 .phonetic {

@@ -55,8 +55,8 @@
               <p class="translation">{{ sense.translation }}</p>
               <ul class="examples">
                 <li v-for="(ex, exIdx) in sense.examples" :key="exIdx">
-                  <strong>- {{ ex.en }}</strong><br>
-                  <em>{{ ex.es }}</em>
+                  <strong>» {{ ex.en }}</strong><br>
+                  <em v-if="ex.es">╚ {{ ex.es }}</em>
                 </li>
               </ul>
             </div>
@@ -432,21 +432,25 @@ export default {
 .word-display {
   margin-top: 1rem;
 }
+
 .pronunciation-info {
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
+
 .accent-block {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
+
 .ipa {
   font-style: italic;
   font-size: 1.1rem;
 }
+
 .play-btn {
   background: none;
   border: none;
@@ -454,49 +458,91 @@ export default {
   font-size: 1.2rem;
   color: #7928CA;
 }
+
 .definitions {
   margin-bottom: 1.5rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
+
 .definitions h3 {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
 }
+
 .definition {
   font-weight: bold;
   margin-bottom: 0.2rem;
   color: #8a3bda;
+  word-break: break-word;
 }
+
 .translation {
   color: #ff2b94;
   margin-bottom: 0.5rem;
+  word-break: break-word;
 }
+
 .examples {
   list-style: none;
   padding-left: 1rem;
   margin-bottom: 1rem;
 }
+
 .examples li {
   margin-bottom: 0.5rem;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
 }
 
+.examples li strong,
+.examples li em {
+  display: inline-block;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.examples li {
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  cursor: default;
+}
+
+.examples li:hover {
+  background-color: rgba(121, 40, 202, 0.08); /* suave púrpura translúcido */
+  transform: translateX(4px); /* sutil movimiento para sensación táctil */
+}
+
+.examples li:hover strong {
+  color: #7928CA; /* púrpura más fuerte */
+}
+
+.examples li:hover em {
+  color: #FF0080; /* rosado más intenso */
+}
+
+/* Responsive */
 @media (max-width: 640px) {
   .audio-content {
     padding: 1.5rem 1rem;
   }
-  
+
   .title {
     font-size: 2rem;
   }
-  
+
   .input-group {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
     padding: 1rem;
   }
-  
+
   .radio-group {
     flex-direction: column;
   }
@@ -514,6 +560,13 @@ export default {
 
   .playing-text {
     white-space: normal;
+  }
+
+  .definitions h3,
+  .definition,
+  .translation,
+  .examples li {
+    font-size: 0.95rem;
   }
 }
 
