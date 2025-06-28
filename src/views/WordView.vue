@@ -49,19 +49,21 @@
 
           <div class="definitions" v-for="entry in wordData.entries" :key="entry.pos">
             <h3>{{ entry.pos }}</h3>
-            <div class="sense" v-for="(sense, idx) in entry.senses" :key="idx">
-              <p class="definition">» {{ sense.definition }}</p>
-              <p class="translation">╚ {{ sense.translation }}</p>
-              <div class="examples-toggle" @click="toggleExamples(entry.pos, idx)">
-                <span>Examples ({{ sense.examples.length }})</span>
-                <span class="toggle-icon">{{ isExampleExpanded(entry.pos, idx) ? '▼' : '▶' }}</span>
+            <div v-for="(sense, idx) in entry.senses" :key="idx">
+              <div class="sense">
+                <p class="definition">» {{ sense.definition }}</p>
+                <p class="translation">╚ {{ sense.translation }}</p>
+                <div class="examples-toggle" @click="toggleExamples(entry.pos, idx)">
+                  <span>Examples ({{ sense.examples.length }})</span>
+                  <span class="toggle-icon">{{ isExampleExpanded(entry.pos, idx) ? '▼' : '▶' }}</span>
+                </div>
+                <ul class="examples" v-if="isExampleExpanded(entry.pos, idx)">
+                  <li v-for="(ex, exIdx) in sense.examples" :key="exIdx">
+                    <strong>» {{ ex.en }}</strong><br>
+                    <em v-if="ex.es">╚ {{ ex.es }}</em>
+                  </li>
+                </ul>
               </div>
-              <ul class="examples" v-if="isExampleExpanded(entry.pos, idx)">
-                <li v-for="(ex, exIdx) in sense.examples" :key="exIdx">
-                  <strong>» {{ ex.en }}</strong><br>
-                  <em v-if="ex.es">╚ {{ ex.es }}</em>
-                </li>
-              </ul>
             </div>
           </div>
         </div>
@@ -517,7 +519,7 @@ export default {
 .definition {
   font-weight: bold;
   margin-bottom: 0.2rem;
-  color: var(--text-light);
+  color: #5f646c;
   word-break: break-word;
 }
 
@@ -529,6 +531,11 @@ export default {
   color: #ff2b94;
   margin-bottom: 0.5rem;
   word-break: break-word;
+}
+
+.sense {
+  margin-bottom: 30px;
+  border-top: solid 3px #7928CA;
 }
 
 .examples-toggle {
@@ -569,6 +576,7 @@ export default {
   display: inline-block;
   max-width: 100%;
   word-break: break-word;
+  font-style: italic;
 }
 
 .examples li {
@@ -628,8 +636,11 @@ export default {
   .playing-text {
     white-space: normal;
   }
+  
+  .definitions h3 {
+    font-size: 1.5rem;
+  }
 
-  .definitions h3,
   .definition,
   .translation,
   .examples li {

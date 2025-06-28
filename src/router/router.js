@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import VerbsView from '@/views/VerbsView.vue'
 import WordView from '@/views/WordView.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
 
 const routes = [
   {
@@ -18,6 +19,11 @@ const routes = [
     path: '/word',
     name: 'word',
     component: WordView
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'notfound',
+    component: NotFoundView
   }
 ];
 
