@@ -28,7 +28,7 @@
           >
           <button 
             @click="fetchWordInfo"
-            :disabled="!inputWord"
+            :disabled="!inputWord || isSearching"
             class="btn primary"
           >
             <span class="btn-content">
@@ -43,17 +43,20 @@
             <div class="accent-block" v-for="(data, key) in wordData.pronunciations" :key="key">
               <strong>{{ key.toUpperCase() }}</strong>
               <span class="ipa">/{{ data.ipa }}/</span>
-              <button class="play-btn" @click="playAccentAudio(key)">▶</button>
+              <button class="play-btn" @click="playAccentAudio(key)">🔊</button>
             </div>
           </div>
 
           <div class="definitions" v-for="entry in wordData.entries" :key="entry.pos">
             <h3>{{ entry.pos }}</h3>
-            <!-- <h3>{{ entry.pos }} <span v-if="entry.cefr">- {{ entry.cefr }}</span></h3> -->
             <div class="sense" v-for="(sense, idx) in entry.senses" :key="idx">
-              <p class="definition">{{ sense.definition }}</p>
-              <p class="translation">{{ sense.translation }}</p>
-              <ul class="examples">
+              <p class="definition">» {{ sense.definition }}</p>
+              <p class="translation">╚ {{ sense.translation }}</p>
+              <div class="examples-toggle" @click="toggleExamples(entry.pos, idx)">
+                <span>Examples ({{ sense.examples.length }})</span>
+                <span class="toggle-icon">{{ isExampleExpanded(entry.pos, idx) ? '▼' : '▶' }}</span>
+              </div>
+              <ul class="examples" v-if="isExampleExpanded(entry.pos, idx)">
                 <li v-for="(ex, exIdx) in sense.examples" :key="exIdx">
                   <strong>» {{ ex.en }}</strong><br>
                   <em v-if="ex.es">╚ {{ ex.es }}</em>
@@ -89,6 +92,7 @@ import QuizModals from '@/components/modals/QuizModals.vue';
 import { useSettingsStore } from '@/stores/settings';
 import { useVerbsStore } from '@/stores/verbs';
 import { useAudioStore } from '@/stores/audio';
+import { ref, computed } from 'vue';
 
 export default {
   name: 'AudioView',
@@ -97,67 +101,106 @@ export default {
     const settingsStore = useSettingsStore();
     const verbsStore = useVerbsStore();
     const audioStore = useAudioStore();
-    return { settingsStore, verbsStore, audioStore };
-  },
-  data() {
-    return {
-      showQuiz: null,
-      inputWord: '',
-      isSearching: false,
-      waveAnimation: Array(5).fill(0),
-      wordData: null
+    
+    const showQuiz = ref(null);
+    const inputWord = ref('');
+    const isSearching = ref(false);
+    const waveAnimation = ref(Array(5).fill(0));
+    const wordData = ref(null);
+    const lastRequestId = ref(0);
+    const expandedExamples = ref({});
+
+    const preparedVerbs = computed(() => verbsStore.allVerbs);
+
+    const isExampleExpanded = (pos, idx) => {
+      return !!expandedExamples.value[`${pos}-${idx}`];
     };
-  },
-  computed: {
-    preparedVerbs () {
-      return this.verbsStore.allVerbs;
-    }
-  },
-  methods: {
-    async fetchWordInfo() {
-      if (!this.inputWord.trim()) return;
-      this.wordData = null;
-      this.isSearching = true;
-      this.startWaveAnimation();
+
+    const toggleExamples = (pos, idx) => {
+      const key = `${pos}-${idx}`;
+      expandedExamples.value = {
+        ...expandedExamples.value,
+        [key]: !expandedExamples.value[key]
+      };
+    };
+
+    const fetchWordInfo = async () => {
+      if (!inputWord.value.trim() || isSearching.value) return;
+      
+      wordData.value = null;
+      isSearching.value = true;
+      startWaveAnimation();
+      
+      const currentRequestId = ++lastRequestId.value;
+      
       try {
-        const data = await this.audioStore.fetchWordData(this.inputWord);
-        this.wordData = data;
+        const data = await audioStore.fetchWordData(inputWord.value);
+        
+        if (currentRequestId === lastRequestId.value) {
+          wordData.value = data;
+          expandedExamples.value = {};
+        }
       } catch (err) {
         console.error('Error loading word data:', err);
       } finally {
-        setTimeout(() => {
-          this.isSearching = false;
-          this.stopWaveAnimation();
-        }, 500);
+        if (currentRequestId === lastRequestId.value) {
+          setTimeout(() => {
+            isSearching.value = false;
+            stopWaveAnimation();
+          }, 500);
+        }
       }
-    },
-    playAccentAudio(accent) {
-      if (!this.wordData || !this.wordData.word) return;
-      this.audioStore.playWord(this.wordData.word, 'en-US', accent);
-    },
-    startWaveAnimation() {
-      this.animationInterval = setInterval(() => {
-        this.waveAnimation = this.waveAnimation.map(() => 
+    };
+
+    const playAccentAudio = (accent) => {
+      if (!wordData.value || !wordData.value.word) return;
+      audioStore.playWord(wordData.value.word, 'en-US', accent);
+    };
+
+    let animationInterval = null;
+
+    const startWaveAnimation = () => {
+      animationInterval = setInterval(() => {
+        waveAnimation.value = waveAnimation.value.map(() => 
           Math.floor(Math.random() * 15) + 5
         );
       }, 200);
-    },
-    stopWaveAnimation() {
-      clearInterval(this.animationInterval);
-      this.waveAnimation = Array(5).fill(0);
-    },
-    waveBarStyle(index) {
+    };
+
+    const stopWaveAnimation = () => {
+      clearInterval(animationInterval);
+      waveAnimation.value = Array(5).fill(0);
+    };
+
+    const waveBarStyle = (index) => {
       return {
-        height: `${this.waveAnimation[index-1]}px`,
-        backgroundColor: this.settingsStore.darkMode ? '#7928CA' : '#FF0080'
+        height: `${waveAnimation.value[index-1]}px`,
+        backgroundColor: settingsStore.darkMode ? '#7928CA' : '#FF0080'
       };
-    }
-  },
-  beforeUnmount() {
-    this.stopWaveAnimation();
+    };
+
+    return {
+      settingsStore,
+      verbsStore,
+      audioStore,
+      showQuiz,
+      inputWord,
+      isSearching,
+      waveAnimation,
+      wordData,
+      preparedVerbs,
+      fetchWordInfo,
+      playAccentAudio,
+      waveBarStyle,
+      isExampleExpanded,
+      toggleExamples
+    };
   },
   created() {
     document.body.classList.add('theme-loaded');
+  },
+  beforeUnmount() {
+    this.stopWaveAnimation();
   }
 };
 </script>
@@ -474,14 +517,38 @@ export default {
 .definition {
   font-weight: bold;
   margin-bottom: 0.2rem;
-  color: #8a3bda;
+  color: var(--text-light);
   word-break: break-word;
+}
+
+.dark-mode .definition {
+  color: var(--text-light);
 }
 
 .translation {
   color: #ff2b94;
   margin-bottom: 0.5rem;
   word-break: break-word;
+}
+
+.examples-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: cadetblue;
+  margin: 0.5rem 0;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.examples-toggle:hover {
+  background-color: rgba(121, 40, 202, 0.1);
+}
+
+.toggle-icon {
+  font-size: 0.8rem;
 }
 
 .examples {
@@ -512,16 +579,16 @@ export default {
 }
 
 .examples li:hover {
-  background-color: rgba(121, 40, 202, 0.08); /* suave púrpura translúcido */
-  transform: translateX(4px); /* sutil movimiento para sensación táctil */
+  background-color: rgba(121, 40, 202, 0.08);
+  transform: translateX(4px);
 }
 
 .examples li:hover strong {
-  color: #7928CA; /* púrpura más fuerte */
+  color: #7928CA;
 }
 
 .examples li:hover em {
-  color: #FF0080; /* rosado más intenso */
+  color: #FF0080;
 }
 
 /* Responsive */
