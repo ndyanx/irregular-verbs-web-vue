@@ -51,6 +51,7 @@
             <h3>{{ entry.pos }}</h3>
             <div v-for="(sense, idx) in entry.senses" :key="idx">
               <div class="sense">
+                <p v-if="sense.sense_title" class="stitle">[{{ sense.sense_title }}]</p>
                 <p class="definition">» {{ sense.definition }}</p>
                 <p class="translation">╚ {{ sense.translation }}</p>
                 <div class="examples-toggle" @click="toggleExamples(entry.id, idx)">
@@ -516,6 +517,18 @@ export default {
   margin-bottom: 0.5rem;
 }
 
+.stitle {
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+  color: #1d55af;
+  word-break: break-word;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.dark-mode .stitle {
+  color: #3078ec;
+}
+
 .definition {
   font-weight: bold;
   margin-bottom: 0.2rem;
@@ -641,6 +654,7 @@ export default {
     font-size: 1.5rem;
   }
 
+  .stitle ,
   .definition,
   .translation,
   .examples li {
