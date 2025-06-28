@@ -47,17 +47,17 @@
             </div>
           </div>
 
-          <div class="definitions" v-for="entry in wordData.entries" :key="entry.pos">
+          <div class="definitions" v-for="entry in wordData.entries" :key="entry.id">
             <h3>{{ entry.pos }}</h3>
             <div v-for="(sense, idx) in entry.senses" :key="idx">
               <div class="sense">
                 <p class="definition">» {{ sense.definition }}</p>
                 <p class="translation">╚ {{ sense.translation }}</p>
-                <div class="examples-toggle" @click="toggleExamples(entry.pos, idx)">
+                <div class="examples-toggle" @click="toggleExamples(entry.id, idx)">
                   <span>Examples ({{ sense.examples.length }})</span>
-                  <span class="toggle-icon">{{ isExampleExpanded(entry.pos, idx) ? '▼' : '▶' }}</span>
+                  <span class="toggle-icon">{{ isExampleExpanded(entry.id, idx) ? '▼' : '▶' }}</span>
                 </div>
-                <ul class="examples" v-if="isExampleExpanded(entry.pos, idx)">
+                <ul class="examples" v-if="isExampleExpanded(entry.id, idx)">
                   <li v-for="(ex, exIdx) in sense.examples" :key="exIdx">
                     <strong>» {{ ex.en }}</strong><br>
                     <em v-if="ex.es">╚ {{ ex.es }}</em>
@@ -114,12 +114,12 @@ export default {
 
     const preparedVerbs = computed(() => verbsStore.allVerbs);
 
-    const isExampleExpanded = (pos, idx) => {
-      return !!expandedExamples.value[`${pos}-${idx}`];
+    const isExampleExpanded = (id, idx) => {
+      return !!expandedExamples.value[`${id}-${idx}`];
     };
 
-    const toggleExamples = (pos, idx) => {
-      const key = `${pos}-${idx}`;
+    const toggleExamples = (id, idx) => {
+      const key = `${id}-${idx}`;
       expandedExamples.value = {
         ...expandedExamples.value,
         [key]: !expandedExamples.value[key]
