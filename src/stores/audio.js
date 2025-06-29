@@ -36,8 +36,8 @@ export const useAudioStore = defineStore('audio', {
 
     async fetchWordData(word) {
       word = word.toLowerCase().trim();
-      // const apiUrl = `http://localhost:3001/api/audio/${encodeURIComponent(word)}`;
-      const apiUrl = `https://irregular-verbs-web-express.onrender.com/api/audio/${encodeURIComponent(word)}`;
+      // const apiUrl = `http://localhost:3001/api/word/${encodeURIComponent(word)}`;
+      const apiUrl = `https://irregular-verbs-web-express.onrender.com/api/word/${encodeURIComponent(word)}`;
 
       try {
         const response = await fetch(apiUrl);
