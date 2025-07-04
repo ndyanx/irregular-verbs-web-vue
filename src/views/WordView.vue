@@ -52,8 +52,9 @@
             <div v-for="(sense, idx) in entry.senses" :key="idx">
               <div class="sense">
                 <p v-if="sense.sense_title" class="stitle">[{{ sense.sense_title }}]</p>
-                <p class="definition">» {{ sense.definition }}</p>
-                <p class="translation">╚ {{ sense.translation }}</p>
+                <p v-if="sense.phrase" class="sphrase">» {{ sense.phrase }}</p>
+                <p v-if="sense.definition" class="definition">» {{ sense.definition }}</p>
+                <p v-if="sense.translation" class="translation">╚ {{ sense.translation }}</p>
                 <div class="examples-toggle" @click="toggleExamples(entry.id, idx)">
                   <span>Examples ({{ sense.examples.length }})</span>
                   <span class="toggle-icon">{{ isExampleExpanded(entry.id, idx) ? '▼' : '▶' }}</span>
