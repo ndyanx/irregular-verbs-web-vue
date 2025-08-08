@@ -1,12 +1,6 @@
 <template>
   <div :class="['app', { 'dark-mode': settingsStore.darkMode }]">
-    <NavBar 
-      :soundEnabled="settingsStore.soundEnabled" 
-      :darkMode="settingsStore.darkMode"
-      @toggle-sound="settingsStore.toggleSound"
-      @toggle-dark-mode="settingsStore.toggleDarkMode"
-      @open-quiz="showQuiz = $event"
-    />
+    <NavBar @open-quiz="showQuiz = $event" />
 
     <main class="audio-content">
       <div class="header-wrapper">
@@ -196,6 +190,7 @@ export default {
       fetchWordInfo,
       playAccentAudio,
       waveBarStyle,
+      stopWaveAnimation,
       isExampleExpanded,
       toggleExamples
     };

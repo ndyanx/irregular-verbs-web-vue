@@ -162,6 +162,10 @@
 </template>
 
 <script>
+// Tabla de verbos: búsqueda, ordenamiento y paginación
+// Notas de diseño:
+// - Se trabaja internamente con objetos { key: data } por compatibilidad con el JSON
+// - Si la fuente de datos creciera mucho, convendría usar arrays para evitar recreaciones con fromEntries
 const SORT_NAMES = Object.freeze({
   default: 'A-Z',
   identical: 'Formas Idénticas',
@@ -210,6 +214,7 @@ export default {
   
   computed: {
     filteredData() {
+      // Filtro full-text simple sobre campos principales y meanings
       if (!this.searchQuery) return this.verbs;
       
       const query = this.searchQuery.toLowerCase();
@@ -238,6 +243,10 @@ export default {
     },
     
     sortedData() {
+      // Ordenamientos:
+      // - identical: prioriza verbos con formas iguales (present/past/participle)
+      // - easy: heurística simple por longitud + bonus para comunes + penalización si no idénticos
+      // - common: prioriza los verbos listados como comunes
       const entries = Object.entries(this.filteredData);
       
       const sortFunctions = {
@@ -328,6 +337,8 @@ export default {
     
     // Método optimizado para calcular dificultad
     calculateDifficultyScore(verbKey, verbData) {
+      // Heurística simple: longitud de la forma base + penalización si no son idénticas
+      // y bonus si el verbo está en la lista de comunes
       const lengthScore = verbData.present.length;
       const identicalBonus = this.getIdenticalScore(verbData) === 0 ? 0 : 5;
       const commonBonus = this.commonVerbs.includes(verbKey) ? -10 : 0;

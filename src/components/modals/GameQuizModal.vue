@@ -86,6 +86,9 @@
 <script>
 import confetti from 'canvas-confetti';
 
+// Modal: Juego clásico de preguntas
+// - Genera preguntas aleatorias sobre formas verbales
+// - Soporta reglas especiales (gameRules) para verbos con múltiples mapeos
 const QUESTION_TYPES = [
   { type: 'base_to_past', text: (verb, verbKey) => `¿Pasado de "${verb.present}"?` },
   { type: 'base_to_participle', text: (verb, verbKey) => `¿Participio de "${verb.present}"?` },
@@ -166,6 +169,7 @@ export default {
     },
     
     generateQuestionText() {
+      // Si el verbo define gameRules, se usa el mapeo explícito para generar la pregunta
       if (this.currentVerb.gameRules) {
         const forms = {
           present: this.currentVerb.present.split(' / ').map(f => f.trim()),
@@ -211,6 +215,7 @@ export default {
     },
     
     checkAnswer() {
+      // Normaliza y compara la respuesta contra las formas válidas
       if (!this.userAnswer.trim() || this.isChecking || this.answerLock) return;
 
       this.isChecking = true;

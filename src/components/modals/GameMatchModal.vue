@@ -88,6 +88,9 @@
 <script>
 import confetti from 'canvas-confetti';
 
+// Modal: Emparejar significados con formas
+// - Permite alternar modo (present/past/participle)
+// - Mide precisión y da feedback visual
 export default {
   name: 'GameMatchModal',
   props: {

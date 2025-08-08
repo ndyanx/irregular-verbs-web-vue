@@ -16,6 +16,20 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 npm install
 ```
 
+### Variables de entorno
+
+Crea un archivo `.env` en la raíz (o copia el ejemplo) para configurar la URL del API de pronunciaciones:
+
+```sh
+cp .env.example .env
+```
+
+Contenido del `.env`:
+
+```
+VITE_API_BASE_URL=https://irregular-verbs-web-express.onrender.com
+```
+
 ### Compile and Hot-Reload for Development
 
 ```sh

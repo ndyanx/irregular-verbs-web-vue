@@ -2,6 +2,11 @@
 import { defineStore } from 'pinia';
 import verbs from '@/assets/data/verbs.json';
 
+/**
+ * Store de verbos
+ * - Expone todos los verbos y una lista de verbos comunes
+ * - Ideal para añadir filtros/selecciones globales en el futuro
+ */
 export const useVerbsStore = defineStore('verbs', {
   state: () => ({
     allVerbs: verbs,

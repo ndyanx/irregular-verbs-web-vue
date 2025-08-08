@@ -1,12 +1,6 @@
 <template>
   <div :class="['app', { 'dark-mode': settingsStore.darkMode }]">
-    <NavBar 
-      :soundEnabled="settingsStore.soundEnabled"
-      :darkMode="settingsStore.darkMode"
-      @toggle-sound="settingsStore.toggleSound"
-      @toggle-dark-mode="settingsStore.toggleDarkMode"
-      @open-quiz="showQuiz = $event"
-    />
+    <NavBar @open-quiz="showQuiz = $event" />
     
     <main class="home-content">
       <section class="hero">

@@ -264,24 +264,7 @@ export default {
 </script>
 
 <style>
-:root {
-  --header-height: 70px;
-  --bg: #ffffff;
-  --text: #213547;
-  --primary: #4361ee;
-  --card: #ffffff;
-  --border: rgba(60, 60, 67, 0.12);
-  --neon-green: #39ff14;
-  --control-item-bg: #f8f8f8;
-}
-
-.dark-mode {
-  --bg: #1a1a1a;
-  --text: rgba(255, 255, 255, 0.87);
-  --card: #242424;
-  --border: rgba(84, 84, 88, 0.48);
-  --control-item-bg: #333333;
-}
+/* Variables globales se manejan en assets/styles.css */
 
 /* Estructura base */
 .header {
