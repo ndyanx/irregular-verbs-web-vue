@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const HomeView = () => import('@/views/HomeView.vue')
 const VerbsView = () => import('@/views/VerbsView.vue')
 const WordView = () => import('@/views/WordView.vue')
+const TextView = () => import('@/views/TextView.vue')
 const NotFoundView = () => import('@/views/NotFoundView.vue')
 
 const routes = [
@@ -32,6 +33,15 @@ const routes = [
     meta: {
       title: 'Word Explorer - Pronunciación y Ejemplos',
       description: 'Busca palabras en inglés, escucha su audio y revisa ejemplos.'
+    }
+  },
+  {
+    path: '/text',
+    name: 'text',
+    component: TextView,
+    meta: {
+      title: 'Texto interactivo - Pronunciación por palabras',
+      description: 'Pega un texto y haz clic en palabras para escuchar pronunciación y ver detalles.'
     }
   },
   {

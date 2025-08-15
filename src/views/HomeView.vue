@@ -16,6 +16,9 @@
           <router-link to="/word" class="btn outline">
             Buscar palabra
           </router-link>
+          <router-link to="/text" class="btn outline">
+            Texto interactivo
+          </router-link>
         </div>
       </section>
 
