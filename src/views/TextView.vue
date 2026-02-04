@@ -12,6 +12,7 @@
           class="text-input"
           placeholder="Pega aquí tu párrafo en inglés..."
           rows="6"
+          @keyup.enter="analyzeText"
         ></textarea>
         <div class="actions">
           <div class="accent-select">
@@ -25,26 +26,32 @@
               <span>UK</span>
             </label>
           </div>
-          <button class="btn primary" @click="analyzeText" :disabled="!inputText.trim() || isAnalyzing">
+          <button 
+            class="btn primary" 
+            @click="analyzeText" 
+            :disabled="!inputText.trim() || isAnalyzing"
+          >
             {{ isAnalyzing ? 'Analizando…' : 'Analizar texto' }}
           </button>
         </div>
       </section>
 
-      <section v-if="tokens.length" class="results">
+      <section v-if="tokens.length > 0" class="results">
         <div class="paragraph" aria-label="Texto interactivo">
-          <template v-for="(token, idx) in tokens" :key="idx">
+          <template v-for="(token, idx) in tokens" :key="`token-${idx}`">
             <span
               v-if="token.type === 'word'"
               class="word"
-              :class="{ active: selectedWord?.original === token.original }"
+              :class="getWordClass(token)"
               @click="handleWordClick(token)"
               :title="getWordTitle(token)"
               role="button"
               tabindex="0"
               @keyup.enter="handleWordClick(token)"
-              >{{ token.original }}</span
-            ><span v-else class="sep">{{ token.original }}</span>
+            >
+              {{ token.original }}
+            </span>
+            <span v-else class="sep">{{ token.original }}</span>
           </template>
         </div>
 
@@ -84,132 +91,126 @@
 </template>
 
 <script>
+import { ref, computed, watch } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useSettingsStore } from '@/stores/settings';
+import { useTextViewStore } from '@/stores/textViewStore';
 import NavBar from '@/components/NavBar.vue';
 import Footer from '@/components/Footer.vue';
-import { ref, computed, watch } from 'vue';
-import { useSettingsStore } from '@/stores/settings';
-import { useAudioStore } from '@/stores/audio';
 
-// Vista: Texto interactivo
-// - Tokeniza el párrafo preservando espacios y puntuación
-// - Hace prefetch de palabras únicas y cachea resultados
-// - Reproduce pronunciación y muestra detalles al seleccionar una palabra
 export default {
   name: 'TextView',
-  components: { NavBar, Footer },
+  components: {
+    NavBar,
+    Footer
+  },
   setup() {
     const settingsStore = useSettingsStore();
-    const audioStore = useAudioStore();
+    const textViewStore = useTextViewStore();
+    const showQuiz = ref(false);
+    
+    // Usar storeToRefs para mantener la reactividad
+    const { 
+      inputText, 
+      tokens, 
+      isAnalyzing, 
+      accent, 
+      wordDataMap, 
+      selectedWord 
+    } = storeToRefs(textViewStore);
 
-    const inputText = ref('');
-    const tokens = ref([]);
-    const isAnalyzing = ref(false);
-    const accent = ref(audioStore.currentAccent || 'us');
-
-    // Mapa palabra(normalizada) -> datos de API
-    const wordDataMap = ref({});
-    const selectedWord = ref(null);
-    const analyzeRunId = ref(0);
-
-    // Control de ritmo de peticiones para evitar saturar la API
-    const PREFETCH_BATCH_SIZE = 8; // nº de palabras por lote
-    const PREFETCH_DELAY_MS = 400; // pausa entre lotes
-
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
+    // Datos de la palabra seleccionada
     const selectedData = computed(() => {
       if (!selectedWord.value) return null;
-      return wordDataMap.value[selectedWord.value.normalized] || null;
+      const wordKey = selectedWord.value.normalized || selectedWord.value.original?.toLowerCase();
+      return wordDataMap.value[wordKey] || null;
     });
 
-    watch(accent, (val) => {
-      audioStore.currentAccent = val;
+    // Watchers
+    watch(accent, (newAccent) => {
+      textViewStore.setAccent(newAccent);
     });
 
-    function tokenize(text) {
-      const result = [];
-      // Divide en grupos de letras/apóstrofos y lo demás como separadores
-      const regex = /([A-Za-z']+)|([^A-Za-z']+)/g;
-      let match;
-      while ((match = regex.exec(text)) !== null) {
-        if (match[1]) {
-          const original = match[1];
-          result.push({ type: 'word', original, normalized: original.toLowerCase() });
-        } else if (match[2]) {
-          result.push({ type: 'sep', original: match[2] });
-        }
-      }
-      return result;
+    /**
+     * Analiza el texto ingresado
+     */
+    function analyzeText() {
+      textViewStore.analyzeText();
     }
 
-    async function analyzeText() {
-      if (!inputText.value.trim()) return;
-      isAnalyzing.value = true;
-      tokens.value = tokenize(inputText.value);
-
-      const unique = Array.from(
-        new Set(tokens.value.filter(t => t.type === 'word').map(t => t.normalized))
-      );
-
-      const currentRun = ++analyzeRunId.value;
-
-      // Prefetch en lotes con pausa entre ellos
-      for (let i = 0; i < unique.length; i += PREFETCH_BATCH_SIZE) {
-        const slice = unique.slice(i, i + PREFETCH_BATCH_SIZE);
-        await Promise.all(slice.map(async (w) => {
-          try {
-            if (wordDataMap.value[w] !== undefined) return;
-            const data = await audioStore.fetchWordData(w);
-            wordDataMap.value[w] = data;
-          } catch (e) {
-            // Si falla, mantenemos null; SpeechSynthesis actuará como fallback
-            wordDataMap.value[w] = null;
-          }
-        }));
-
-        // Si hay una nueva ejecución, aborta esta
-        if (analyzeRunId.value !== currentRun) {
-          return;
-        }
-
-        // Pausa entre lotes si aún quedan palabras
-        if (i + PREFETCH_BATCH_SIZE < unique.length) {
-          await sleep(PREFETCH_DELAY_MS);
-        }
-      }
-
-      // Marcar fin sólo si no fue sustituido por otra ejecución
-      if (analyzeRunId.value === currentRun) {
-        isAnalyzing.value = false;
-        const firstWord = tokens.value.find(t => t.type === 'word');
-        selectedWord.value = firstWord || null;
-      }
+    /**
+     * Maneja el clic en una palabra
+     */
+    function handleWordClick(token) {
+      textViewStore.handleWordClick(token);
     }
 
+    /**
+     * Obtiene el título para el tooltip de una palabra
+     */
     function getWordTitle(token) {
-      const hasData = !!wordDataMap.value[token.normalized];
-      return hasData ? 'Clic para escuchar y ver detalles' : 'Clic para pronunciar (sintetizado)';
+      if (token.type !== 'word') return '';
+      const wordKey = token.normalized || token.original?.toLowerCase();
+      const wordData = wordDataMap.value[wordKey];
+      
+      if (!wordData) return token.original;
+      if (wordData.loading) return 'Cargando...';
+      
+      // Mostrar la primera definición si existe
+      if (wordData.definitions?.length > 0) {
+        return wordData.definitions[0].definition;
+      }
+      
+      return token.original;
     }
 
-    async function handleWordClick(token) {
-      selectedWord.value = token;
-      await audioStore.playWord(token.original, 'en-US', accent.value);
+    /**
+     * Obtiene las clases CSS para una palabra
+     */
+    function getWordClass(token) {
+      if (token.type !== 'word') return '';
+      
+      const classes = [];
+      const wordKey = token.normalized || token.original?.toLowerCase();
+      const wordData = wordDataMap.value[wordKey];
+      
+      // Resaltar palabra seleccionada
+      if (selectedWord.value?.normalized === wordKey || 
+          selectedWord.value?.original?.toLowerCase() === wordKey) {
+        classes.push('selected');
+      }
+      
+      // Estado de carga
+      if (wordData?.loading) {
+        classes.push('loading');
+      } 
+      // Tiene datos
+      else if (wordData?.definitions?.length > 0) {
+        classes.push('has-data');
+      }
+      
+      return classes.join(' ');
     }
 
     return {
+      // Stores
       settingsStore,
-      audioStore,
+      
+      // Estado reactivo
       inputText,
       tokens,
       isAnalyzing,
-      analyzeText,
+      accent,
       selectedWord,
       selectedData,
-      getWordTitle,
+      wordDataMap,
+      showQuiz,
+      
+      // Métodos
+      analyzeText,
       handleWordClick,
-      accent
+      getWordTitle,
+      getWordClass
     };
   },
   created() {

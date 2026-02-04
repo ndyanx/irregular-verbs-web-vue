@@ -15,7 +15,7 @@
         </div>
       </router-link>
 
-      <div class="quiz-button-container">
+      <div class="quiz-button-container" v-if="!$route.path.startsWith('/text')">
         <div class="dropdown" :class="{ open: dropdownOpen }">
           <button 
             id="quiz-button" 
