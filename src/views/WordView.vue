@@ -42,9 +42,21 @@
                                 @click="playAccentAudio(key)"
                                 aria-label="Reproducir pronunciación"
                             >
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
-                                    <path d="M16 12a4.5 4.5 0 0 0-1.5-3.37"></path>
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"
+                                    ></path>
+                                    <path
+                                        d="M16 12a4.5 4.5 0 0 0-1.5-3.37"
+                                    ></path>
                                 </svg>
                             </button>
                         </div>
@@ -87,9 +99,18 @@
                                         fill="none"
                                         stroke="currentColor"
                                         stroke-width="2.5"
-                                        :style="{ transform: isExampleExpanded(entry.id, idx) ? 'rotate(180deg)' : 'rotate(0deg)' }"
+                                        :style="{
+                                            transform: isExampleExpanded(
+                                                entry.id,
+                                                idx,
+                                            )
+                                                ? 'rotate(180deg)'
+                                                : 'rotate(0deg)',
+                                        }"
                                     >
-                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                        <polyline
+                                            points="6 9 12 15 18 9"
+                                        ></polyline>
                                     </svg>
                                 </div>
                                 <ul

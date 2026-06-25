@@ -1,5 +1,5 @@
-import { ref } from 'vue';
-import confetti from 'canvas-confetti';
+import { ref } from "vue";
+import confetti from "canvas-confetti";
 
 /**
  * Encapsula el lanzamiento de confetti sobre un <canvas>.

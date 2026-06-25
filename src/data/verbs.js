@@ -1,4 +1,4 @@
-import verbsData from '@/assets/data/verbs.json';
+import verbsData from "@/assets/data/verbs.json";
 
 /**
  * Antes `verbs` era un store de Pinia (`useVerbsStore`) que solo envolvía
@@ -13,5 +13,14 @@ import verbsData from '@/assets/data/verbs.json';
 export const allVerbs = verbsData;
 
 export const commonVerbs = [
-  'be', 'have', 'do', 'say', 'go', 'get', 'make', 'take', 'come', 'see',
+  "be",
+  "have",
+  "do",
+  "say",
+  "go",
+  "get",
+  "make",
+  "take",
+  "come",
+  "see",
 ];

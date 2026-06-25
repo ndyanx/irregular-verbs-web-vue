@@ -1,4 +1,4 @@
-import { useAudioStore } from '@/stores/audio';
+import { useAudioStore } from "@/stores/audio";
 
 /**
  * Antes WordView y TextView repetían el mismo try/catch alrededor de
