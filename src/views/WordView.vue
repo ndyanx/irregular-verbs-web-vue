@@ -1,15 +1,12 @@
 <template>
-    <div :class="['app', { 'dark-mode': settingsStore.darkMode }]">
+    <div class="app">
         <NavBar @open-quiz="showQuiz = $event" />
 
         <main class="audio-content">
             <div class="header-wrapper">
-                <h1 class="title">
-                    <span class="title-gradient">Word Explorer</span>
-                    <span class="title-emoji">🎙️</span>
-                </h1>
+                <h1 class="title">Word Explorer</h1>
                 <p class="subtitle">
-                    Escuche la pronunciación en inglés y ejemplos.
+                    Escucha la pronunciación en inglés y revisa ejemplos.
                 </p>
             </div>
 
@@ -18,7 +15,7 @@
                     <input
                         v-model="inputWord"
                         type="text"
-                        placeholder="Type an English word..."
+                        placeholder="Escribe una palabra en inglés..."
                         @keyup.enter="fetchWordInfo"
                         class="audio-input"
                     />
@@ -27,10 +24,7 @@
                         :disabled="!inputWord || isSearching"
                         class="btn primary"
                     >
-                        <span class="btn-content">
-                            <span class="btn-text">Search</span>
-                            <span class="btn-icon">🔎</span>
-                        </span>
+                        Buscar
                     </button>
                 </div>
 
@@ -46,8 +40,12 @@
                             <button
                                 class="play-btn"
                                 @click="playAccentAudio(key)"
+                                aria-label="Reproducir pronunciación"
                             >
-                                🔊
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
+                                    <path d="M16 12a4.5 4.5 0 0 0-1.5-3.37"></path>
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -64,28 +62,35 @@
                                     [{{ sense.sense_title }}]
                                 </p>
                                 <p v-if="sense.phrase" class="sphrase">
-                                    » {{ sense.phrase }}
+                                    {{ sense.phrase }}
                                 </p>
                                 <p v-if="sense.definition" class="definition">
-                                    » {{ sense.definition }}
+                                    {{ sense.definition }}
                                 </p>
                                 <p v-if="sense.translation" class="translation">
-                                    ╚ {{ sense.translation }}
+                                    {{ sense.translation }}
                                 </p>
                                 <div
                                     class="examples-toggle"
                                     @click="toggleExamples(entry.id, idx)"
                                 >
                                     <span
-                                        >Examples ({{
+                                        >Ejemplos ({{
                                             sense.examples.length
                                         }})</span
                                     >
-                                    <span class="toggle-icon">{{
-                                        isExampleExpanded(entry.id, idx)
-                                            ? "▼"
-                                            : "▶"
-                                    }}</span>
+                                    <svg
+                                        class="toggle-icon"
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.5"
+                                        :style="{ transform: isExampleExpanded(entry.id, idx) ? 'rotate(180deg)' : 'rotate(0deg)' }"
+                                    >
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
                                 </div>
                                 <ul
                                     class="examples"
@@ -95,9 +100,9 @@
                                         v-for="(ex, exIdx) in sense.examples"
                                         :key="exIdx"
                                     >
-                                        <strong>» {{ ex.en }}</strong
+                                        <strong>{{ ex.en }}</strong
                                         ><br />
-                                        <em v-if="ex.es">╚ {{ ex.es }}</em>
+                                        <em v-if="ex.es">{{ ex.es }}</em>
                                     </li>
                                 </ul>
                             </div>
@@ -114,7 +119,7 @@
                             :style="waveBarStyle(n)"
                         ></span>
                     </div>
-                    <span class="playing-text">Searching: {{ inputWord }}</span>
+                    <span class="playing-text">Buscando: {{ inputWord }}</span>
                 </div>
             </div>
         </main>
@@ -133,18 +138,17 @@
 import NavBar from "@/components/NavBar.vue";
 import Footer from "@/components/Footer.vue";
 import QuizModals from "@/components/modals/QuizModals.vue";
-import { useSettingsStore } from "@/stores/settings";
-import { useVerbsStore } from "@/stores/verbs";
 import { useAudioStore } from "@/stores/audio";
-import { ref, computed } from "vue";
+import { useWordFetch } from "@/composables/useWordFetch";
+import { allVerbs } from "@/data/verbs";
+import { ref } from "vue";
 
 export default {
     name: "AudioView",
     components: { NavBar, QuizModals, Footer },
     setup() {
-        const settingsStore = useSettingsStore();
-        const verbsStore = useVerbsStore();
         const audioStore = useAudioStore();
+        const { fetchWord } = useWordFetch();
 
         const showQuiz = ref(null);
         const inputWord = ref("");
@@ -154,7 +158,7 @@ export default {
         const lastRequestId = ref(0);
         const expandedExamples = ref({});
 
-        const preparedVerbs = computed(() => verbsStore.allVerbs);
+        const preparedVerbs = allVerbs;
 
         const isExampleExpanded = (id, idx) => {
             return !!expandedExamples.value[`${id}-${idx}`];
@@ -178,7 +182,7 @@ export default {
             const currentRequestId = ++lastRequestId.value;
 
             try {
-                const data = await audioStore.fetchWordData(inputWord.value);
+                const data = await fetchWord(inputWord.value);
 
                 if (currentRequestId === lastRequestId.value) {
                     wordData.value = data;
@@ -219,13 +223,10 @@ export default {
         const waveBarStyle = (index) => {
             return {
                 height: `${waveAnimation.value[index - 1]}px`,
-                backgroundColor: settingsStore.darkMode ? "#7928CA" : "#FF0080",
             };
         };
 
         return {
-            settingsStore,
-            verbsStore,
             audioStore,
             showQuiz,
             inputWord,
@@ -254,7 +255,7 @@ export default {
 .audio-content {
     max-width: 640px;
     margin: 0 auto;
-    padding: 2rem 1.25rem;
+    padding: 2.5rem 1.25rem;
     min-height: calc(100vh - 120px);
     display: flex;
     flex-direction: column;
@@ -267,201 +268,90 @@ export default {
 }
 
 .title {
-    font-size: 2.5rem;
+    font-family: var(--font-display);
+    font-size: 2.25rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    color: var(--ink);
     line-height: 1.2;
 }
 
-.title-gradient {
-    background: linear-gradient(90deg, #7928ca 0%, #ff0080 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.title-emoji {
-    font-size: 2rem;
-}
-
 .subtitle {
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
     color: var(--text-light);
     margin-bottom: 0;
 }
 
 .audio-card {
-    background: var(--card);
-    border-radius: 16px;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
     padding: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border);
-    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--line);
     margin: 0 0.5rem;
-}
-
-.dark-mode .audio-card {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    border-color: var(--border-dark);
 }
 
 .input-group {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-bottom: 1.5rem;
 }
 
 .audio-input {
     flex: 1;
     padding: 1rem 1.25rem;
-    border-radius: 12px;
-    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
     font-size: 1rem;
-    transition: all 0.2s ease;
-    background: var(--input-bg);
+    transition: var(--transition);
+    background: var(--surface);
     color: var(--text);
     min-height: 50px;
+    font-family: var(--font-body);
 }
 
 .audio-input:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(115, 103, 255, 0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .btn {
     padding: 0 1.5rem;
-    border-radius: 12px;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    transition: var(--transition);
     cursor: pointer;
     border: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 50px;
-}
-
-.btn-content {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    position: relative;
-    z-index: 2;
-    font-size: 0.9rem;
+    font-family: var(--font-body);
 }
 
 .btn.primary {
-    background: linear-gradient(90deg, #7928ca 0%, #ff0080 100%);
+    background: var(--accent);
     color: white;
-    position: relative;
-    overflow: hidden;
-    min-width: 120px;
+    min-width: 110px;
 }
 
-.btn.primary::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, #8a3bda 0%, #ff2b94 100%);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    z-index: 1;
-}
-
-.btn.primary:hover::before {
-    opacity: 1;
-}
-
-.btn.primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(121, 40, 202, 0.3);
-}
-
-.btn.primary:active {
-    transform: translateY(0);
+.btn.primary:hover:not(:disabled) {
+    background: var(--accent-dark);
 }
 
 .btn.primary:disabled {
-    background: var(--disabled-bg);
-    color: var(--disabled-text);
-    transform: none;
-    box-shadow: none;
+    background: var(--line);
+    color: var(--ink-faint);
     cursor: not-allowed;
-}
-
-.btn.primary:disabled::before {
-    display: none;
-}
-
-.accent-selector {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.selector-title {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-light);
-}
-
-.radio-group {
-    display: flex;
-    gap: 1rem;
-}
-
-.radio-option {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
-    background: var(--radio-bg);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex: 1;
-}
-
-.radio-option:hover {
-    border-color: var(--primary-light);
-}
-
-.radio-option.active {
-    background: var(--primary-lightest);
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-.radio-input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.radio-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9375rem;
-    width: 100%;
-    justify-content: center;
 }
 
 /* Audio Status Bar */
 .audio-status-bar {
     margin-top: 1.5rem;
     padding: 1rem;
-    border-radius: 12px;
-    background: var(--status-bar-bg);
+    border-radius: var(--radius);
+    background: var(--accent-soft);
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -477,7 +367,7 @@ export default {
 
 .wave-bar {
     width: 4px;
-    background: linear-gradient(to top, #7928ca, #ff0080);
+    background: var(--accent);
     border-radius: 2px;
     transition: height 0.2s ease;
     display: inline-block;
@@ -503,26 +393,6 @@ export default {
     }
 }
 
-/* Dark mode adjustments */
-.dark-mode {
-    --radio-bg: rgba(255, 255, 255, 0.05);
-    --status-bar-bg: rgba(255, 255, 255, 0.05);
-}
-
-.dark-mode .audio-input {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.dark-mode .radio-option {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.dark-mode .radio-option.active {
-    background: rgba(121, 40, 202, 0.2);
-}
-
 .word-display {
     margin-top: 1rem;
 }
@@ -538,19 +408,31 @@ export default {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    color: var(--ink);
 }
 
 .ipa {
     font-style: italic;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    color: var(--text-light);
 }
 
 .play-btn {
-    background: none;
+    background: var(--accent-soft);
     border: none;
+    border-radius: 999px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    font-size: 1.2rem;
-    color: #7928ca;
+    color: var(--accent);
+    transition: var(--transition);
+}
+
+.play-btn:hover {
+    background: var(--accent-soft-strong);
 }
 
 .definitions {
@@ -561,42 +443,39 @@ export default {
 }
 
 .definitions h3 {
-    font-size: 1.5rem;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
     margin-bottom: 0.5rem;
+    color: var(--ink);
+    text-transform: capitalize;
 }
 
 .stitle {
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 0.2rem;
-    color: #1d55af;
+    color: var(--accent-dark);
     word-break: break-word;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-.dark-mode .stitle {
-    color: #3078ec;
 }
 
 .definition {
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 0.2rem;
-    color: #5f646c;
+    color: var(--ink);
     word-break: break-word;
-}
-
-.dark-mode .definition {
-    color: var(--text-light);
 }
 
 .translation {
-    color: #ff2b94;
+    color: var(--text-light);
     margin-bottom: 0.5rem;
     word-break: break-word;
+    font-style: italic;
 }
 
 .sense {
-    margin-bottom: 30px;
-    border-top: solid 3px #7928ca;
+    margin-bottom: 24px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
 }
 
 .examples-toggle {
@@ -604,32 +483,38 @@ export default {
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    color: cadetblue;
+    color: var(--text-light);
     margin: 0.5rem 0;
     padding: 0.25rem;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    font-size: 0.9rem;
 }
 
 .examples-toggle:hover {
-    background-color: rgba(121, 40, 202, 0.1);
+    background-color: var(--accent-soft);
+    color: var(--accent-dark);
 }
 
 .toggle-icon {
-    font-size: 0.8rem;
+    transition: transform 0.2s ease;
 }
 
 .examples {
     list-style: none;
-    padding-left: 1rem;
+    padding-left: 0.5rem;
     margin-bottom: 1rem;
 }
 
 .examples li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     word-break: break-word;
     overflow-wrap: anywhere;
-    line-height: 1.4;
+    line-height: 1.5;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.2s ease;
+    cursor: default;
 }
 
 .examples li strong,
@@ -637,29 +522,15 @@ export default {
     display: inline-block;
     max-width: 100%;
     word-break: break-word;
+}
+
+.examples li em {
+    color: var(--text-light);
     font-style: italic;
 }
 
-.examples li {
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition:
-        background-color 0.2s ease,
-        transform 0.2s ease;
-    cursor: default;
-}
-
 .examples li:hover {
-    background-color: rgba(121, 40, 202, 0.08);
-    transform: translateX(4px);
-}
-
-.examples li:hover strong {
-    color: #7928ca;
-}
-
-.examples li:hover em {
-    color: #ff0080;
+    background-color: var(--accent-soft);
 }
 
 /* Responsive */
@@ -669,7 +540,7 @@ export default {
     }
 
     .title {
-        font-size: 2rem;
+        font-size: 1.875rem;
     }
 
     .input-group {
@@ -679,10 +550,6 @@ export default {
     .btn {
         width: 100%;
         padding: 1rem;
-    }
-
-    .radio-group {
-        flex-direction: column;
     }
 
     .audio-card {
@@ -701,21 +568,14 @@ export default {
     }
 
     .definitions h3 {
-        font-size: 1.5rem;
+        font-size: 1.125rem;
     }
 
     .stitle,
     .definition,
     .translation,
     .examples li {
-        font-size: 0.95rem;
-    }
-}
-
-@media (max-width: 400px) {
-    .title {
-        flex-direction: column;
-        gap: 0.25rem;
+        font-size: 0.9375rem;
     }
 }
 </style>

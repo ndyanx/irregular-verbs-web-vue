@@ -13,10 +13,10 @@
         <!-- Header compacto -->
         <div class="quiz-header">
           <div class="header-left">
-            <h3 id="quiz-title">🌚 Verbos Irregulares</h3>
+            <h3 id="quiz-title">Verbos Irregulares</h3>
             <div class="quiz-stats">
-              <span class="stat-item correct">✅ {{ score }}</span>
-              <span class="stat-item wrong">❌ {{ attempts }}</span>
+              <span class="stat-item correct">{{ score }} correctas</span>
+              <span class="stat-item wrong">{{ attempts }} intentos</span>
             </div>
           </div>
           <button 
@@ -60,8 +60,10 @@
               @click="checkAnswer"
               :disabled="!userAnswer.trim() || isChecking || answerLock"
             >
-              <span v-if="isChecking">⏳</span>
-              <span v-else>✓</span>
+              <span v-if="isChecking" class="spinner" aria-hidden="true"></span>
+              <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
             </button>
           </div>
 
@@ -84,7 +86,8 @@
 </template>
 
 <script>
-import confetti from 'canvas-confetti';
+import { useConfetti } from '@/composables/useConfetti';
+import '@/assets/game-modal.css';
 
 // Modal: Juego clásico de preguntas
 // - Genera preguntas aleatorias sobre formas verbales
@@ -97,6 +100,9 @@ const QUESTION_TYPES = [
 
 export default {
   name: 'GameQuizModal',
+  setup() {
+    return useConfetti();
+  },
   props: {
     show: {
       type: Boolean,
@@ -143,18 +149,6 @@ export default {
       return verb.meanings?.map(m => m.present).join(" / ") || '';
     },
     
-    launchConfetti() {
-      const canvas = this.$refs.confettiCanvas;
-      const myConfetti = confetti.create(canvas, { 
-        resize: true, 
-        useWorker: true 
-      });
-      myConfetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 }
-      });
-    },
     
     getRandomVerbKey() {
       if (this.unusedVerbKeys.length === 0) {
@@ -260,8 +254,8 @@ export default {
 
       this.isCorrect = isCorrect;
       this.feedback = isCorrect 
-        ? '¡Correcto! 🎉' 
-        : `❌ Era: ${correctAnswer}`;
+        ? '¡Correcto!' 
+        : `Era: ${correctAnswer}`;
       
       if (isCorrect) {
         this.answerLock = true;
@@ -315,135 +309,6 @@ export default {
 </script>
 
 <style scoped>
-.confetti-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.quiz-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.75);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 12px;
-  box-sizing: border-box;
-}
-
-.quiz-content {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 420px;
-  padding: 20px;
-  position: relative;
-  max-height: 90vh;
-  overflow-y: auto;
-  border: 1px solid #e5e7eb;
-}
-
-.quiz-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-  gap: 12px;
-}
-
-.header-left {
-  flex: 1;
-  min-width: 0;
-}
-
-.quiz-header h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 6px 0;
-  color: #1f2937;
-  line-height: 1.2;
-}
-
-.quiz-stats {
-  display: flex;
-  gap: 12px;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.stat-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.stat-item.correct {
-  color: #10b981;
-}
-
-.stat-item.wrong {
-  color: #ef4444;
-}
-
-.close-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  background: #f9fafb;
-  color: #6b7280;
-  flex-shrink: 0;
-}
-
-.close-btn:hover {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.quiz-body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.quiz-reference {
-  font-size: 0.95rem;
-  text-align: center;
-  padding: 8px 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 10px;
-  font-weight: 500;
-  line-height: 1.3;
-  word-break: break-word;
-}
-
-.quiz-question {
-  font-size: 1.1rem;
-  padding: 14px 16px;
-  background: white;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 500;
-  color: #1f2937;
-  line-height: 1.4;
-  border: 1px solid #e5e7eb;
-}
-
 .input-section {
   display: flex;
   gap: 8px;
@@ -453,18 +318,19 @@ export default {
 .quiz-input {
   flex: 1;
   padding: 12px 14px;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
   font-size: 1rem;
-  background: #ffffff;
-  color: #1f2937;
+  background: var(--surface);
+  color: var(--ink);
   min-width: 0;
+  font-family: var(--font-body);
 }
 
 .quiz-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .quiz-input:disabled {
@@ -475,25 +341,40 @@ export default {
 .quiz-submit {
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--accent);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 1.1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: var(--transition);
 }
 
 .quiz-submit:hover:not(:disabled) {
+  background: var(--accent-dark);
   transform: translateY(-1px);
 }
 
 .quiz-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .quiz-feedback {
@@ -506,15 +387,15 @@ export default {
 }
 
 .quiz-feedback.correct {
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #10b981;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  border: 1px solid var(--accent);
 }
 
 .quiz-feedback.wrong {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #ef4444;
+  background: var(--warn-soft);
+  color: var(--warn);
+  border: 1px solid var(--warn);
 }
 
 @media (max-width: 480px) {
@@ -528,7 +409,7 @@ export default {
     max-width: none;
     width: 100%;
     padding: 16px;
-    border-radius: 12px;
+    border-radius: var(--radius);
     max-height: calc(100vh - 80px);
   }
   
@@ -554,39 +435,6 @@ export default {
   .quiz-submit {
     width: 40px;
     height: 40px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .quiz-content {
-    background: #1f2937;
-    border-color: #374151;
-  }
-  
-  .quiz-header h3 {
-    color: #f9fafb;
-  }
-  
-  .quiz-question {
-    background: #1f2937;
-    color: #f9fafb;
-    border-color: #374151;
-  }
-  
-  .quiz-input {
-    background: #1f2937;
-    color: #f9fafb;
-    border-color: #374151;
-  }
-  
-  .close-btn {
-    background: #374151;
-    color: #9ca3af;
-  }
-  
-  .close-btn:hover {
-    background: #dc2626;
-    color: white;
   }
 }
 </style>

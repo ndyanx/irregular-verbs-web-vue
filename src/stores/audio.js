@@ -51,21 +51,45 @@ export const useAudioStore = defineStore("audio", {
     },
 
     /**
-     * Obtiene datos de pronunciación/definiciones desde el backend
+     * Obtiene datos de pronunciación/definiciones desde el backend.
+     * La API devuelve directamente el objeto plano { word, pronunciations, entries }.
+     *
+     * Incluye timeout: sin esto, un fetch que se queda "colgado" (red lenta,
+     * backend dormido en Render, etc.) nunca resuelve ni rechaza, y cuando
+     * TextView lanza varias peticiones en paralelo con Promise.all, basta
+     * una sola petición colgada para bloquear el lote completo de forma
+     * indefinida. Con el timeout, esa palabra falla rápido y cae al fallback
+     * de síntesis de voz en vez de trabar el análisis de todo el texto.
      */
-    async fetchWordData(word) {
+    async fetchWordData(word, timeoutMs = 90000) {
       word = word.toLowerCase().trim();
       const apiUrl = `${VITE_API_BASE_URL}/api/word/${encodeURIComponent(word)}`;
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
       try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, { signal: controller.signal });
         if (!response.ok) throw new Error("Word not found in the dictionary.");
 
-        const data = await response.json();
-        return data;
+        const payload = await response.json();
+
+        if (!payload?.success || !payload?.data) {
+          throw new Error("Word not found in the dictionary.");
+        }
+
+        return payload.data;
       } catch (error) {
-        console.error("[fetchWordData ERROR]", error.message);
+        if (error.name === "AbortError") {
+          console.error(
+            `[fetchWordData TIMEOUT] "${word}" tardó más de ${timeoutMs}ms`,
+          );
+        } else {
+          console.error("[fetchWordData ERROR]", error.message);
+        }
         throw new Error("Unable to fetch word data. Please try another word.");
+      } finally {
+        clearTimeout(timeoutId);
       }
     },
 

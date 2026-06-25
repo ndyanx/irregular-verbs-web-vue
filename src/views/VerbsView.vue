@@ -1,12 +1,12 @@
 <template>
-  <div :class="['app', { 'dark-mode': settingsStore.darkMode }]">
+  <div class="app">
     <NavBar @open-quiz="handleOpenQuiz" />
     
     <VerbTable 
       :verbs="preparedVerbs" 
       :soundEnabled="settingsStore.soundEnabled"
       :showParticiple="settingsStore.showParticiple"
-      :commonVerbs="verbsStore.commonVerbs"
+      :commonVerbs="commonVerbs"
       @toggle-participle="settingsStore.toggleParticiple"
       @speak-word="speakWord"
     />
@@ -28,8 +28,8 @@ import VerbTable from '@/components/VerbTable.vue';
 import QuizModals from '@/components/modals/QuizModals.vue';
 import Footer from '@/components/Footer.vue';
 import { useSettingsStore } from '@/stores/settings';
-import { useVerbsStore } from '@/stores/verbs';
 import { useAudioStore } from '@/stores/audio';
+import { allVerbs, commonVerbs } from '@/data/verbs';
 
 export default {
   name: 'VerbsView',
@@ -41,9 +41,8 @@ export default {
   },
   setup() {
     const settingsStore = useSettingsStore();
-    const verbsStore = useVerbsStore();
     const audioStore = useAudioStore();
-    return { settingsStore, verbsStore, audioStore };
+    return { settingsStore, audioStore, commonVerbs };
   },
   data() {
     return {
@@ -52,7 +51,7 @@ export default {
   },
   computed: {
     preparedVerbs () {
-      return this.verbsStore.allVerbs;
+      return allVerbs;
     }
   },
   methods: {

@@ -1,8 +1,11 @@
 <template>
   <div class="not-found-container">
     <div class="not-found-content">
-      <h1 class="error-code gradient-text">404</h1>
-      <p class="error-message">Ups, parece que esta página no existe.</p>
+      <span class="error-code">404</span>
+      <h1 class="error-title">Esta página no existe</h1>
+      <p class="error-message">
+        Puede que el enlace esté roto o la página se haya movido.
+      </p>
       <router-link to="/" class="btn primary">Volver al inicio</router-link>
     </div>
   </div>
@@ -18,89 +21,75 @@ export default {
 </script>
 
 <style scoped>
-/* Fondo de la página */
 .not-found-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-  font-family: 'Roboto', sans-serif;
-  margin: 0;
+  min-height: calc(100vh - 72px);
+  background: var(--paper);
+  padding: 2rem;
 }
 
-/* Contenedor del error */
 .not-found-content {
   text-align: center;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 3rem 2rem;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 3rem 2.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  max-width: 420px;
   width: 100%;
-  backdrop-filter: blur(10px); /* Efecto de desenfoque en el fondo */
 }
 
-/* Error 404 con gradiente */
 .error-code {
-  font-size: 120px;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: transparent;
-  background-image: linear-gradient(270deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0);
-  background-clip: text;
-  -webkit-background-clip: text;
-  animation: gradientText 6s ease infinite;
+  display: block;
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.75rem;
 }
 
-@keyframes gradientText {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+.error-title {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
 }
 
-/* Mensaje de error */
 .error-message {
-  font-size: 1.25rem;
-  color: #555;
-  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: var(--text-light);
+  margin-bottom: 1.75rem;
 }
 
-/* Botón principal con estilo de gradiente */
 .btn {
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  font-weight: 500;
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .btn.primary {
-  background: linear-gradient(90deg, #41d1ff 0%, #7367ff 100%);
+  background: var(--accent);
   color: white;
-  border: none;
 }
 
 .btn.primary:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(65, 209, 255, 0.3);
+  background: var(--accent-dark);
 }
 
-/* Estilo para móviles */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .not-found-content {
-    padding: 2rem 1.5rem;
+    padding: 2.25rem 1.5rem;
   }
+
   .error-code {
-    font-size: 100px;
-  }
-  .error-message {
-    font-size: 1rem;
+    font-size: 3.5rem;
   }
 }
 </style>

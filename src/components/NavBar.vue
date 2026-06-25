@@ -1,210 +1,119 @@
 <template>
   <header class="header">
-    <!-- Navbar para desktop -->
-    <div class="navbar-desktop">
+    <div class="header-inner">
       <router-link to="/" class="logo-container">
-        <div class="logo">
-          <div class="logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z"></path>
-              <path d="M12 22V12"></path>
-              <path d="M9 10l3-3 3 3"></path>
-            </svg>
-          </div>
-          <span class="logo-text">ICPNX</span>
-        </div>
+        <span class="logo-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z"></path>
+            <path d="M12 22V12"></path>
+            <path d="M9 10l3-3 3 3"></path>
+          </svg>
+        </span>
+        <span class="logo-text">ICPNX</span>
       </router-link>
 
       <div class="quiz-button-container" v-if="!$route.path.startsWith('/text')">
         <div class="dropdown" :class="{ open: dropdownOpen }">
-          <button 
-            id="quiz-button" 
-            class="quiz-btn-with-text" 
+          <button
+            id="quiz-button"
+            class="quiz-btn"
             aria-label="Abrir juego de verbos"
+            :aria-expanded="dropdownOpen"
             @click="toggleDropdown"
           >
-            <span class="quiz-btn-text">Practicar</span>
-            <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <span>Practicar</span>
+            <svg class="dropdown-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
-          <div v-if="dropdownOpen" class="dropdown-menu">
-            <button @click="openQuiz('classic')">Juego Clásico</button>
-            <button @click="openQuiz('match')">Emparejar Verbos</button>
-            <button @click="openQuiz('race')">Carrera de Verbos</button>
+          <div v-if="dropdownOpen" class="dropdown-menu" role="menu">
+            <button role="menuitem" @click="openQuiz('classic')">Juego clásico</button>
+            <button role="menuitem" @click="openQuiz('match')">Emparejar verbos</button>
+            <button role="menuitem" @click="openQuiz('race')">Carrera de verbos</button>
           </div>
         </div>
       </div>
 
       <div class="controls-container">
-        <button 
+        <button
           v-if="$route.path === '/verbs'"
-          id="toggle-sound" 
-          class="vt-switch vt-switch-sound" 
-          type="button" 
-          role="switch" 
+          id="toggle-sound"
+          class="vt-switch"
+          type="button"
+          role="switch"
+          :aria-checked="settingsStore.soundEnabled"
           aria-label="Alternar sonido"
           @click="toggleSound"
           :class="{ active: settingsStore.soundEnabled }"
         >
           <span class="vt-switch-check">
-            <span class="vt-switch-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="vt-switch-sound-off">
-                <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
-              </svg>   
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="vt-switch-sound-on">
-                <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
-                <path d="M16 12a4.5 4.5 0 0 0-1.5-3.37l.71-.71a5.5 5.5 0 0 1 0 8.16l-.71-.71A4.5 4.5 0 0 0 16 12z" />
-                <path d="M18.5 12a7 7 0 0 0-2.33-5.19l.71-.71a8 8 0 0 1 0 11.8l-.71-.71A7 7 0 0 0 18.5 12z" />
-              </svg>
-            </span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
+              <path v-if="settingsStore.soundEnabled" d="M16 12a4.5 4.5 0 0 0-1.5-3.37"></path>
+              <path v-if="settingsStore.soundEnabled" d="M18.5 12a7 7 0 0 0-2.33-5.19"></path>
+              <line v-else x1="22" y1="2" x2="2" y2="22"></line>
+            </svg>
           </span>
         </button>
 
-        <button 
-          id="toggle-mode" 
-          class="vt-switch vt-switch-appearance"
-          type="button" 
-          role="switch" 
-          aria-label="Alternar modo oscuro"
-          @click="toggleDarkMode"
-          :class="{ active: settingsStore.darkMode }"
-        >
-          <span class="vt-switch-check">
-            <span class="vt-switch-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="vt-switch-appearance-sun">
-                <path d="M12,18c-3.3,0-6-2.7-6-6s2.7-6,6-6s6,2.7,6,6S15.3,18,12,18zM12,8c-2.2,0-4,1.8-4,4c0,2.2,1.8,4,4,4c2.2,0,4-1.8,4-4C16,9.8,14.2,8,12,8z"></path>
-                <path d="M12,4c-0.6,0-1-0.4-1-1V1c0-0.6,0.4-1,1-1s1,0.4,1,1v2C13,3.6,12.6,4,12,4z"></path>
-                <path d="M12,24c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1s1,0.4,1,1v2C13,23.6,12.6,24,12,24z"></path>
-                <path d="M5.6,6.6c-0.3,0-0.5-0.1-0.7-0.3L3.5,4.9c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l1.4,1.4c0.4,0.4,0.4,1,0,1.4C6.2,6.5,5.9,6.6,5.6,6.6z"></path>
-                <path d="M19.8,20.8c-0.3,0-0.5-0.1-0.7-0.3l-1.4-1.4c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l1.4,1.4c0.4,0.4,0.4,1,0,1.4C20.3,20.7,20,20.8,19.8,20.8z"></path>
-                <path d="M3,13H1c-0.6,0-1-0.4-1-1s0.4-1,1-1h2c0.6,0,1,0.4,1,1S3.6,13,3,13z"></path>
-                <path d="M23,13h-2c-0.6,0-1-0.4-1-1s0.4-1,1-1h2c0.6,0,1,0.4,1,1S23.6,13,23,13z"></path>
-                <path d="M4.2,20.8c-0.3,0-0.5-0.1-0.7-0.3c-0.4-0.4-0.4-1,0-1.4l1.4-1.4c0.4-0.4,1-0.4,1.4,0s0.4,1,0,1.4l-1.4,1.4C4.7,20.7,4.5,20.8,4.2,20.8z"></path>
-                <path d="M18.4,6.6c-0.3,0-0.5-0.1-0.7-0.3c-0.4-0.4-0.4-1,0-1.4l1.4-1.4c0.4-0.4,1-0.4,1.4,0s0.4,1,0,1.4l-1.4,1.4C18.9,6.5,18.6,6.6,18.4,6.6z"></path>
-              </svg>
-              <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="vt-switch-appearance-moon">
-                <path d="M12.1,22c-0.3,0-0.6,0-0.9,0c-5.5-0.5-9.5-5.4-9-10.9c0.4-4.8,4.2-8.6,9-9c0.4,0,0.8,0.2,1,0.5c0.2,0.3,0.2,0.8-0.1,1.1c-2,2.7-1.4,6.4,1.3,8.4c2.1,1.6,5,1.6,7.1,0c0.3-0.2,0.7-0.3,1.1-0.1c0.3,0.2,0.5,0.6,0.5,1c-0.2,2.7-1.5,5.1-3.6,6.8C16.6,21.2,14.4,22,12.1,22zM9.3,4.4c-2.9,1-5,3.6-5.2,6.8c-0.4,4.4,2.8,8.3,7.2,8.7c2.1,0.2,4.2-0.4,5.8-1.8c1.1-0.9,1.9-2.1,2.4-3.4c-2.5,0.9-5.3,0.5-7.5-1.1C9.2,11.4,8.1,7.7,9.3,4.4z"></path>
-              </svg>
-            </span>
-          </span>
+        <button class="mobile-menu-toggle" @click="toggleMobileMenu" aria-label="Abrir menú">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M3 12h18"></path>
+            <path d="M3 6h18"></path>
+            <path d="M3 18h18"></path>
+          </svg>
         </button>
       </div>
     </div>
 
-    <!-- Navbar para móvil -->
-    <div class="navbar-mobile">
-      <router-link to="/" class="logo-container">
-        <div class="logo">
-          <div class="logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z"></path>
-              <path d="M12 22V12"></path>
-              <path d="M9 10l3-3 3 3"></path>
-            </svg>
-          </div>
-          <span class="logo-text">ICPNX</span>
-        </div>
-      </router-link>
-
-      <div class="quiz-button-container">
-        <div class="dropdown" :class="{ open: dropdownOpen }">
-          <button 
-            id="quiz-button" 
-            class="quiz-btn-with-text" 
-            aria-label="Abrir juego de verbos"
-            @click="toggleDropdown"
-          >
-            <span class="quiz-btn-text">Practicar</span>
-            <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-          <div v-if="dropdownOpen" class="dropdown-menu">
-            <button @click="openQuiz('classic')">Juego Clásico</button>
-            <button @click="openQuiz('match')">Emparejar Verbos</button>
-            <button @click="openQuiz('race')">Carrera de Verbos</button>
-          </div>
-        </div>
-      </div>
-
-      <button class="mobile-menu-toggle" @click="toggleMobileMenu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 12h18"></path>
-          <path d="M3 6h18"></path>
-          <path d="M3 18h18"></path>
-        </svg>
-      </button>
-
-      <div class="mobile-menu" :class="{ open: mobileMenuOpen }">
-        <button class="mobile-menu-close" @click="toggleMobileMenu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="mobile-menu" :class="{ open: mobileMenuOpen }">
+      <div class="mobile-menu-header">
+        <span class="mobile-menu-title">Menú</span>
+        <button class="mobile-menu-close" @click="toggleMobileMenu" aria-label="Cerrar menú">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M18 6L6 18"></path>
             <path d="M6 6l12 12"></path>
           </svg>
         </button>
+      </div>
 
-        <div class="mobile-menu-content">
-          <div class="mobile-control-item" v-if="$route.path === '/verbs'">
-            <span class="mobile-control-label">Sonido</span>
-            <button 
-              id="toggle-sound-mobile" 
-              class="vt-switch vt-switch-sound" 
-              type="button" 
-              role="switch" 
-              aria-label="Alternar sonido"
-              @click="toggleSound"
-              :class="{ active: settingsStore.soundEnabled }"
-            >
-              <span class="vt-switch-check">
-                <span class="vt-switch-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="vt-switch-sound-off">
-                    <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
-                  </svg>   
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="vt-switch-sound-on">
-                    <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
-                    <path d="M16 12a4.5 4.5 0 0 0-1.5-3.37l.71-.71a5.5 5.5 0 0 1 0 8.16l-.71-.71A4.5 4.5 0 0 0 16 12z" />
-                    <path d="M18.5 12a7 7 0 0 0-2.33-5.19l.71-.71a8 8 0 0 1 0 11.8l-.71-.71A7 7 0 0 0 18.5 12z" />
-                  </svg>
-                </span>
-              </span>
-            </button>
-          </div>
+      <nav class="mobile-menu-links">
+        <router-link to="/" @click="toggleMobileMenu">Inicio</router-link>
+        <router-link to="/verbs" @click="toggleMobileMenu">Tabla de verbos</router-link>
+        <router-link to="/word" @click="toggleMobileMenu">Buscar palabra</router-link>
+        <router-link to="/text" @click="toggleMobileMenu">Texto interactivo</router-link>
+      </nav>
 
-          <div class="mobile-control-item">
-            <span class="mobile-control-label">Apariencia</span>
-            <button 
-              id="toggle-mode-mobile" 
-              class="vt-switch vt-switch-appearance" 
-              type="button" 
-              role="switch" 
-              aria-label="Alternar modo oscuro"
-              @click="toggleDarkMode"
-              :class="{ active: settingsStore.darkMode }"
-            >
-              <span class="vt-switch-check">
-                <span class="vt-switch-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="vt-switch-appearance-sun">
-                    <path d="M12,18c-3.3,0-6-2.7-6-6s2.7-6,6-6s6,2.7,6,6S15.3,18,12,18zM12,8c-2.2,0-4,1.8-4,4c0,2.2,1.8,4,4,4c2.2,0,4-1.8,4-4C16,9.8,14.2,8,12,8z"></path>
-                    <path d="M12,4c-0.6,0-1-0.4-1-1V1c0-0.6,0.4-1,1-1s1,0.4,1,1v2C13,3.6,12.6,4,12,4z"></path>
-                    <path d="M12,24c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1s1,0.4,1,1v2C13,23.6,12.6,24,12,24z"></path>
-                    <path d="M5.6,6.6c-0.3,0-0.5-0.1-0.7-0.3L3.5,4.9c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l1.4,1.4c0.4,0.4,0.4,1,0,1.4C6.2,6.5,5.9,6.6,5.6,6.6z"></path>
-                    <path d="M19.8,20.8c-0.3,0-0.5-0.1-0.7-0.3l-1.4-1.4c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l1.4,1.4c0.4,0.4,0.4,1,0,1.4C20.3,20.7,20,20.8,19.8,20.8z"></path>
-                    <path d="M3,13H1c-0.6,0-1-0.4-1-1s0.4-1,1-1h2c0.6,0,1,0.4,1,1S3.6,13,3,13z"></path>
-                    <path d="M23,13h-2c-0.6,0-1-0.4-1-1s0.4-1,1-1h2c0.6,0,1,0.4,1,1S23.6,13,23,13z"></path>
-                    <path d="M4.2,20.8c-0.3,0-0.5-0.1-0.7-0.3c-0.4-0.4-0.4-1,0-1.4l1.4-1.4c0.4-0.4,1-0.4,1.4,0s0.4,1,0,1.4l-1.4,1.4C4.7,20.7,4.5,20.8,4.2,20.8z"></path>
-                    <path d="M18.4,6.6c-0.3,0-0.5-0.1-0.7-0.3c-0.4-0.4-0.4-1,0-1.4l1.4-1.4c0.4-0.4,1-0.4,1.4,0s0.4,1,0,1.4l-1.4,1.4C18.9,6.5,18.6,6.6,18.4,6.6z"></path>
-                  </svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="vt-switch-appearance-moon">
-                    <path d="M12.1,22c-0.3,0-0.6,0-0.9,0c-5.5-0.5-9.5-5.4-9-10.9c0.4-4.8,4.2-8.6,9-9c0.4,0,0.8,0.2,1,0.5c0.2,0.3,0.2,0.8-0.1,1.1c-2,2.7-1.4,6.4,1.3,8.4c2.1,1.6,5,1.6,7.1,0c0.3-0.2,0.7-0.3,1.1-0.1c0.3,0.2,0.5,0.6,0.5,1c-0.2,2.7-1.5,5.1-3.6,6.8C16.6,21.2,14.4,22,12.1,22zM9.3,4.4c-2.9,1-5,3.6-5.2,6.8c-0.4,4.4,2.8,8.3,7.2,8.7c2.1,0.2,4.2-0.4,5.8-1.8c1.1-0.9,1.9-2.1,2.4-3.4c-2.5,0.9-5.3,0.5-7.5-1.1C9.2,11.4,8.1,7.7,9.3,4.4z"></path>
-                  </svg>
-                </span>
-              </span>
-            </button>
-          </div>
-        </div>
+      <div class="mobile-menu-section" v-if="!$route.path.startsWith('/text')">
+        <span class="mobile-menu-section-label">Practicar</span>
+        <nav class="mobile-menu-links">
+          <button @click="openQuiz('classic')">Juego clásico</button>
+          <button @click="openQuiz('match')">Emparejar verbos</button>
+          <button @click="openQuiz('race')">Carrera de verbos</button>
+        </nav>
+      </div>
+
+      <div class="mobile-control-item" v-if="$route.path === '/verbs'">
+        <span class="mobile-control-label">Sonido</span>
+        <button
+          class="vt-switch"
+          type="button"
+          role="switch"
+          :aria-checked="settingsStore.soundEnabled"
+          aria-label="Alternar sonido"
+          @click="toggleSound"
+          :class="{ active: settingsStore.soundEnabled }"
+        >
+          <span class="vt-switch-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path>
+              <line v-if="!settingsStore.soundEnabled" x1="22" y1="2" x2="2" y2="22"></line>
+            </svg>
+          </span>
+        </button>
       </div>
     </div>
+    <div v-if="mobileMenuOpen" class="mobile-menu-backdrop" @click="toggleMobileMenu"></div>
   </header>
 </template>
 
@@ -226,9 +135,6 @@ export default {
   methods: {
     toggleSound() {
       this.settingsStore.toggleSound();
-    },
-    toggleDarkMode() {
-      this.settingsStore.toggleDarkMode();
     },
     toggleDropdown() {
       this.dropdownOpen = !this.dropdownOpen;
@@ -264,511 +170,326 @@ export default {
 </script>
 
 <style>
-/* Variables globales se manejan en assets/styles.css */
+/* Variables globales en assets/styles.css */
 
-/* Estructura base */
 .header {
   width: 100%;
   height: var(--header-height);
-  background-color: var(--bg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
   z-index: 1000;
-  position: relative;
 }
 
-.dark-mode .header {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-/* Layouts de navegación */
-.navbar-desktop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.header-inner {
   height: 100%;
-  padding: 0 24px;
-  max-width: 1440px;
+  max-width: 1200px;
   margin: 0 auto;
-}
-
-.navbar-mobile {
-  display: none;
-  height: 100%;
-  padding: 0 16px;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-}
-
-/* Logo */
-.logo-container {
-  text-decoration: none;
+  padding: 0 24px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
-.logo {
+.logo-container {
   display: flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-right: 16px;
-}
-
-.logo:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  text-decoration: none;
+  color: var(--ink);
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #4361ee, #3a0ca3);
-  color: white;
-  padding: 6px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .logo-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .logo-text {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
-  font-size: 18px;
-  color: var(--text);
-  letter-spacing: 0.5px;
-  background: linear-gradient(90deg, #4361ee, #f72585);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
 }
 
-/* Botón Practicar y dropdown */
+/* Dropdown "Practicar" */
 .quiz-button-container {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
 }
 
-.quiz-btn-with-text {
-  position: relative;
+.quiz-btn {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
-  border-radius: 30px;
-  border: none;
-  cursor: pointer;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 500;
   font-size: 14px;
-  background: white;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: var(--transition);
 }
 
-.quiz-btn-with-text::before {
-  content: '';
-  position: absolute;
-  inset: -1.5px;
-  background: linear-gradient(270deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #4895ef);
-  background-size: 400% 400%;
-  border-radius: 33px;
-  animation: gradientBorder 6s ease infinite;
-  z-index: -1;
-}
-
-.quiz-btn-with-text::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: inherit;
-  border-radius: 30px;
-  z-index: -1;
-}
-
-.quiz-btn-with-text:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.quiz-btn-with-text .quiz-btn-text {
-  background: linear-gradient(270deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #4895ef);
-  background-size: 400% 400%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientBorder 6s ease infinite;
-}
-
-.quiz-btn-with-text svg {
-  stroke: #f72585;
-  fill: none;
-}
-
-.quiz-btn-with-text:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.dark-mode .quiz-btn-with-text {
-  background: #000000;
-}
-
-.dark-mode .quiz-btn-with-text::after {
-  background: #000000;
-}
-
-@keyframes gradientBorder {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.quiz-btn-text {
-  white-space: nowrap;
-}
-
-.dropdown-arrow {
-  margin-left: 6px;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.quiz-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .dropdown.open .dropdown-arrow {
   transform: rotate(180deg);
 }
 
-/* Menú desplegable */
-.dropdown {
-  position: relative;
-  display: inline-block;
+.dropdown-arrow {
+  transition: transform 0.2s ease;
 }
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--card);
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  z-index: 110;
-  width: 180px;
-  overflow: hidden;
-  margin-top: 8px;
-  animation: dropdownSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dark-mode .dropdown-menu {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-}
-
-@keyframes dropdownSlide {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 6px;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1100;
 }
 
 .dropdown-menu button {
-  width: 100%;
-  padding: 12px 16px;
   text-align: left;
-  background: none;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
   border: none;
-  color: var(--text);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Inter', sans-serif;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-body);
   font-size: 14px;
-  position: relative;
-}
-
-.dropdown-menu button:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: -2px;
-}
-
-.dropdown-menu button::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 3px;
-  background: var(--primary);
-  transform: scaleX(0);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dropdown-menu button:hover::before {
-  transform: scaleX(1);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
 .dropdown-menu button:hover {
-  background-color: rgba(67, 97, 238, 0.1);
-  color: var(--primary);
-  padding-left: 20px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
 }
 
-/* Controles (sonido y modo oscuro) */
+/* Controles */
 .controls-container {
   display: flex;
-  gap: 12px;
   align-items: center;
+  gap: 10px;
 }
 
-/* Switches */
 .vt-switch {
   position: relative;
-  border-radius: 11px;
-  display: block;
-  width: 40px;
-  height: 22px;
-  flex-shrink: 0;
-  border: 1px solid var(--border);
-  transition: border-color 0.25s, background-color 0.25s;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  border: none;
+  background: var(--line);
   cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
 }
 
-.vt-switch:hover {
-  border-color: #a7a4a4;
+.vt-switch.active {
+  background: var(--accent);
 }
 
 .vt-switch-check {
   position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 18px;
-  height: 18px;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background-color: white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  transition: transform 0.25s;
-}
-
-.vt-switch.active .vt-switch-check {
-  transform: translateX(18px);
-}
-
-.vt-switch-icon {
-  position: relative;
-  display: block;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  overflow: hidden;
-}
-
-.vt-switch-icon svg {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 12px;
-  height: 12px;
-  color: #666;
-  fill: currentColor;
-  transition: opacity 0.25s;
-}
-
-/* Modo oscuro para switches */
-.dark-mode .vt-switch {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.dark-mode .vt-switch-check {
-  background-color: black;
-}
-
-.dark-mode .vt-switch-icon svg {
-  color: white;
-}
-
-/* Estados de iconos */
-.vt-switch-sound-off,
-.vt-switch-sound-on,
-.vt-switch-appearance-sun,
-.vt-switch-appearance-moon {
-  transition: opacity 0.25s;
-}
-
-.vt-switch-sound-on,
-.vt-switch-appearance-moon {
-  opacity: 0;
-}
-
-.vt-switch.active .vt-switch-sound-off,
-.vt-switch.active .vt-switch-appearance-sun {
-  opacity: 0;
-}
-
-.vt-switch.active .vt-switch-sound-on,
-.vt-switch.active .vt-switch-appearance-moon {
-  opacity: 1;
-}
-
-.vt-switch-sound.active .vt-switch-sound-on {
-  color: var(--neon-green);
-}
-
-/* Menú móvil */
-.mobile-menu-toggle {
-  background: none;
-  border: none;
-  color: var(--text);
-  width: 40px;
-  height: 40px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--ink-soft);
+  transition: transform 0.2s ease;
+}
+
+.vt-switch.active .vt-switch-check {
+  transform: translateX(20px);
+  color: var(--accent);
+}
+
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--ink);
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.2s;
+  border-radius: var(--radius-sm);
 }
 
 .mobile-menu-toggle:hover {
-  background-color: rgba(67, 97, 238, 0.1);
+  background-color: var(--accent-soft);
 }
 
-.mobile-menu-toggle svg {
-  stroke: currentColor;
+/* Menú móvil: un solo bloque de markup, mostrado por CSS */
+.mobile-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 29, 31, 0.35);
+  z-index: 998;
 }
 
 .mobile-menu {
   position: fixed;
-  top: 5px;
-  right: -100%;
-  width: 220px;
-  background-color: var(--card);
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
-  transition: right 0.3s ease;
+  top: 0;
+  right: -280px;
+  width: 260px;
+  height: 100%;
+  background-color: var(--surface);
+  box-shadow: var(--shadow-lg);
+  transition: right 0.25s ease;
   z-index: 999;
   padding: 20px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .mobile-menu.open {
   right: 0;
 }
 
+.mobile-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobile-menu-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+}
+
 .mobile-menu-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
   background: none;
   border: none;
-  color: var(--text);
-  width: 30px;
-  height: 30px;
+  color: var(--ink-soft);
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border-radius: 50%;
-  transition: background-color 0.2s;
 }
 
 .mobile-menu-close:hover {
-  background-color: rgba(67, 97, 238, 0.1);
+  background-color: var(--accent-soft);
+  color: var(--accent);
 }
 
-.mobile-menu-content {
+.mobile-menu-links {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 25px;
+  gap: 4px;
 }
 
-/* Elementos de control móvil - CON EL CAMBIO SOLICITADO */
+.mobile-menu-links a,
+.mobile-menu-links button {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font-body);
+  cursor: pointer;
+  width: 100%;
+}
+
+.mobile-menu-links a:hover,
+.mobile-menu-links a.router-link-active,
+.mobile-menu-links button:hover {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+
+.mobile-menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.mobile-menu-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  padding: 0 12px;
+}
+
 .mobile-control-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  border-radius: 8px;
-  background-color: var(--control-item-bg);
-  transition: all 0.3s ease;
-}
-
-.dark-mode .mobile-control-item {
-  background-color: #444444;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background-color: var(--paper);
+  border: 1px solid var(--line);
 }
 
 .mobile-control-label {
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  color: var(--text);
+  color: var(--ink);
   font-weight: 500;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .navbar-desktop {
+  .quiz-button-container {
     display: none;
   }
-  
-  .navbar-mobile {
+
+  .mobile-menu-toggle {
     display: flex;
-  }
-  
-  .logo-icon {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .logo-text {
-    font-size: 16px;
-  }
-  
-  .quiz-btn-with-text {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-  
-  .dropdown-menu {
-    width: 160px;
-  }
-  
-  .dropdown-menu button {
-    padding: 10px 14px;
-    font-size: 13px;
-  }
-
-  .mobile-menu {
-    width: 200px;
-    padding: 20px 15px;
-  }
-  
-  .dropdown-menu button:hover {
-    padding-left: 18px;
-  }
-
-    .quiz-button-container {
-    left: 65%;
   }
 }
 
 @media (min-width: 769px) {
-  .mobile-menu {
+  .mobile-menu,
+  .mobile-menu-backdrop {
     display: none;
-  }
-}
-
-/* Accesibilidad */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
   }
 }
 </style>

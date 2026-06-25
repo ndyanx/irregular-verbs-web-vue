@@ -7,10 +7,10 @@
         <!-- Header compacto -->
         <div class="quiz-header">
           <div class="header-left">
-            <h3 id="quiz-title">🌚 Carrera de Verbos</h3>
+            <h3 id="quiz-title">Carrera de Verbos</h3>
             <div class="quiz-stats">
-              <span class="stat-item correct">✅ {{ score }}</span>
-              <span class="stat-item wrong">❌ {{ attempts }}</span>
+              <span class="stat-item correct">{{ score }} correctas</span>
+              <span class="stat-item wrong">{{ attempts }} fallos</span>
             </div>
           </div>
           <button 
@@ -30,7 +30,7 @@
           <!-- Configuración de Participio -->
           <div class="toggle-container">
             <label class="toggle-label">
-              <span class="toggle-text">Incluir Participio</span>
+              <span class="toggle-text">Incluir participio</span>
               <div class="toggle-switch">
                 <input 
                   type="checkbox" 
@@ -67,15 +67,15 @@
               @click="checkAnswer"
               :disabled="timeOver || !userAnswer.trim() || isChecking || answerLock"
             >
-              <span v-if="timeOver">⏰ Tiempo terminado</span>
-              <span v-else>✓ Comprobar</span>
+              <span v-if="timeOver">Tiempo terminado</span>
+              <span v-else>Comprobar</span>
             </button>
             <button 
               v-if="timeOver"
               class="next-btn"
               @click="resetGame"
             >
-              🔄 Reiniciar Juego
+              Reiniciar juego
             </button>
           </div>
           
@@ -98,10 +98,14 @@
 </template>
 
 <script>
-import confetti from 'canvas-confetti';
+import { useConfetti } from '@/composables/useConfetti';
+import '@/assets/game-modal.css';
 
 export default {
   name: 'TimeRaceModal',
+  setup() {
+    return useConfetti();
+  },
   props: {
     show: Boolean,
     verbs: Object,
@@ -147,18 +151,6 @@ export default {
     }
   },
   methods: {
-    launchConfetti() {
-      const canvas = this.$refs.confettiCanvas;
-      const myConfetti = confetti.create(canvas, { 
-        resize: true, 
-        useWorker: true 
-      });
-      myConfetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 }
-      });
-    },
     getFormName(form) {
       return {
         present: 'Presente',
@@ -255,118 +247,10 @@ export default {
 </script>
 
 <style scoped>
-.confetti-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.quiz-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.75);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 12px;
-  box-sizing: border-box;
-}
-
-.quiz-content {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  width: 100%;
-  max-width: 420px;
-  padding: 20px;
-  position: relative;
-  max-height: 90vh;
-  overflow-y: auto;
-  border: 1px solid #e5e7eb;
-}
-
-/* Header optimizado */
-.quiz-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-  gap: 12px;
-}
-
-.header-left {
-  flex: 1;
-  min-width: 0;
-}
-
-.quiz-header h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 6px 0;
-  color: #1f2937;
-  line-height: 1.2;
-}
-
-.quiz-stats {
-  display: flex;
-  gap: 12px;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.stat-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.stat-item.correct {
-  color: #10b981;
-}
-
-.stat-item.wrong {
-  color: #ef4444;
-}
-
-.close-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: #f9fafb;
-  color: #6b7280;
-  flex-shrink: 0;
-}
-
-.close-btn:hover {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-/* Contenido principal */
-.quiz-body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
 /* Toggle switch */
 .toggle-container {
   margin-bottom: 12px;
-  -webkit-tap-highlight-color: transparent; /* Elimina el destello azul */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .toggle-label {
@@ -378,13 +262,13 @@ export default {
 
 .toggle-text {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-light);
 }
 
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 50px;
+  width: 44px;
   height: 24px;
 }
 
@@ -400,7 +284,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #e5e7eb;
+  background-color: var(--line);
   border-radius: 24px;
   transition: .3s;
 }
@@ -412,17 +296,18 @@ export default {
   width: 18px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background-color: var(--surface);
   border-radius: 50%;
   transition: .3s;
+  box-shadow: var(--shadow-sm);
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background-color: #10b981;
+  background-color: var(--accent);
 }
 
 .toggle-switch input:checked + .toggle-slider:before {
-  transform: translateX(26px);
+  transform: translateX(20px);
 }
 
 /* Temporizador */
@@ -432,21 +317,21 @@ export default {
 
 .time-bar {
   height: 8px;
-  background: #e5e7eb;
+  background: var(--line);
   border-radius: 4px;
   overflow: hidden;
 }
 
 .time-left {
   height: 100%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--accent);
   transition: width 1s linear;
 }
 
 .time-text {
   text-align: right;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-light);
   margin-top: 4px;
 }
 
@@ -457,45 +342,23 @@ export default {
   gap: 12px;
 }
 
-.quiz-reference {
-  font-size: 0.95rem;
-  text-align: center;
-  padding: 8px 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 10px;
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-.quiz-question {
-  font-size: 1.1rem;
-  padding: 14px 16px;
-  background: white;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 500;
-  color: #1f2937;
-  line-height: 1.4;
-  border: 1px solid #e5e7eb;
-}
-
 .quiz-input {
   width: 100%;
   padding: 12px 14px;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
   font-size: 1rem;
-  background: #ffffff;
-  color: #1f2937;
+  background: var(--surface);
+  color: var(--ink);
   min-width: 0;
   text-align: center;
+  font-family: var(--font-body);
 }
 
 .quiz-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .quiz-input:disabled {
@@ -506,19 +369,19 @@ export default {
 .quiz-submit {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--accent);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: var(--transition);
 }
 
 .quiz-submit:hover:not(:disabled) {
+  background: var(--accent-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .quiz-submit:disabled {
@@ -529,14 +392,14 @@ export default {
 .next-btn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #10b981, #34d399);
+  background: var(--ink);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: var(--transition);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -544,14 +407,14 @@ export default {
 }
 
 .next-btn:hover {
+  opacity: 0.85;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 /* Feedback */
 .quiz-feedback {
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   text-align: center;
   font-weight: 500;
   font-size: 0.95rem;
@@ -559,15 +422,15 @@ export default {
 }
 
 .quiz-feedback.correct {
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #10b981;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  border: 1px solid var(--accent);
 }
 
 .quiz-feedback.wrong {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #ef4444;
+  background: var(--warn-soft);
+  color: var(--warn);
+  border: 1px solid var(--warn);
 }
 
 /* Responsive */
@@ -582,7 +445,7 @@ export default {
     max-width: none;
     width: 100%;
     padding: 16px;
-    border-radius: 12px;
+    border-radius: var(--radius);
     max-height: calc(100vh - 80px);
   }
   
@@ -608,48 +471,6 @@ export default {
   .quiz-submit, .next-btn {
     padding: 12px;
     font-size: 0.9rem;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .quiz-content {
-    background: #1f2937;
-    border-color: #374151;
-  }
-  
-  .quiz-header h3 {
-    color: #f9fafb;
-  }
-  
-  .quiz-question {
-    background: #1f2937;
-    color: #f9fafb;
-    border-color: #374151;
-  }
-  
-  .quiz-input {
-    background: #1f2937;
-    color: #f9fafb;
-    border-color: #374151;
-  }
-  
-  .close-btn {
-    background: #374151;
-    color: #9ca3af;
-  }
-  
-  .close-btn:hover {
-    background: #dc2626;
-    color: white;
-  }
-  
-  .toggle-slider {
-    background-color: #4b5563;
-  }
-  
-  .time-bar {
-    background-color: #4b5563;
   }
 }
 </style>

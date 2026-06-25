@@ -7,11 +7,11 @@
         <!-- Header compacto -->
         <div class="quiz-header">
           <div class="header-left">
-            <h3 id="quiz-title">🌚 Emparejar Verbos</h3>
+            <h3 id="quiz-title">Emparejar Verbos</h3>
             <div class="quiz-stats">
-              <span class="stat-item correct">✅ {{ score }}</span>
-              <span class="stat-item wrong">❌ {{ attempts }}</span>
-              <span class="stat-item">📊 {{ accuracy }}%</span>
+              <span class="stat-item correct">{{ score }} correctas</span>
+              <span class="stat-item wrong">{{ attempts }} fallos</span>
+              <span class="stat-item">{{ accuracy }}% precisión</span>
             </div>
           </div>
           <button 
@@ -30,7 +30,7 @@
         <div class="quiz-body">
           <!-- Selector de modo de juego -->
           <div class="game-mode-container">
-            <h4 class="mode-title">Modo de juego:</h4>
+            <h4 class="mode-title">Modo de juego</h4>
             <div class="game-mode-selector">
               <button
                 v-for="mode in gameModes"
@@ -39,7 +39,6 @@
                 :class="{ active: gameMode === mode.value }"
                 class="mode-btn"
               >
-                <span class="mode-icon">{{ mode.icon }}</span>
                 <span>{{ mode.label }}</span>
               </button>
             </div>
@@ -64,8 +63,12 @@
                 @click="selectVerb(index)"
               >
                 <div class="verb-text">{{ verb[gameMode] }}</div>
-                <div v-if="feedback && correctIndices.includes(index)" class="card-icon correct-icon">✓</div>
-                <div v-else-if="feedback && selectedVerbs.includes(index)" class="card-icon wrong-icon">✗</div>
+                <div v-if="feedback && correctIndices.includes(index)" class="card-icon correct-icon">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div v-else-if="feedback && selectedVerbs.includes(index)" class="card-icon wrong-icon">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </div>
               </div>
             </div>
           </div>
@@ -76,7 +79,6 @@
             class="next-btn" 
             @click="generateNewQuestion"
           >
-            <span class="btn-icon">🎯</span>
             <span>Siguiente pregunta</span>
           </button>
         </div>
@@ -86,13 +88,17 @@
 </template>
 
 <script>
-import confetti from 'canvas-confetti';
+import { useConfetti } from '@/composables/useConfetti';
+import '@/assets/game-modal.css';
 
 // Modal: Emparejar significados con formas
 // - Permite alternar modo (present/past/participle)
 // - Mide precisión y da feedback visual
 export default {
   name: 'GameMatchModal',
+  setup() {
+    return useConfetti();
+  },
   props: {
     show: Boolean,
     verbs: Object,
@@ -111,9 +117,9 @@ export default {
       gameMode: 'past',
       questionKey: 0,
       gameModes: [
-        { value: 'present', label: 'Presente', icon: '🔄' },
-        { value: 'past', label: 'Pasado', icon: '⏮️' },
-        { value: 'participle', label: 'Participio', icon: '✨' },
+        { value: 'present', label: 'Presente' },
+        { value: 'past', label: 'Pasado' },
+        { value: 'participle', label: 'Participio' },
       ],
     };
   },
@@ -128,19 +134,6 @@ export default {
     }
   },
   methods: {
-    launchConfetti() {
-      const canvas = this.$refs.confettiCanvas;
-      const myConfetti = confetti.create(canvas, { 
-        resize: true, 
-        useWorker: true 
-      });
-      myConfetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 }
-      });
-    },
-
     generateNewQuestion() {
       const verbKeys = Object.keys(this.verbs);
       if (verbKeys.length < 4) return;
@@ -185,7 +178,7 @@ export default {
       this.selectedVerbs = [index];
       this.isCorrect = this.correctIndices.includes(index);
       
-      this.feedback = this.isCorrect ? '¡Correcto! 🎉' : 'Incorrecto, intenta de nuevo.';
+      this.feedback = this.isCorrect ? '¡Correcto!' : 'Incorrecto, intenta de nuevo.';
       
       if (this.isCorrect) {
         this.score++;
@@ -245,122 +238,28 @@ export default {
 </script>
 
 <style scoped>
-.confetti-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.quiz-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.75);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 12px;
-  box-sizing: border-box;
-}
-
+/* Overrides sobre game-modal.css: este modal necesita más ancho y stats que
+   pueden envolver en varias líneas (tiene un stat extra: "precisión") */
 .quiz-content {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  width: 100%;
   max-width: 500px;
-  padding: 20px;
-  position: relative;
-  max-height: 90vh;
-  overflow-y: auto;
-  border: 1px solid #e5e7eb;
-}
-
-/* Header optimizado */
-.quiz-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-  gap: 12px;
-}
-
-.header-left {
-  flex: 1;
-  min-width: 0;
-}
-
-.quiz-header h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 6px 0;
-  color: #1f2937;
-  line-height: 1.2;
 }
 
 .quiz-stats {
-  display: flex;
-  gap: 12px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  flex-wrap: wrap;
 }
 
 .stat-item {
-  color: white;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.stat-item.correct {
-  color: #10b981;
-}
-
-.stat-item.wrong {
-  color: #ef4444;
-}
-
-.close-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: #f9fafb;
-  color: #6b7280;
-  flex-shrink: 0;
-}
-
-.close-btn:hover {
-  background: #fee2e2;
-  color: #dc2626;
+  color: var(--text-light);
 }
 
 /* Contenido principal */
-.quiz-body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
 .game-mode-container {
   margin-bottom: 8px;
 }
 
 .mode-title {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-light);
   margin-bottom: 8px;
   text-align: center;
   font-weight: 500;
@@ -377,50 +276,27 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
-  border: 2px solid #e5e7eb;
-  border-radius: 25px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
   background: transparent;
-  color: #6b7280;
+  color: var(--text-light);
   cursor: pointer;
   font-weight: 500;
   font-size: 0.85rem;
   -webkit-tap-highlight-color: transparent;
+  transition: var(--transition);
 }
 
 .mode-btn:hover {
-  border-color: #818cf8;
-  color: #6366f1;
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .mode-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--accent);
   color: white;
-  border-color: #6366f1;
-}
-
-.quiz-reference {
-  font-size: 0.95rem;
-  text-align: center;
-  padding: 8px 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 10px;
-  font-weight: 500;
-  line-height: 1.3;
-  word-break: break-word;
-}
-
-.quiz-question {
-  font-size: 1.1rem;
-  padding: 14px 16px;
-  background: white;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 500;
-  color: #1f2937;
-  line-height: 1.4;
-  border: 1px solid #e5e7eb;
+  border-color: var(--accent);
 }
 
 /* Grid de verbos */
@@ -443,42 +319,42 @@ export default {
 .verb-card {
   position: relative;
   padding: 16px 12px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   cursor: pointer;
   text-align: center;
-  background: #ffffff;
+  background: var(--surface);
   min-height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: var(--transition);
 }
 
 .verb-card:hover {
-  border-color: #818cf8;
+  border-color: var(--accent);
   transform: translateY(-2px);
 }
 
 .verb-card.selected {
-  border-color: #6366f1;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .verb-card.correct {
-  border-color: #10b981;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .verb-card.wrong {
-  border-color: #ef4444;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(248, 113, 113, 0.1));
+  border-color: var(--warn);
+  background: var(--warn-soft);
 }
 
 .verb-text {
   font-weight: 600;
   font-size: 1rem;
-  color: #1f2937;
+  color: var(--ink);
 }
 
 .card-icon {
@@ -491,17 +367,15 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 0.7rem;
 }
 
 .correct-icon {
-  background: #10b981;
+  background: var(--accent);
   color: white;
 }
 
 .wrong-icon {
-  background: #ef4444;
+  background: var(--warn);
   color: white;
 }
 
@@ -510,26 +384,22 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--accent);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius);
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: var(--transition);
 }
 
 .next-btn:hover {
+  background: var(--accent-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.btn-icon {
-  font-size: 1.1rem;
 }
 
 /* Responsive */
@@ -544,7 +414,7 @@ export default {
     max-width: none;
     width: 100%;
     padding: 16px;
-    border-radius: 12px;
+    border-radius: var(--radius);
     max-height: calc(100vh - 80px);
   }
   
@@ -579,57 +449,6 @@ export default {
   .next-btn {
     padding: 12px;
     font-size: 0.9rem;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .quiz-content {
-    background: #1f2937;
-    border-color: #374151;
-  }
-  
-  .quiz-header h3 {
-    color: #f9fafb;
-  }
-  
-  .quiz-question {
-    background: #1f2937;
-    color: #f9fafb;
-    border-color: #374151;
-  }
-  
-  .verb-card {
-    background: #1f2937;
-    border-color: #374151;
-  }
-  
-  .verb-text {
-    color: #f9fafb;
-  }
-  
-  .close-btn {
-    background: #374151;
-    color: #9ca3af;
-  }
-  
-  .close-btn:hover {
-    background: #dc2626;
-    color: white;
-  }
-  
-  .mode-btn {
-    border-color: #4b5563;
-    color: #d1d5db;
-  }
-  
-  .mode-btn:hover {
-    border-color: #818cf8;
-    color: #818cf8;
-  }
-  
-  .mode-btn.active {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   }
 }
 </style>

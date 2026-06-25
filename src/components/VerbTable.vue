@@ -40,7 +40,7 @@
     
     <div class="table-container">
       <table role="table" aria-label="Tabla de verbos irregulares">
-        <thead class="rainbow-header">
+        <thead class="table-header">
           <tr role="row">
             <th scope="col">Presente</th>
             <th scope="col">Pasado</th>
@@ -379,28 +379,9 @@ h1 {
   text-align: center;
   margin-bottom: 30px;
   font-size: 2.2rem;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
-  background: linear-gradient(
-    270deg,
-    #f72585,
-    #7209b7,
-    #3a0ca3,
-    #4361ee,
-    #4cc9f0,
-    #4895ef,
-    #f72585
-  );
-  background-size: 400% 400%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradientText 6s ease infinite;
-}
-
-@keyframes gradientText {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  color: var(--ink);
 }
 
 .search-container {
@@ -424,8 +405,8 @@ h1 {
 
 .search-input:focus {
   outline: none;
-  border-color: linear-gradient(135deg,#667eea,#764ba2);
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .icon-btn-text {
@@ -436,7 +417,7 @@ h1 {
   border-radius: 30px;
   background: var(--card);
   border: none;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
   color: var(--text);
@@ -478,13 +459,13 @@ h1 {
 .sort-selector:focus,
 .rows-selector:focus {
   outline: none;
-  border-color: linear-gradient(135deg,#667eea,#764ba2);
+  border-color: var(--accent);
 }
 
 .table-container {
   background: var(--card);
   border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   overflow-x: auto;
   margin-bottom: 24px;
   -webkit-overflow-scrolling: touch;
@@ -527,17 +508,17 @@ td {
 }
 
 .clickable-cell:hover {
-  background: rgba(67, 97, 238, 0.1) !important;
-  color: var(--primary);
+  background: var(--accent-soft) !important;
+  color: var(--accent);
 }
 
 .clickable-cell:focus {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
 
 tbody tr:hover td {
-  background: rgba(121, 40, 202, 0.08);
+  background: var(--accent-soft);
 }
 
 .phonetic {
@@ -571,12 +552,12 @@ tbody tr:hover td {
   align-items: center;
   gap: 6px;
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   font-weight: 500;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg,#667eea,#764ba2);
+  background: var(--accent);
   color: white;
   transform: translateY(-1px);
 }
@@ -598,32 +579,13 @@ tbody tr:hover td {
   min-width: 120px;
 }
 
-.rainbow-header {
-  position: relative;
-  z-index: 0;
+.table-header {
+  background: var(--ink);
 }
 
-.rainbow-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(270deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #4895ef, #f72585);
-  background-size: 400% 400%;
-  animation: rainbowBG 6s linear infinite;
-  z-index: -1;
-}
-
-.rainbow-header th {
-  position: relative;
-  background: transparent;
+.table-header th {
   color: white;
-  font-weight: bold;
-  z-index: 1;
-}
-
-@keyframes rainbowBG {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 400% 50%; }
+  font-weight: 600;
 }
 
 /* Responsive Design */

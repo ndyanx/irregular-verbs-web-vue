@@ -1,11 +1,15 @@
 <template>
-  <div :class="['app', { 'dark-mode': settingsStore.darkMode }]">
+  <div class="app">
     <NavBar @open-quiz="showQuiz = $event" />
-    
+
     <main class="home-content">
       <section class="hero">
-        <h1>Aprende <span class="gradient-text">Verbos Irregulares</span></h1>
-        <p class="subtitle">La forma más eficiente de dominar el inglés</p>
+        <span class="eyebrow">Inglés · Verbos irregulares</span>
+        <h1>Domina los verbos irregulares <span class="accent-word">con claridad</span></h1>
+        <p class="subtitle">
+          Tabla completa, pronunciación nativa y tres modos de práctica
+          pensados para que avances a tu ritmo.
+        </p>
         <div class="cta-buttons">
           <router-link to="/verbs" class="btn primary">
             Comenzar ahora
@@ -24,19 +28,19 @@
 
       <section class="features">
         <div v-for="(feature, index) in features" :key="index" class="feature-card">
-          <div class="icon" :style="iconGradient(index)"></div>
+          <div class="icon" v-html="feature.icon"></div>
           <h3>{{ feature.title }}</h3>
           <p>{{ feature.description }}</p>
         </div>
       </section>
     </main>
 
-    <QuizModals 
+    <QuizModals
       :showQuiz="showQuiz"
       :verbs="preparedVerbs"
       @close="showQuiz = null"
     />
-    
+
     <Footer />
   </div>
 </template>
@@ -45,61 +49,42 @@
 import NavBar from '@/components/NavBar.vue';
 import Footer from '@/components/Footer.vue';
 import QuizModals from '@/components/modals/QuizModals.vue';
-import { useSettingsStore } from '@/stores/settings';
-import { useVerbsStore } from '@/stores/verbs';
+import { allVerbs } from '@/data/verbs';
+
+const ICONS = {
+  audio: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9v6a2 2 0 0 0 2 2h3l5 4V3l-5 4H5a2 2 0 0 0-2 2z"></path><path d="M16 12a4.5 4.5 0 0 0-1.5-3.37l.71-.71a5.5 5.5 0 0 1 0 8.16l-.71-.71A4.5 4.5 0 0 0 16 12z"></path></svg>',
+  games: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M7 9v6M4 12h6M15 10h.01M18 13h.01"></path></svg>',
+  progress: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"></path><path d="M7 16l4-6 4 3 5-8"></path></svg>'
+};
 
 export default {
   name: 'HomeView',
   components: { NavBar, QuizModals, Footer },
-  setup() {
-    const settingsStore = useSettingsStore();
-    const verbsStore = useVerbsStore();
-    return { settingsStore, verbsStore };
-  },
   data() {
     return {
-      // verbType: 'all',
       showQuiz: null,
       features: [
         {
-          title: "Pronunciación",
-          description: "Audios nativos + síntesis de voz"
+          title: 'Pronunciación',
+          description: 'Audios nativos con respaldo de síntesis de voz.',
+          icon: ICONS.audio
         },
         {
-          title: "3 Modos de Juego",
-          description: "Aprende practicando"
+          title: 'Tres modos de juego',
+          description: 'Aprende practicando: quiz, emparejar y carrera.',
+          icon: ICONS.games
         },
         {
-          title: "Seguimiento",
-          description: "Monitoriza tu progreso"
+          title: 'Seguimiento',
+          description: 'Monitorea tu progreso mientras avanzas.',
+          icon: ICONS.progress
         }
-      ],
-      gradients: {
-        light: [
-          'linear-gradient(135deg, #41d1ff 0%, #7367ff 100%)',
-          'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',
-          'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'
-        ],
-        dark: [
-          'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-          'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-          'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
-        ]
-      }
+      ]
     };
   },
   computed: {
-    preparedVerbs () {
-      return this.verbsStore.allVerbs;
-    }
-  },
-  methods: {
-    iconGradient(index) {
-      return {
-        background: this.settingsStore.darkMode 
-          ? this.gradients.dark[index]
-          : this.gradients.light[index]
-      };
+    preparedVerbs() {
+      return allVerbs;
     }
   },
   created() {
@@ -110,163 +95,147 @@ export default {
 
 <style scoped>
 .home-content {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1.5rem;
 }
 
-/* Hero: Minimalista con acento de gradiente */
 .hero {
   text-align: center;
-  padding: 4rem 0;
-  margin-bottom: 3rem;
+  padding: 4.5rem 0 3.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.eyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
 }
 
 .hero h1 {
-  font-size: 3.5rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: var(--text);
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 1.25rem;
+  color: var(--ink);
+  max-width: 720px;
 }
 
-.gradient-text {
-  display: inline-block;
-  background-image: linear-gradient(
-    270deg,
-    #f72585,
-    #7209b7,
-    #3a0ca3,
-    #4361ee,
-    #4cc9f0,
-    #4895ef,
-    #f72585
-  );
-  background-size: 400% 400%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: gradientText 6s ease infinite;
-}
-
-@keyframes gradientText {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+.accent-word {
+  color: var(--accent);
 }
 
 .subtitle {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   color: var(--text-light);
-  margin-bottom: 2rem;
+  margin-bottom: 2.25rem;
+  max-width: 520px;
 }
 
-/* Botones: Estilo Vercel pero con hover gradiente */
 .cta-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .btn {
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: var(--transition);
   cursor: pointer;
 }
 
 .btn.primary {
-  background: linear-gradient(90deg, #41d1ff 0%, #7367ff 100%);
+  background: var(--accent);
   color: white;
   border: none;
   text-decoration: none;
 }
 
 .btn.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(65, 209, 255, 0.3);
+  background: var(--accent-dark);
 }
 
 .btn.outline {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
   text-decoration: none;
-  font-size: 0.9rem;
 }
 
 .btn.outline:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
-/* Features: Tarjetas limpias con iconos gradientes */
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
 }
 
 .feature-card {
-  background: var(--card);
-  border-radius: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
   padding: 2rem;
-  text-align: center;
-  border: 1px solid var(--border);
-  transition: transform 0.2s ease;
+  border: 1px solid var(--line);
+  transition: var(--transition);
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow);
 }
 
 .icon {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 1.5rem;
-  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1.25rem;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .feature-card h3 {
-  font-size: 1.25rem;
-  margin-bottom: 0.75rem;
-  color: var(--text);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
 }
 
 .feature-card p {
   color: var(--text-light);
   line-height: 1.6;
+  font-size: 0.9375rem;
 }
 
-/* Modo oscuro: Ajustes sutiles */
-.dark-mode .hero h1 {
-  color: white;
-}
-
-.dark-mode .btn.outline {
-  border-color: var(--border-dark);
-  color: white;
-}
-
-.dark-mode .btn.outline:hover {
-  border-color: var(--primary);
-}
-
-/* Responsive */
 @media (max-width: 768px) {
   .hero {
-    padding: 3rem 0;
+    padding: 3rem 0 2.5rem;
   }
-  
+
+  .hero h1 {
+    font-size: 2.25rem;
+  }
+
   .cta-buttons {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
-  
-  .features {
-    grid-template-columns: 1fr;
+
+  .btn {
+    text-align: center;
   }
 }
 </style>

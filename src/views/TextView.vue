@@ -1,5 +1,5 @@
 <template>
-    <div :class="['app', { 'dark-mode': settingsStore.darkMode }]">
+    <div class="app">
         <NavBar @open-quiz="showQuiz = $event" />
 
         <main class="text-explorer">
@@ -33,7 +33,11 @@
                         @click="analyzeText"
                         :disabled="!inputText.trim() || isAnalyzing"
                     >
-                        {{ isAnalyzing ? "Analizando…" : "Analizar texto" }}
+                        {{
+                            isAnalyzing
+                                ? `Analizando ${prefetchProgress.done}/${prefetchProgress.total}…`
+                                : "Analizar texto"
+                        }}
                     </button>
                 </div>
             </section>
@@ -76,7 +80,7 @@
                                 <span class="ipa" v-if="p.ipa"
                                     >/{{ p.ipa }}/</span
                                 >
-                                <!-- <button class="play-btn" @click="audioStore.playWord(selectedData.word, 'en-US', key)">🔊</button> -->
+                                <!-- Reproducción disponible al hacer clic en la palabra del párrafo -->
                             </div>
                         </div>
                     </div>
@@ -120,8 +124,8 @@
 import NavBar from "@/components/NavBar.vue";
 import Footer from "@/components/Footer.vue";
 import { ref, computed, watch } from "vue";
-import { useSettingsStore } from "@/stores/settings";
 import { useAudioStore } from "@/stores/audio";
+import { useWordFetch } from "@/composables/useWordFetch";
 
 // Vista: Texto interactivo
 // - Tokeniza el párrafo preservando espacios y puntuación
@@ -131,26 +135,21 @@ export default {
     name: "TextView",
     components: { NavBar, Footer },
     setup() {
-        const settingsStore = useSettingsStore();
         const audioStore = useAudioStore();
+        const { fetchWord } = useWordFetch();
 
         const inputText = ref("");
         const tokens = ref([]);
         const isAnalyzing = ref(false);
         const accent = ref(audioStore.currentAccent || "us");
+        const prefetchProgress = ref({ done: 0, total: 0 });
 
         // Mapa palabra(normalizada) -> datos de API
         const wordDataMap = ref({});
         const selectedWord = ref(null);
         const analyzeRunId = ref(0);
 
-        // Control de ritmo de peticiones para evitar saturar la API
-        const PREFETCH_BATCH_SIZE = 8; // nº de palabras por lote
-        const PREFETCH_DELAY_MS = 400; // pausa entre lotes
-
-        function sleep(ms) {
-            return new Promise((resolve) => setTimeout(resolve, ms));
-        }
+        const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
         const selectedData = computed(() => {
             if (!selectedWord.value) return null;
@@ -164,7 +163,7 @@ export default {
         function tokenize(text) {
             const result = [];
             // Divide en grupos de letras/apóstrofos y lo demás como separadores
-            const regex = /([A-Za-z']+)|([^A-Za-z']+)/g;
+            const regex = /([A-Za-z\']+)|([^A-Za-z\']+)/g;
             let match;
             while ((match = regex.exec(text)) !== null) {
                 if (match[1]) {
@@ -184,6 +183,8 @@ export default {
         async function analyzeText() {
             if (!inputText.value.trim()) return;
             isAnalyzing.value = true;
+            wordDataMap.value = {};
+            selectedWord.value = null;
             tokens.value = tokenize(inputText.value);
 
             const unique = Array.from(
@@ -195,37 +196,30 @@ export default {
             );
 
             const currentRun = ++analyzeRunId.value;
+            prefetchProgress.value = { done: 0, total: unique.length };
 
-            // Prefetch en lotes con pausa entre ellos
-            for (let i = 0; i < unique.length; i += PREFETCH_BATCH_SIZE) {
-                const slice = unique.slice(i, i + PREFETCH_BATCH_SIZE);
-                await Promise.all(
-                    slice.map(async (w) => {
-                        try {
-                            if (wordDataMap.value[w] !== undefined) return;
-                            const data = await audioStore.fetchWordData(w);
-                            wordDataMap.value[w] = data;
-                        } catch (e) {
-                            // Si falla, mantenemos null; SpeechSynthesis actuará como fallback
-                            wordDataMap.value[w] = null;
-                        }
-                    }),
-                );
-
-                // Si hay una nueva ejecución, aborta esta
-                if (analyzeRunId.value !== currentRun) {
-                    return;
-                }
-
-                // Pausa entre lotes si aún quedan palabras
-                if (i + PREFETCH_BATCH_SIZE < unique.length) {
-                    await sleep(PREFETCH_DELAY_MS);
-                }
+            // Enviar todas las palabras al backend para que las encole en background.
+            // POST /api/words responde 202 inmediatamente — el scraping ocurre en el servidor
+            // sin bloquear al usuario. Cuando haga clic en una palabra, GET /api/word/:word
+            // ya la encontrará en caché y responderá al instante.
+            try {
+                await fetch(`${VITE_API_BASE_URL}/api/words`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ words: unique }),
+                });
+            } catch {
+                // Si falla el encolado, continuamos igual —
+                // el clic individual hará el fetch bajo demanda
             }
 
-            // Marcar fin sólo si no fue sustituido por otra ejecución
+            // El texto ya está listo para interactuar; quitamos el spinner
             if (analyzeRunId.value === currentRun) {
                 isAnalyzing.value = false;
+                prefetchProgress.value = {
+                    done: unique.length,
+                    total: unique.length,
+                };
                 const firstWord = tokens.value.find((t) => t.type === "word");
                 selectedWord.value = firstWord || null;
             }
@@ -240,15 +234,24 @@ export default {
 
         async function handleWordClick(token) {
             selectedWord.value = token;
+
+            // Si aún no tenemos datos de esta palabra, fetchearla bajo demanda.
+            // El backend ya debería tenerla en caché tras el POST /api/words inicial.
+            if (wordDataMap.value[token.normalized] === undefined) {
+                wordDataMap.value[token.normalized] = await fetchWord(
+                    token.normalized,
+                );
+            }
+
             await audioStore.playWord(token.original, "en-US", accent.value);
         }
 
         return {
-            settingsStore,
             audioStore,
             inputText,
             tokens,
             isAnalyzing,
+            prefetchProgress,
             analyzeText,
             selectedWord,
             selectedData,
@@ -271,10 +274,12 @@ export default {
 }
 
 .title {
-    font-size: 2rem;
+    font-family: var(--font-display);
+    font-size: 1.875rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
     text-align: center;
+    color: var(--ink);
 }
 
 .subtitle {
@@ -327,12 +332,18 @@ export default {
 }
 
 .btn.primary {
-    background: linear-gradient(90deg, #7928ca 0%, #ff0080 100%);
+    background: var(--accent);
     color: #fff;
     border: none;
-    border-radius: 10px;
-    padding: 0.6rem 1rem;
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 1.25rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn.primary:hover:not(:disabled) {
+    background: var(--accent-dark);
 }
 
 .btn.primary:disabled {
@@ -367,12 +378,13 @@ export default {
 }
 
 .word:hover {
-    background: rgba(121, 40, 202, 0.08);
-    color: #7928ca;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
 }
 
 .word.active {
-    background: rgba(121, 40, 202, 0.15);
+    background: var(--accent-soft-strong);
+    color: var(--accent-dark);
 }
 
 .sep {
@@ -428,19 +440,21 @@ export default {
     margin-bottom: 1rem;
 }
 .sense {
-    margin-bottom: 0.5rem;
-    border-top: solid 2px #7928ca;
+    margin-bottom: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--line);
 }
 .stitle {
-    font-weight: bold;
-    color: #1d55af;
+    font-weight: 600;
+    color: var(--accent-dark);
 }
 .definition {
-    font-weight: bold;
-    color: #5f646c;
+    font-weight: 600;
+    color: var(--ink);
 }
 .translation {
-    color: #ff2b94;
+    color: var(--text-light);
+    font-style: italic;
 }
 
 @media (max-width: 900px) {

@@ -1,0 +1,143 @@
+/*
+ * Estilos compartidos por los modales de juego (GameQuizModal, GameMatchModal,
+ * GameRaceModal). Antes este bloque estaba copiado y pegado de forma idéntica
+ * en los tres archivos .vue; cualquier ajuste (colores, paddings, etc.) había
+ * que repetirlo a mano en cada uno. Ahora vive en un solo lugar.
+ *
+ * Se importa con un simple `import '@/assets/game-modal.css';` dentro del
+ * <script> de cada modal, lo que lo aplica como CSS global (no scoped).
+ * Cada modal puede seguir sobreescribiendo cualquier regla en su propio
+ * <style scoped>, ya que el atributo data-v-xxxx que Vue agrega a los
+ * selectores scoped les da más especificidad que estas reglas globales.
+ */
+
+.confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.quiz-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(28, 29, 31, 0.6);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.quiz-content {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.header-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.quiz-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.quiz-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.stat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-item.correct {
+  color: var(--accent);
+}
+
+.stat-item.wrong {
+  color: var(--warn);
+}
+
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  background: var(--paper);
+  color: var(--ink-soft);
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.close-btn:hover {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.quiz-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.quiz-reference {
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 8px 12px;
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.quiz-question {
+  font-size: 1.1rem;
+  padding: 14px 16px;
+  background: var(--paper);
+  border-radius: var(--radius);
+  text-align: center;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.4;
+  border: 1px solid var(--line);
+}
