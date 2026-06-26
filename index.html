@@ -19,6 +19,7 @@
         <meta property="og:image" content="/favicon.ico" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
 
+        <!-- Fuentes: preconnect + carga no bloqueante + font-display para evitar CLS -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -36,7 +37,26 @@
 
         <title>Verbos Irregulares en Inglés</title>
 
+        <!-- CSS crítico inlineado: evita solicitud bloqueante de /assets/index-*.css -->
         <style>
+            /* Fallback fonts con métricas ajustadas para evitar CLS al cargar Sora/Inter */
+            @font-face {
+                font-family: "Sora-fallback";
+                src: local("Arial");
+                size-adjust: 100%;
+                ascent-override: 95%;
+                descent-override: 25%;
+                line-gap-override: 0%;
+            }
+            @font-face {
+                font-family: "Inter-fallback";
+                src: local("Arial");
+                size-adjust: 100%;
+                ascent-override: 90%;
+                descent-override: 22%;
+                line-gap-override: 0%;
+            }
+
             :root {
                 --ink: #1c1d1f;
                 --ink-soft: #5b5e63;
@@ -62,8 +82,8 @@
                 --success: var(--accent);
                 --danger: var(--warn);
                 --warning: #b5482f;
-                --font-display: "Sora", "Inter", sans-serif;
-                --font-body: "Inter", sans-serif;
+                --font-display: "Sora", "Sora-fallback", "Inter", sans-serif;
+                --font-body: "Inter", "Inter-fallback", sans-serif;
                 --radius-sm: 8px;
                 --radius: 12px;
                 --radius-lg: 16px;
