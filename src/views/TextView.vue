@@ -62,7 +62,28 @@
                     </template>
                 </div>
 
-                <aside class="details" v-if="selectedWord">
+                <!--
+                    En mobile, .details se comporta como un bottom sheet:
+                    - .details-backdrop oscurece el fondo y permite cerrar tocando fuera
+                    - El botón "close-btn" y el "drag-handle" permiten cerrar explícitamente
+                    En desktop, .details-backdrop no se renderiza y .details queda
+                    sticky en la columna derecha (ver <style scoped>).
+                -->
+                <div
+                    class="details-backdrop"
+                    v-if="selectedWord"
+                    @click="closeDetails"
+                ></div>
+
+                <aside
+                    class="details"
+                    v-if="selectedWord"
+                    @touchstart="onSheetTouchStart"
+                    @touchmove="onSheetTouchMove"
+                    @touchend="onSheetTouchEnd"
+                    :style="sheetDragStyle"
+                >
+                    <div class="drag-handle" aria-hidden="true"></div>
                     <div class="details-header">
                         <h2 class="details-title">
                             {{ selectedWord.normalized }}
@@ -83,6 +104,14 @@
                                 <!-- Reproducción disponible al hacer clic en la palabra del párrafo -->
                             </div>
                         </div>
+                        <button
+                            class="close-details-btn"
+                            type="button"
+                            aria-label="Cerrar detalles"
+                            @click="closeDetails"
+                        >
+                            ✕
+                        </button>
                     </div>
 
                     <div class="definitions" v-if="selectedData?.entries">
@@ -123,7 +152,7 @@
 <script>
 import NavBar from "@/components/NavBar.vue";
 import Footer from "@/components/Footer.vue";
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onUnmounted } from "vue";
 import { useAudioStore } from "@/stores/audio";
 import { useWordFetch } from "@/composables/useWordFetch";
 
@@ -158,6 +187,21 @@ export default {
 
         watch(accent, (val) => {
             audioStore.currentAccent = val;
+        });
+
+        // Cuando .details actúa como bottom sheet (mobile, <=900px),
+        // bloqueamos el scroll del body para que el gesto de swipe-down
+        // del usuario no termine también scrolleando el párrafo detrás.
+        // En desktop (.details es sticky, no fixed) esto no tiene efecto
+        // visible, pero lo restringimos al breakpoint para no interferir.
+        const MOBILE_BREAKPOINT = "(max-width: 900px)";
+        watch(selectedWord, (val) => {
+            const isMobile = window.matchMedia(MOBILE_BREAKPOINT).matches;
+            if (val && isMobile) {
+                document.body.style.overflow = "hidden";
+            } else {
+                document.body.style.overflow = "";
+            }
         });
 
         function tokenize(text) {
@@ -225,6 +269,63 @@ export default {
             }
         }
 
+        // Cierra el panel de detalles (solo relevante en mobile, donde
+        // .details se comporta como bottom sheet). En desktop el panel
+        // es sticky y permanece a la vista, pero deseleccionar también
+        // es un estado válido (no rompe nada que selectedWord sea null).
+        function closeDetails() {
+            selectedWord.value = null;
+        }
+
+        // --- Swipe-down para cerrar el bottom sheet (solo tiene efecto
+        // visual en mobile, gracias al CSS; en desktop .details no es
+        // "fixed" así que el transform no produce ningún movimiento
+        // perceptible, pero dejamos los handlers activos sin penalidad). ---
+        const dragOffset = ref(0);
+        const isDragging = ref(false);
+        let touchStartY = 0;
+        const SWIPE_CLOSE_THRESHOLD = 90; // px
+
+        const sheetDragStyle = computed(() => {
+            if (!isDragging.value || dragOffset.value <= 0) return {};
+            return {
+                transform: `translateY(${dragOffset.value}px)`,
+                transition: "none",
+            };
+        });
+
+        function onSheetTouchStart(e) {
+            // Solo iniciamos el gesto si el toque empieza cerca del borde
+            // superior del panel (handle/encabezado), para no interferir
+            // con el scroll normal del contenido de detalles.
+            const sheetEl = e.currentTarget;
+            const touchY = e.touches[0].clientY;
+            const sheetTop = sheetEl.getBoundingClientRect().top;
+            if (touchY - sheetTop > 80) return;
+
+            touchStartY = touchY;
+            isDragging.value = true;
+        }
+
+        function onSheetTouchMove(e) {
+            if (!isDragging.value) return;
+            const delta = e.touches[0].clientY - touchStartY;
+            dragOffset.value = Math.max(0, delta);
+        }
+
+        function onSheetTouchEnd() {
+            if (!isDragging.value) return;
+            isDragging.value = false;
+            if (dragOffset.value > SWIPE_CLOSE_THRESHOLD) {
+                closeDetails();
+            }
+            dragOffset.value = 0;
+        }
+
+        onUnmounted(() => {
+            document.body.style.overflow = "";
+        });
+
         function getWordTitle(token) {
             const hasData = !!wordDataMap.value[token.normalized];
             return hasData
@@ -257,6 +358,11 @@ export default {
             selectedData,
             getWordTitle,
             handleWordClick,
+            closeDetails,
+            sheetDragStyle,
+            onSheetTouchStart,
+            onSheetTouchMove,
+            onSheetTouchEnd,
             accent,
         };
     },
@@ -398,6 +504,28 @@ export default {
     padding: 1rem;
     max-height: 70vh;
     overflow: auto;
+    /*
+     * Desktop: el panel se "pega" debajo del NavBar (que es sticky,
+     * top:0, height: var(--header-height)) y se queda a la vista
+     * mientras se hace scroll por el párrafo largo. align-self: start
+     * es necesario porque el grid, por defecto, estira los items a
+     * la altura de la fila (stretch), lo que invalidaría el sticky.
+     */
+    position: sticky;
+    top: calc(var(--header-height) + 1rem);
+    align-self: start;
+}
+
+.drag-handle {
+    display: none;
+}
+
+.close-details-btn {
+    display: none;
+}
+
+.details-backdrop {
+    display: none;
 }
 
 .details-header {
@@ -409,6 +537,7 @@ export default {
 .details-title {
     margin: 0;
     font-size: 1.25rem;
+    flex: 1;
 }
 
 .pronunciations {
@@ -463,12 +592,110 @@ export default {
         justify-items: center;
     }
     .controls,
-    .paragraph,
-    .details {
+    .paragraph {
         width: 100%;
         max-width: 680px;
         margin-left: auto;
         margin-right: auto;
+    }
+
+    /*
+     * Mobile: .details deja de ser parte del flujo del grid y se
+     * convierte en un bottom sheet — un panel que sube desde abajo
+     * sin tapar toda la pantalla, para no perder el contexto del
+     * párrafo que se está leyendo. Se cierra con el botón ✕, tocando
+     * el fondo oscurecido (.details-backdrop), o deslizando hacia
+     * abajo (swipe, implementado en el script).
+     */
+    .details-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(28, 29, 31, 0.5);
+        z-index: 1100;
+        animation: backdrop-in 0.2s ease;
+    }
+
+    .details {
+        display: block;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        width: 100%;
+        max-width: none;
+        max-height: 75vh;
+        margin: 0;
+        border-radius: 20px 20px 0 0;
+        box-shadow: var(--shadow-lg);
+        z-index: 1101;
+        padding: 0.5rem 1.25rem 1.5rem;
+        box-sizing: border-box;
+        animation: sheet-in 0.25s ease;
+        /* Permite que el navegador gestione el swipe-down para cerrar
+           sin interferir con el scroll vertical del contenido */
+        touch-action: pan-y;
+    }
+
+    .drag-handle {
+        display: block;
+        width: 40px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--border);
+        margin: 0.5rem auto 0.75rem;
+    }
+
+    .details-header {
+        align-items: flex-start;
+    }
+
+    .close-details-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        border: none;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent-dark);
+        font-size: 0.95rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .close-details-btn:hover,
+    .close-details-btn:active {
+        background: var(--accent-soft-strong);
+    }
+}
+
+@keyframes sheet-in {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes backdrop-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .details,
+    .details-backdrop {
+        animation: none;
     }
 }
 </style>
