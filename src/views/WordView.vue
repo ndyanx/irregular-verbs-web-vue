@@ -67,7 +67,7 @@
                         v-for="entry in wordData.entries"
                         :key="entry.id"
                     >
-                        <h3>{{ entry.pos }}</h3>
+                        <h2>{{ entry.pos }}</h2>
                         <div v-for="(sense, idx) in entry.senses" :key="idx">
                             <div class="sense">
                                 <p v-if="sense.sense_title" class="stitle">
@@ -463,7 +463,7 @@ export default {
     word-break: break-word;
 }
 
-.definitions h3 {
+.definitions h2 {
     font-family: var(--font-display);
     font-size: 1.25rem;
     font-weight: 600;
@@ -588,7 +588,7 @@ export default {
         white-space: normal;
     }
 
-    .definitions h3 {
+    .definitions h2 {
         font-size: 1.125rem;
     }
 

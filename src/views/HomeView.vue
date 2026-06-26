@@ -36,7 +36,7 @@
                     class="feature-card"
                 >
                     <div class="icon" v-html="feature.icon"></div>
-                    <h3>{{ feature.title }}</h3>
+                    <h2>{{ feature.title }}</h2>
                     <p>{{ feature.description }}</p>
                 </div>
             </section>
@@ -217,7 +217,7 @@ export default {
     color: var(--accent);
 }
 
-.feature-card h3 {
+.feature-card h2 {
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
