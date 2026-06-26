@@ -19,27 +19,11 @@
         <meta property="og:image" content="/favicon.ico" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
 
-        <!-- Fuentes: preconnect + carga no bloqueante + font-display para evitar CLS -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
-            rel="stylesheet"
-            media="print"
-            onload="this.media = 'all'"
-        />
-        <noscript>
-            <link
-                href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
-                rel="stylesheet"
-            />
-        </noscript>
-
         <title>Verbos Irregulares en Inglés</title>
 
-        <!-- CSS crítico inlineado: evita solicitud bloqueante de /assets/index-*.css -->
+        <!-- CSS crítico inlineado: variables, reset y body para la primera pintura -->
         <style>
-            /* Fallback fonts con métricas ajustadas para evitar CLS al cargar Sora/Inter */
+            /* Fallback con métricas ajustadas para evitar CLS al cargar Sora/Inter */
             @font-face {
                 font-family: "Sora-fallback";
                 src: local("Arial");
@@ -82,7 +66,7 @@
                 --success: var(--accent);
                 --danger: var(--warn);
                 --warning: #b5482f;
-                --font-display: "Sora", "Sora-fallback", "Inter", sans-serif;
+                --font-display: "Sora", "Sora-fallback", sans-serif;
                 --font-body: "Inter", "Inter-fallback", sans-serif;
                 --radius-sm: 8px;
                 --radius: 12px;

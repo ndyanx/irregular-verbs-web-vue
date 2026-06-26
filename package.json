@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/sora": "^5.2.8",
     "canvas-confetti": "^1.9.4",
     "pinia": "^3.0.4",
     "sass": "^1.101.0",

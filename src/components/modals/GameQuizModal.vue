@@ -113,7 +113,6 @@
 
 <script>
 import { useConfetti } from "@/composables/useConfetti";
-import "@/assets/game-modal.css";
 
 // Modal: Juego clásico de preguntas
 // - Genera preguntas aleatorias sobre formas verbales

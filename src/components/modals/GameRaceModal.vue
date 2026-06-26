@@ -128,7 +128,6 @@
 
 <script>
 import { useConfetti } from "@/composables/useConfetti";
-import "@/assets/game-modal.css";
 
 export default {
     name: "TimeRaceModal",

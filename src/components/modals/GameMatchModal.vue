@@ -153,7 +153,6 @@
 
 <script>
 import { useConfetti } from "@/composables/useConfetti";
-import "@/assets/game-modal.css";
 
 // Modal: Emparejar significados con formas
 // - Permite alternar modo (present/past/participle)
