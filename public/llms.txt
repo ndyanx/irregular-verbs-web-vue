@@ -1,0 +1,14 @@
+# Verbos Irregulares en Inglés
+
+Sitio web educativo para aprender y practicar los verbos irregulares del inglés.
+
+## Contenido
+
+- [Inicio](https://irregular-verbs-icpnx.pages.dev/): Página principal con tabla de verbos y acceso a los juegos.
+- [Verbos](https://irregular-verbs-icpnx.pages.dev/verbs): Tabla completa de verbos irregulares con pronunciación.
+- [Word Explorer](https://irregular-verbs-icpnx.pages.dev/word): Busca cualquier palabra en inglés y escucha su pronunciación.
+- [Texto interactivo](https://irregular-verbs-icpnx.pages.dev/text): Pega un texto y haz clic en las palabras para ver definiciones y pronunciación.
+
+## Sobre el sitio
+
+Aplicación construida con Vue 3 y Vite. Incluye tres modos de práctica: quiz clásico, emparejamiento y carrera de verbos.
