@@ -1,72 +1,78 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from "vue-router";
+import HomeView from "@/views/HomeView.vue";
 
-// Carga perezosa para mejorar el rendimiento del bundle inicial
-const HomeView = () => import('@/views/HomeView.vue')
-const VerbsView = () => import('@/views/VerbsView.vue')
-const WordView = () => import('@/views/WordView.vue')
-const TextView = () => import('@/views/TextView.vue')
-const NotFoundView = () => import('@/views/NotFoundView.vue')
+// HomeView importado de forma estática — es la ruta inicial y el LCP
+// Las demás rutas siguen siendo lazy para no inflar el bundle inicial
+const VerbsView = () => import("@/views/VerbsView.vue");
+const WordView = () => import("@/views/WordView.vue");
+const TextView = () => import("@/views/TextView.vue");
+const NotFoundView = () => import("@/views/NotFoundView.vue");
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
+    path: "/",
+    name: "home",
     component: HomeView,
     meta: {
-      title: 'Verbos Irregulares en Inglés - Aprende y Practica',
-      description: 'Tabla de verbos irregulares, pronunciación y juegos para practicar.'
-    }
+      title: "Verbos Irregulares en Inglés - Aprende y Practica",
+      description:
+        "Tabla de verbos irregulares, pronunciación y juegos para practicar.",
+    },
   },
   {
-    path: '/verbs',
-    name: 'verbs',
+    path: "/verbs",
+    name: "verbs",
     component: VerbsView,
     meta: {
-      title: 'Lista de Verbos Irregulares - Tabla y Juegos',
-      description: 'Explora la tabla de verbos irregulares y practica con quizzes.'
-    }
+      title: "Lista de Verbos Irregulares - Tabla y Juegos",
+      description:
+        "Explora la tabla de verbos irregulares y practica con quizzes.",
+    },
   },
   {
-    path: '/word',
-    name: 'word',
+    path: "/word",
+    name: "word",
     component: WordView,
     meta: {
-      title: 'Word Explorer - Pronunciación y Ejemplos',
-      description: 'Busca palabras en inglés, escucha su audio y revisa ejemplos.'
-    }
+      title: "Word Explorer - Pronunciación y Ejemplos",
+      description:
+        "Busca palabras en inglés, escucha su audio y revisa ejemplos.",
+    },
   },
   {
-    path: '/text',
-    name: 'text',
+    path: "/text",
+    name: "text",
     component: TextView,
     meta: {
-      title: 'Texto interactivo - Pronunciación por palabras',
-      description: 'Pega un texto y haz clic en palabras para escuchar pronunciación y ver detalles.'
-    }
+      title: "Texto interactivo - Pronunciación por palabras",
+      description:
+        "Pega un texto y haz clic en palabras para escuchar pronunciación y ver detalles.",
+    },
   },
   {
-    path: '/:pathMatch(.*)*',
-    name: 'notfound',
+    path: "/:pathMatch(.*)*",
+    name: "notfound",
     component: NotFoundView,
     meta: {
-      title: 'Página no encontrada',
-      description: 'La página solicitada no existe.'
-    }
-  }
+      title: "Página no encontrada",
+      description: "La página solicitada no existe.",
+    },
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-})
+  routes,
+});
 
 // Actualiza el título y la meta descripción por ruta (SEO básico)
-const DEFAULT_TITLE = 'Verbos Irregulares en Inglés';
-const DEFAULT_DESC = 'Aprende verbos irregulares con tabla, pronunciación y juegos.';
+const DEFAULT_TITLE = "Verbos Irregulares en Inglés";
+const DEFAULT_DESC =
+  "Aprende verbos irregulares con tabla, pronunciación y juegos.";
 router.afterEach((to) => {
   document.title = to.meta?.title || DEFAULT_TITLE;
   const meta = document.querySelector('meta[name="description"]');
-  if (meta) meta.setAttribute('content', to.meta?.description || DEFAULT_DESC);
+  if (meta) meta.setAttribute("content", to.meta?.description || DEFAULT_DESC);
 });
 
-export default router
+export default router;
